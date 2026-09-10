@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- ✅ حماية إضافية -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <title>تسجيل الدخول - شركة العبادي</title>
+    
+    <!-- ✅ Preconnect لتحسين الأداء -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">🏢</div>
+            <h1>شركة العبادي</h1>
+            <p>نظام إدارة المخازن والمبيعات</p>
+        </div>
+
+        <!-- ✅ رسالة الخطأ مع دور ARIA لإمكانية الوصول -->
+        <div id="errorMessage" class="error-message" style="display:none;" role="alert" aria-live="polite">
+            ⚠️ <span id="errorText">خطأ في تسجيل الدخول</span>
+        </div>
+
+        <!-- ✅ تمت إزالة onsubmit - سيتم ربطه في JavaScript -->
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="username">👤 اسم المستخدم</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username"
+                    placeholder="أدخل اسم المستخدم" 
+                    autocomplete="username"
+                    autocapitalize="off"
+                    autocorrect="off"
+                    spellcheck="false"
+                    maxlength="100"
+                    required 
+                    autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">🔑 كلمة المرور</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        placeholder="أدخل كلمة المرور" 
+                        autocomplete="current-password"
+                        maxlength="128"
+                        required>
+                    <button 
+                        type="button" 
+                        class="toggle-password" 
+                        id="togglePasswordBtn"
+                        aria-label="إظهار أو إخفاء كلمة المرور"
+                        aria-pressed="false">👁️</button>
+                </div>
+            </div>
+
+            <div class="login-options">
+                <label>
+                    <input type="checkbox" id="rememberMe"> تذكرني
+                </label>
+                <a href="#" id="forgotPasswordLink" rel="noopener">نسيت كلمة المرور؟</a>
+            </div>
+
+            <!-- ✅ منع النقر المزدوج أثناء التحميل -->
+            <button type="submit" class="btn-login" id="loginBtn">
+                <span id="loginText">🚀 تسجيل الدخول</span>
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>© 2026 شركة العبادي - جميع الحقوق محفوظة</p>
+            <p style="font-size:11px;margin-top:4px;">نظام إدارة المخازن والمبيعات</p>
+        </div>
+    </div>
+
+    <!-- مكتبة Supabase من CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- ملفات المشروع -->
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- ✅ سكربت آمن بدون كشف معلومات حساسة -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // ✅ لا نكشف أي معلومات في الإنتاج
+            const isDevelopment = 
+                window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1' ||
+                window.location.hostname === '';
+            
+            if (isDevelopment) {
+                console.log('🔧 بيئة تطوير - فحص Supabase');
+                console.log('Supabase loaded:', typeof window.supabase !== 'undefined');
+            }
+            
+            // ✅ منع تضمين الصفحة في iframe (حماية إضافية ضد Clickjacking)
+            if (window.self !== window.top) {
+                window.top.location = window.self.location;
+            }
+        })();
+    </script>
+</body>
+</html>

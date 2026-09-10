@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>المبيعات - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           🏢 شركة العبادي - تنسيق المبيعات للموبايل
+           ============================================ */
+
+        :root {
+            --bg: #d9dfe6;
+            --text: #1a1a2e;
+            --border: #a0a8b4;
+            --success: #2e7d32;
+            --danger: #c0392b;
+            --warning: #e67e22;
+            --info: #2196F3;
+            --white: #fff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --radius: 10px;
+            --header-height: 50px;
+            --footer-height: 56px;
+            --search-height: 52px;
+            --sidebar-width: 140px;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Times New Roman', Times, serif;
+            background: #d9dfe6;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== الشريط العلوي ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            min-height: var(--header-height);
+            height: var(--header-height);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            gap: 4px;
+        }
+        .top-bar .store-name { 
+            font-weight: 800; 
+            font-size: 13px; 
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
+        }
+        .top-bar .user-info { 
+            display: flex; 
+            gap: 6px; 
+            align-items: center; 
+            font-size: 10px; 
+            flex-wrap: nowrap;
+        }
+        .top-bar .user-info span { 
+            opacity: 0.9;
+            white-space: nowrap;
+            font-size: 10px;
+        }
+        .top-bar button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 10px;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .top-bar button:hover { background: rgba(255,255,255,0.25); }
+        .top-bar button:active { transform: scale(0.95); }
+
+        /* ===== الحاوية الرئيسية ===== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - var(--header-height) - var(--footer-height) - var(--search-height));
+            height: calc(100dvh - var(--header-height) - var(--footer-height) - var(--search-height));
+            gap: 0;
+        }
+
+        /* ===== الشريط الجانبي الأيمن ===== */
+        .right-sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            padding: 6px 4px;
+            background: #d9dfe6;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-shrink: 0;
+            border-left: 1px solid #c0c7d2;
+            overflow-y: auto;
+        }
+        .right-sidebar .btn-customer {
+            width: 100%;
+            padding: 8px 4px;
+            background: #e07070;
+            border: 2px solid #c05050;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            text-align: center;
+            line-height: 1.2;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right-sidebar .btn-customer:active { transform: scale(0.96); }
+        .right-sidebar .btn-customer.active-customer { background: #4CAF50 !important; border-color: #388E3C !important; }
+        .right-sidebar .btn-customer.primary {
+            background: #4CAF50;
+            font-size: 12px;
+            padding: 10px 4px;
+            border-color: #388E3C;
+            min-height: 44px;
+        }
+        .right-sidebar .btn-customer.info { background: #2196F3; border-color: #1976D2; }
+        .right-sidebar .btn-customer.details { background: #8b5cf6; border-color: #7c3aed; }
+        .right-sidebar .btn-hold {
+            width: 100%;
+            padding: 8px 4px;
+            background: #f59e0b;
+            border: 2px solid #d97706;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            text-align: center;
+            line-height: 1.2;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right-sidebar .btn-hold:active { transform: scale(0.96); }
+        .right-sidebar .btn-held-list {
+            width: 100%;
+            padding: 8px 4px;
+            background: #8b5cf6;
+            border: 2px solid #7c3aed;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            text-align: center;
+            line-height: 1.2;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right-sidebar .btn-held-list:active { transform: scale(0.96); }
+
+        .customer-detail-card {
+            background: #e8f5e9;
+            border: 2px solid #a5d6a7;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            line-height: 1.6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: none;
+        }
+        .customer-detail-card .cancel-link {
+            color: #c0392b;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 4px;
+            display: inline-block;
+            text-decoration: underline;
+            font-size: 10px;
+        }
+
+        .red-x {
+            font-size: 24px;
+            color: #e74c3c;
+            text-align: center;
+            font-weight: 900;
+            line-height: 1;
+            cursor: pointer;
+            user-select: none;
+            text-shadow: 0 2px 10px rgba(231,76,60,0.3);
+            transition: 0.2s;
+            padding: 4px;
+        }
+        .red-x:active { transform: scale(0.9); }
+
+        /* ===== المحتوى المركزي ===== */
+        .center-content {
+            flex: 1;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: #e8ecf1;
+            overflow: hidden;
+        }
+
+        /* ===== رأس الفاتورة ===== */
+        .invoice-header {
+            background: linear-gradient(180deg, #dce3ed, #c7d0de);
+            border: 2px solid #a0a8b4;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+        .invoice-header .header-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .invoice-header .header-row label { 
+            font-weight: 700; 
+            font-size: 10px; 
+            color: #1a1a2e; 
+            white-space: nowrap; 
+        }
+        .invoice-header .header-row input {
+            padding: 3px 6px;
+            border: 2px solid #a0a8b4;
+            border-radius: 6px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 10px;
+            background: white;
+            outline: none;
+            max-width: 100px;
+        }
+        .invoice-header .header-row input:focus { border-color: #7c5cbf; }
+
+        .invoice-number-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            margin-top: 3px;
+        }
+        .invoice-number-row label {
+            font-weight: 700;
+            font-size: 11px;
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+        .invoice-number-row input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 2px solid #f0a500;
+            border-radius: 6px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            background: #fffde7;
+            text-align: center;
+            outline: none;
+            min-width: 80px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            border: 1px solid #c0c7d2;
+            white-space: nowrap;
+        }
+
+        /* ===== جدول الفاتورة ===== */
+        .table-container {
+            flex: 1;
+            border: 2px solid #a0a8b4;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 0;
+        }
+        .table-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #a0a8b4;
+            border-radius: 2px;
+        }
+
+        .pos-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            direction: rtl;
+        }
+        .pos-table thead th {
+            background: linear-gradient(180deg, #dce3ed, #c7d0de);
+            border: 2px solid #8a92a0;
+            padding: 4px 3px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #1a1a2e;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            white-space: nowrap;
+        }
+        .pos-table tbody td {
+            border: 1px solid #a0a8b4;
+            padding: 3px 4px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 11px;
+        }
+        .pos-table tbody tr:hover { background: #f0f2f5; }
+        .pos-table tbody tr.selected { background: #e3ecf7; border-right: 3px solid #2b6cb0; }
+        .pos-table .item-name { text-align: right !important; font-weight: 600; font-size: 11px; }
+        .pos-table .item-total { font-weight: 700; color: #2e7d32; font-size: 12px; }
+        .pos-table .remaining-qty { font-size: 8px; color: #94a3b8; display: block; }
+        .pos-table .out-of-stock-badge {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 700;
+            margin-right: 3px;
+        }
+
+        .qty-input {
+            width: 50px;
+            padding: 3px 4px;
+            border: 2px solid #b0b8c4;
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            outline: none;
+            background: white;
+        }
+        .qty-input:focus { border-color: #7c5cbf; }
+
+        .price-edit {
+            width: 60px;
+            padding: 3px 4px;
+            border: 2px solid #b0b8c4;
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            outline: none;
+            background: white;
+        }
+        .price-edit:focus { border-color: #7c5cbf; }
+        .price-edit.special { border-color: #f59e0b; background: #fffbeb; }
+
+        .delete-btn {
+            background: #e74c3c !important;
+            color: white !important;
+            border: none !important;
+            width: 26px;
+            height: 26px;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            font-size: 12px !important;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .delete-btn:active { transform: scale(0.9); }
+
+        .empty-row td { padding: 30px 10px !important; color: #a0a8b4; font-size: 12px; }
+        .empty-icon { font-size: 40px; display: block; margin-bottom: 8px; }
+
+        /* ===== الشريط الجانبي الأيسر (الخلاصة) ===== */
+        .customer-sidebar {
+            width: 180px;
+            min-width: 180px;
+            padding: 6px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-shrink: 0;
+            border-right: 1px solid #c0c7d2;
+            background: #d9dfe6;
+            overflow-y: auto;
+        }
+
+        .summary-item {
+            text-align: center;
+            background: white;
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid #c0c7d2;
+        }
+        .summary-item label { 
+            display: block; 
+            font-size: 8px; 
+            font-weight: 700; 
+            color: #666; 
+            margin-bottom: 2px; 
+        }
+        .summary-item input {
+            width: 100%;
+            height: 24px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid #d0d5dc;
+            font-family: 'Tajawal', sans-serif;
+            border-radius: 4px;
+            background: #fafbfc;
+            outline: none;
+            padding: 0 4px;
+        }
+        .summary-item input.grand-total {
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 16px;
+            border-color: #4caf50;
+            height: 30px;
+        }
+        .summary-item input.remaining {
+            background: #fff3e0;
+            color: #e65100;
+            border-color: #ff9800;
+        }
+        .summary-item input.previous-debt {
+            background: #f3f4f6;
+            color: #1e40af;
+            border-color: #9ca3af;
+            font-weight: 700;
+        }
+        .summary-item input.current-balance {
+            background: #e0f2fe;
+            color: #1e40af;
+            border-color: #3b82f6;
+            font-weight: 800;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+        .buttons .btn-customer.primary {
+            padding: 8px 4px;
+            font-size: 11px;
+            flex: 1;
+            min-height: 36px;
+        }
+        .buttons .red-x {
+            font-size: 20px;
+            padding: 4px 8px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #processingIndicator {
+            display: none;
+            text-align: center;
+            padding: 4px;
+            background: #f59e0b;
+            color: white;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        /* ===== شريط البحث ===== */
+        .search-bar {
+            background: #c7d0de;
+            padding: 4px 8px;
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+            border-top: 2px solid #a0a8b4;
+            align-items: center;
+            position: relative;
+            min-height: var(--search-height);
+            height: var(--search-height);
+        }
+        .search-bar input, .search-bar select {
+            padding: 6px 10px;
+            border: 2px solid #a0a8b4;
+            border-radius: 16px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            background: white;
+            outline: none;
+            transition: 0.2s;
+            height: 34px;
+        }
+        .search-bar input:focus, .search-bar select:focus { border-color: #7c5cbf; }
+        #barcodeInput { 
+            flex: 1; 
+            min-width: 60px;
+            font-size: 12px;
+        }
+        #categoryFilter { 
+            width: 100px; 
+            min-width: 70px;
+        }
+
+        .search-results {
+            position: absolute;
+            width: 60%;
+            bottom: 110%;
+            left: 4px;
+            background: rgb(12, 12, 14);
+            border: 2px solid #a0a8b4;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .search-results .result-item {
+            padding: 6px 10px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            color: white;
+        }
+        .search-results .result-item:active { background: #1a7c7c; }
+        .search-results .result-item .name { font-weight: 600; }
+        .search-results .result-item .price { font-weight: 700; color: #4CAF50; }
+        .search-results .result-item .stock { font-size: 9px; color: #94a3b8; }
+        .search-results .no-results {
+            padding: 15px;
+            color: #888;
+            text-align: center;
+        }
+
+        /* ===== الشريط السفلي ===== */
+        .bottom-bar {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.7);
+            padding: 0 12px;
+            min-height: var(--footer-height);
+            height: var(--footer-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            flex-shrink: 0;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        .bottom-bar .dev { 
+            color: #f0a500; 
+            font-weight: 700;
+            white-space: nowrap;
+            font-size: 8px;
+        }
+        .bottom-bar span {
+            white-space: nowrap;
+            font-size: 8px;
+        }
+
+        /* ===== التنبيهات ===== */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            animation: slideIn 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            max-width: 90%;
+            text-align: center;
+        }
+        .notification-success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .notification-error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .notification-info { background: #d1ecf1; color: #0c5460; border: 2px solid #bee5eb; }
+        .notification-warning { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ===== المودالات ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-dialog {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-dialog-wide {
+            background: white;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            padding: 10px 14px;
+            border-bottom: 2px solid #e0e4ea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            flex-shrink: 0;
+        }
+        .modal-header h5 { margin: 0; font-size: 14px; font-weight: 800; }
+        .modal-close {
+            background: none; border: none;
+            font-size: 20px; cursor: pointer;
+            font-weight: bold; color: #555;
+            width: 30px; height: 30px;
+            border-radius: 50%; transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:active { background: #e0e0e0; }
+        .modal-search { 
+            padding: 8px 14px; 
+            border-bottom: 1px solid #e0e4ea; 
+        }
+        .modal-search input {
+            width: 100%; 
+            padding: 8px 12px;
+            border: 2px solid #ccc; 
+            border-radius: 20px;
+            font-family: 'Tajawal', sans-serif; 
+            font-size: 12px; 
+            outline: none;
+        }
+        .modal-search input:focus { border-color: #2196F3; }
+        .modal-body { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 12px; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-footer {
+            padding: 8px 12px;
+            border-top: 1px solid #e0e4ea;
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            background: #f8fafc;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #ccc;
+            background: white;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .btn-secondary:active { background: #f1f1f1; transform: scale(0.96); }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .btn-success:active { transform: scale(0.96); }
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .btn-primary:active { transform: scale(0.96); }
+
+        .cust-list-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            background: #fafbfc;
+        }
+        .cust-list-item:active { background: #e3f2fd; border-color: #90caf9; }
+        .select-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            transition: 0.2s;
+        }
+        .select-btn:active { transform: scale(0.95); }
+
+        /* ===== التوافق مع الشاشات الصغيرة جداً ===== */
+        @media (max-width: 480px) {
+            :root {
+                --sidebar-width: 50px;
+                --header-height: 44px;
+                --footer-height: 48px;
+                --search-height: 44px;
+            }
+            
+            .right-sidebar .btn-customer,
+            .right-sidebar .btn-hold,
+            .right-sidebar .btn-held-list {
+                font-size: 8px;
+                padding: 4px 2px;
+                min-height: 28px;
+                border-radius: 4px;
+                border-width: 1px;
+            }
+            .right-sidebar .btn-customer.primary {
+                font-size: 9px;
+                padding: 6px 2px;
+                min-height: 32px;
+            }
+            
+            .customer-sidebar {
+                width: 130px;
+                min-width: 130px;
+                padding: 4px 3px;
+            }
+            .summary-item { padding: 3px 4px; }
+            .summary-item label { font-size: 7px; }
+            .summary-item input { 
+                height: 20px; 
+                font-size: 10px; 
+            }
+            .summary-item input.grand-total { 
+                font-size: 14px; 
+                height: 26px; 
+            }
+            
+            .center-content { padding: 4px 5px; }
+            .invoice-header { padding: 4px 6px; }
+            .invoice-header .header-row input { 
+                max-width: 70px; 
+                font-size: 9px; 
+                padding: 2px 4px;
+            }
+            .invoice-number-row input { 
+                font-size: 10px; 
+                padding: 3px 6px; 
+            }
+            .stat-item { 
+                font-size: 8px; 
+                padding: 2px 6px; 
+            }
+            
+            .pos-table { font-size: 10px; }
+            .pos-table thead th { font-size: 8px; padding: 3px 2px; }
+            .pos-table tbody td { font-size: 10px; padding: 2px 3px; }
+            .qty-input { width: 40px; font-size: 10px; padding: 2px 3px; }
+            .price-edit { width: 48px; font-size: 10px; padding: 2px 3px; }
+            .delete-btn { width: 22px; height: 22px; font-size: 10px; }
+            
+            .search-bar input, .search-bar select { 
+                font-size: 10px; 
+                padding: 4px 8px; 
+                height: 28px;
+            }
+            #barcodeInput { font-size: 11px; }
+            #categoryFilter { width: 70px; min-width: 50px; }
+            
+            .top-bar .store-name { font-size: 11px; max-width: 70px; }
+            .top-bar .user-info span { font-size: 8px; }
+            .top-bar button { font-size: 8px; padding: 3px 6px; }
+            
+            .bottom-bar span { font-size: 7px; }
+            .bottom-bar .dev { font-size: 7px; }
+            
+            .buttons .btn-customer.primary { font-size: 10px; padding: 6px 3px; min-height: 30px; }
+            .buttons .red-x { font-size: 18px; min-height: 30px; padding: 4px 6px; }
+            
+            .modal-dialog { max-width: 95%; }
+            .modal-header h5 { font-size: 13px; }
+        }
+
+        @media (max-width: 380px) {
+            :root {
+                --sidebar-width: 44px;
+                --customer-sidebar-width: 110px;
+            }
+            .customer-sidebar {
+                width: var(--customer-sidebar-width);
+                min-width: var(--customer-sidebar-width);
+            }
+            .customer-sidebar .summary-item input { 
+                font-size: 8px; 
+                height: 18px; 
+            }
+            .customer-sidebar .summary-item input.grand-total { 
+                font-size: 12px; 
+                height: 22px; 
+            }
+        }
+
+        /* ===== وضع الشاشة الأفقية ===== */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .top-bar { min-height: 36px; height: 36px; }
+            .top-bar .store-name { font-size: 11px; }
+            .bottom-bar { min-height: 32px; height: 32px; }
+            .search-bar { min-height: 36px; height: 36px; }
+            .search-bar input, .search-bar select { height: 26px; font-size: 10px; padding: 3px 8px; }
+            .right-sidebar .btn-customer,
+            .right-sidebar .btn-hold,
+            .right-sidebar .btn-held-list { min-height: 24px; font-size: 8px; padding: 3px 2px; }
+            .customer-sidebar .summary-item input { height: 18px; font-size: 9px; }
+            .customer-sidebar .summary-item input.grand-total { height: 22px; font-size: 13px; }
+        }
+
+        /* ===== إخفاء شريط التمرير ===== */
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #a0a8b4; border-radius: 2px; }
+
+        /* ===== طباعة ===== */
+        @media print {
+            .top-bar, .bottom-bar, .search-bar, .right-sidebar, .customer-sidebar {
+                display: none !important;
+            }
+            .main-container { height: auto !important; }
+            .center-content { padding: 10px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== الشريط العلوي ===== -->
+    <div class="top-bar">
+        <div class="store-name">🏪 <span id="storeNameDisplay">شركة العبادي</span></div>
+        <div class="user-info">
+            <span id="userNameDisplay">👤 موظف</span>
+            <button onclick="window.location.href='dashboard.html'">🏠</button>
+            <button onclick="window.location.href='customers.html'">👥</button>
+        </div>
+    </div>
+
+    <!-- ===== الحاوية الرئيسية ===== -->
+    <div class="main-container">
+
+        <!-- ===== الشريط الجانبي الأيمن ===== -->
+        <div class="right-sidebar">
+            <button class="btn-hold" onclick="showHoldInvoiceModal()">⏸️ تأجيل</button>
+            <button class="btn-held-list" onclick="showHeldInvoices()">📋 مؤجلة</button>
+            
+            <button class="btn-customer active-customer" id="customerBtn1" onclick="selectDefaultCustomer()">👤 نقدي</button>
+            <button class="btn-customer info" id="customerBtn2" onclick="openCustomerModal()">🔍 بحث</button>
+            <button class="btn-customer info" id="customerBtn3" onclick="openAddCustomerModal()" style="background:#8b5cf6;border-color:#7c3aed;">➕ جديد</button>
+            <button class="btn-customer details" id="customerBtn4" onclick="showCustomerDetails()" style="display:none;">📋 تفاصيل</button>
+
+            <div class="customer-detail-card" id="customerInfoBox" style="display:none;">
+                <strong>👤:</strong> <span id="custName">-</span><br>
+                <strong>📞:</strong> <span id="custPhone">-</span><br>
+                <strong>🏷️:</strong> <span id="custType">-</span><br>
+                <strong>💎 خصم:</strong> <span id="custDiscount">0</span>%
+                <br><span class="cancel-link" onclick="clearSelectedCustomer()">✕ إلغاء</span>
+            </div>
+        </div>
+
+        <!-- ===== المحتوى المركزي ===== -->
+        <div class="center-content">
+            <!-- رأس الفاتورة -->
+            <div class="invoice-header">
+                <div class="header-row">
+                    <label>📅</label>
+                    <input type="date" id="invoiceDate">
+                    <input type="time" id="invoiceTime">
+                    <div class="stat-item">📦 <strong id="totalItemsCount">0</strong></div>
+                    <div class="stat-item">🔢 <strong id="totalQuantity">0</strong></div>
+                </div>
+                <div class="invoice-number-row">
+                    <label>🧾 رقم:</label>
+                    <input type="text" id="invoiceNumber" value="" readonly>
+                </div>
+            </div>
+
+            <!-- جدول الفاتورة -->
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table class="pos-table" id="invoiceTable">
+                        <thead>
+                            <tr>
+                                <th style="width:28px;">#</th>
+                                <th style="text-align:right;">الصنف</th>
+                                <th style="width:60px;">السعر</th>
+                                <th style="width:60px;">الكمية</th>
+                                <th style="width:65px;">الإجمالي</th>
+                                <th style="width:30px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceTableBody">
+                            <tr class="empty-row">
+                                <td colspan="6">
+                                    <span class="empty-icon">🛒</span>
+                                    السلة فارغة
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== الشريط الجانبي الأيسر (الخلاصة) ===== -->
+        <div class="customer-sidebar">
+            <div class="summary-item">
+                <label>🧾 الإجمالي</label>
+                <input type="text" id="totalAmount" class="grand-total" value="0" readonly>
+            </div>
+            <div class="summary-item">
+                <label>💵 مدفوع</label>
+                <input type="number" id="paidAmount" value="0" step="0.01" oninput="updateTotals()">
+            </div>
+            <div class="summary-item">
+                <label>⚠️ متبقي</label>
+                <input type="text" id="remainingAmount" class="remaining" value="0" readonly>
+            </div>
+            <div class="summary-item" style="background:#f3f4f6;border-color:#9ca3af;">
+                <label style="color:#1e40af;">📜 رصيد سابق</label>
+                <input type="text" id="customerDebt" class="previous-debt" value="0" readonly>
+            </div>
+            <div class="summary-item" style="background:#e0f2fe;border-color:#3b82f6;">
+                <label style="color:#1e40af;">💰 الرصيد الحالي</label>
+                <input type="text" id="currentBalance" class="current-balance" value="0" readonly>
+            </div>
+            <div class="buttons">
+                <button class="btn-customer primary" onclick="processSale()" id="btnSaveSale">✅ حفظ</button>
+                <div class="red-x" onclick="handleRefresh()" title="تحديث">🔄</div>
+            </div>
+            <div id="processingIndicator">⏳ جاري المعالجة...</div>
+        </div>
+    </div>
+
+    <!-- ===== شريط البحث ===== -->
+    <div class="search-bar">
+        <select id="categoryFilter">
+            <option value="all">📂 الكل</option>
+        </select>
+        <input type="text" id="barcodeInput" placeholder="📱 ابحث عن منتج..." autofocus>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- ===== الشريط السفلي ===== -->
+    <div class="bottom-bar">
+        <span>© 2026 شركة العبادي</span>
+        <span class="dev">نظام إدارة المخازن</span>
+        <span id="bottomDateTime">🕐</span>
+    </div>
+
+    <!-- ===== مودال العملاء ===== -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h5>🔍 بحث عن عميل</h5>
+                <button class="modal-close" onclick="closeModal('customerModal')">✕</button>
+            </div>
+            <div class="modal-search">
+                <input type="text" id="modalCustomerSearch" placeholder="ابحث بالاسم أو الهاتف..." oninput="filterCustomersModal()">
+            </div>
+            <div class="modal-body" id="modalCustomerList"></div>
+        </div>
+    </div>
+
+    <!-- ===== مودال إضافة عميل ===== -->
+    <div class="modal-overlay" id="addCustomerModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h5>➕ إضافة عميل جديد</h5>
+                <button class="modal-close" onclick="closeModal('addCustomerModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:10px;">
+                    <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;">اسم العميل *</label>
+                    <input type="text" id="newCustomerName" style="width:100%;padding:8px 12px;border:2px solid #e2e8f0;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:13px;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;">رقم الهاتف</label>
+                    <input type="text" id="newCustomerPhone" style="width:100%;padding:8px 12px;border:2px solid #e2e8f0;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:13px;">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label style="display:block;font-weight:600;font-size:12px;margin-bottom:3px;">العنوان</label>
+                    <textarea id="newCustomerAddress" rows="2" style="width:100%;padding:8px 12px;border:2px solid #e2e8f0;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('addCustomerModal')">إلغاء</button>
+                <button class="btn-success" onclick="saveNewCustomer()">💾 حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== مودال تفاصيل العميل ===== -->
+    <div class="modal-overlay" id="customerDetailsModal">
+        <div class="modal-dialog-wide">
+            <div class="modal-header" style="background:#8b5cf6;">
+                <h5 style="color:white;">📋 تفاصيل العميل - <span id="detailsCustomerName">-</span></h5>
+                <button class="modal-close" onclick="closeModal('customerDetailsModal')" style="color:white;">✕</button>
+            </div>
+            <div class="modal-body" id="customerDetailsContent">
+                <p style="text-align:center;color:#888;padding:20px;">⏳ جاري التحميل...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('customerDetailsModal')">إغلاق</button>
+                <button class="btn-primary" onclick="printCustomerDetails()">🖨️ طباعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== مودال التأكيد ===== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-header" style="background:#f59e0b;">
+                <h5 style="color:white;">⚠️ تأكيد</h5>
+                <button class="modal-close" onclick="closeModal('confirmModal')" style="color:white;">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align:center;font-size:15px;padding:10px;" id="confirmModalMessage">هل أنت متأكد؟</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
+                <button class="btn-primary" id="confirmModalOkBtn">تأكيد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== مودال اختيار الوحدة ===== -->
+    <div class="modal-overlay" id="unitSelectModal">
+        <div class="modal-dialog" style="max-width: 380px;">
+            <div class="modal-header" style="background: #3b82f6;">
+                <h5 style="color:white;">📦 اختيار وحدة المنتج</h5>
+                <button class="modal-close" onclick="closeModal('unitSelectModal')" style="color:white;">✕</button>
+            </div>
+            <div class="modal-body" id="unitSelectContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== نافذة الطباعة ===== -->
+    <div id="printArea" class="print-section" style="display:none;"></div>
+
+    <!-- ===== تحميل الملفات ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sales.js"></script>
+</body>
+</html>

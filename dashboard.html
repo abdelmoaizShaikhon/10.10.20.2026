@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لوحة التحكم - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <span class="user-name" id="userName">👤 مدير النظام</span>
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="index.html" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="welcome-section">
+                <h2>📊 لوحة التحكم</h2>
+                <p>مرحباً بك في شركة العبادي - نظام إدارة المخازن والمبيعات</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="todaySales">0 ج.م</span>
+                        <span class="stat-label">مبيعات اليوم</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalProducts">0</span>
+                        <span class="stat-label">إجمالي المنتجات</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalCustomers">0</span>
+                        <span class="stat-label">إجمالي العملاء</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🧾</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalInvoices">0</span>
+                        <span class="stat-label">عدد الفواتير</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h4>📈 المبيعات الشهرية</h4>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>📊 توزيع المنتجات</h4>
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

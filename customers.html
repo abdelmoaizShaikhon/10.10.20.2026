@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>العملاء - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/customers.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <span class="user-name" id="userName">👤 مدير النظام</span>
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html" class="active">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="#" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>👤 إدارة العملاء</h2>
+                <button class="btn-add" onclick="openCustomerModal()">➕ عميل جديد</button>
+            </div>
+
+            <!-- ✅ إحصائيات العملاء -->
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalCustomers">0</span>
+                    <span class="stat-mini-label">إجمالي العملاء</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalDebt">0 ج.م</span>
+                    <span class="stat-mini-label">إجمالي المستحقات</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalPaid">0 ج.م</span>
+                    <span class="stat-mini-label">إجمالي المدفوع</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalSales">0</span>
+                    <span class="stat-mini-label">عدد الفواتير</span>
+                </div>
+            </div>
+
+            <!-- ✅ شريط البحث والفلترة -->
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 بحث عن عميل..." oninput="filterCustomers()">
+                <select id="typeFilter" onchange="filterCustomers()">
+                    <option value="all">جميع الأنواع</option>
+                    <option value="عادي">عادي</option>
+                    <option value="مميز">مميز</option>
+                    <option value="خاص">خاص</option>
+                </select>
+            </div>
+
+            <!-- ✅ قائمة العملاء -->
+            <div class="customers-list" id="customersList">
+                <div class="empty-state">
+                    <div class="empty-icon">👤</div>
+                    <p>جاري تحميل العملاء...</p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- ✅ نافذة إضافة/تعديل عميل -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customerModalTitle">➕ عميل جديد</h3>
+                <button class="modal-close" onclick="closeModal('customerModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editCustomerId">
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label>اسم العميل *</label>
+                        <input type="text" id="customerName" placeholder="اسم العميل">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>رقم الهاتف</label>
+                            <input type="text" id="customerPhone" placeholder="رقم الهاتف">
+                        </div>
+                        <div class="form-group">
+                            <label>النوع</label>
+                            <select id="customerType">
+                                <option value="عادي">عادي</option>
+                                <option value="مميز">مميز</option>
+                                <option value="خاص">خاص</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>نسبة الخصم</label>
+                            <input type="number" id="customerDiscount" value="0" step="0.5" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>الرصيد الافتتاحي</label>
+                            <input type="number" id="customerBalance" value="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان</label>
+                        <textarea id="customerAddress" rows="2" placeholder="العنوان"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('customerModal')">إلغاء</button>
+                <button class="btn-success" onclick="saveCustomer()">💾 حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ نافذة تفاصيل العميل -->
+    <div class="modal-overlay" id="customerDetailsModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header" style="background:#3b82f6;">
+                <h3 style="color:white;">📋 تفاصيل العميل</h3>
+                <button class="modal-close" onclick="closeModal('customerDetailsModal')" style="color:white;">✕</button>
+            </div>
+            <div class="modal-body" id="customerDetailsContent">
+                <p style="text-align:center;padding:20px;color:#94a3b8;">جاري التحميل...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('customerDetailsModal')">إغلاق</button>
+                <button class="btn-primary" onclick="window.print()">🖨️ طباعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ نافذة إضافة دفعة -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header" style="background:#d1fae5;">
+                <h3 style="color:#059669;">💵 إضافة دفعة من العميل</h3>
+                <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>العميل</label>
+                    <input type="text" id="payCustomerName" readonly style="background:#f8fafc;font-weight:700;">
+                </div>
+                <div class="form-group">
+                    <label>المبلغ المستحق</label>
+                    <input type="text" id="payCurrentDebt" readonly style="background:#fee2e2;color:#dc2626;font-weight:700;">
+                </div>
+                <div class="form-group">
+                    <label>المبلغ المدفوع *</label>
+                    <input type="number" id="payAmount" step="0.01" min="0.01" placeholder="أدخل المبلغ" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>طريقة الدفع</label>
+                        <select id="payMethod">
+                            <option value="نقدي">💰 نقدي</option>
+                            <option value="بطاقة">💳 بطاقة</option>
+                            <option value="تحويل بنكي">🏦 تحويل بنكي</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات</label>
+                    <textarea id="payNote" rows="2" placeholder="ملاحظات إضافية"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('paymentModal')">إلغاء</button>
+                <button class="btn-success" onclick="addPayment()">✅ تأكيد الدفع</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ نافذة تأكيد الحذف -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header" style="background:#fef3c7;">
+                <h3>⚠️ تأكيد الحذف</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذا العميل؟</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
+                <button class="btn-danger" onclick="deleteCustomer()">🗑️ حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/customers.js"></script>
+</body>
+</html>

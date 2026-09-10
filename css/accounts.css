@@ -1,0 +1,67 @@
+/* ============================================
+   💰 تنسيق الحسابات - شركة العبادي
+   ============================================ */
+
+.accounts-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.account-card {
+    background: var(--card);
+    padding: 16px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+}
+
+.account-icon {
+    font-size: 28px;
+}
+
+.account-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-value {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.account-label {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+@media (max-width: 600px) {
+    .accounts-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* تفاصيل المعاملات */
+.detail-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.detail-card {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex: 1;
+    min-width: 150px;
+}
+
+.detail-card p {
+    margin: 4px 0;
+    font-size: 13px;
+}

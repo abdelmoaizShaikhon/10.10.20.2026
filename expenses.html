@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المصروفات - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/expenses.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html" class="active">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="#" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>🧾 إدارة المصروفات</h2>
+                <button class="btn-add" onclick="openExpenseModal()">➕ مصروف جديد</button>
+            </div>
+
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalExpenses">0 ج.م</span>
+                    <span class="stat-mini-label">إجمالي المصروفات</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="monthExpenses">0 ج.م</span>
+                    <span class="stat-mini-label">مصروفات الشهر</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="todayExpenses">0 ج.م</span>
+                    <span class="stat-mini-label">مصروفات اليوم</span>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="🔍 بحث..." oninput="filterExpenses()">
+                <select id="typeFilter" onchange="filterExpenses()">
+                    <option value="all">جميع الأنواع</option>
+                    <option value="مصروفات مجمعه">مصروفات مجمعه</option>
+                </select>
+                <select id="monthFilter" onchange="filterExpenses()">
+                    <option value="all">كل الشهور</option>
+                </select>
+            </div>
+
+            <div class="expenses-list" id="expensesList">
+                <div class="empty-state">
+                    <div class="empty-icon">🧾</div>
+                    <p>جاري تحميل المصروفات...</p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/expenses.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الإعدادات - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html" class="active">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="#" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>⚙️ الإعدادات</h2>
+            </div>
+
+            <div class="settings-container">
+                <!-- إعدادات الشركة -->
+                <div class="settings-card">
+                    <h3>🏢 معلومات الشركة</h3>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>اسم الشركة</label>
+                            <input type="text" id="companyName" value="شركة العبادي">
+                        </div>
+                        <div class="form-group">
+                            <label>العنوان</label>
+                            <input type="text" id="companyAddress" placeholder="عنوان الشركة">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>الهاتف</label>
+                                <input type="text" id="companyPhone" placeholder="رقم الهاتف">
+                            </div>
+                            <div class="form-group">
+                                <label>البريد الإلكتروني</label>
+                                <input type="email" id="companyEmail" placeholder="البريد الإلكتروني">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات العملة والضرائب -->
+                <div class="settings-card">
+                    <h3>💰 العملة والضرائب</h3>
+                    <div class="settings-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>عملة النظام</label>
+                                <select id="currency">
+                                    <option value="ج.م">جنيه مصري (ج.م)</option>
+                                    <option value="$">دولار ($)</option>
+                                    <option value="€">يورو (€)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نسبة الضريبة (%)</label>
+                                <input type="number" id="taxRate" value="14" step="0.5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات الطباعة -->
+                <div class="settings-card">
+                    <h3>🖨️ إعدادات الطباعة</h3>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>حجم الورق</label>
+                            <select id="paperSize">
+                                <option value="80mm">80 مم</option>
+                                <option value="58mm">58 مم</option>
+                                <option value="A4">A4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>نسخ الطباعة</label>
+                            <input type="number" id="printCopies" value="1" min="1" max="5">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات النسخ الاحتياطي -->
+                <div class="settings-card">
+                    <h3>💾 النسخ الاحتياطي</h3>
+                    <div class="settings-actions">
+                        <button class="btn-primary" onclick="backupData()">📦 إنشاء نسخة احتياطية</button>
+                        <button class="btn-success" onclick="restoreData()">🔄 استعادة نسخة</button>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button class="btn-success" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المستخدمين - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/users.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <span class="user-name" id="userName">👤 مدير النظام</span>
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html" class="active">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="#" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>👥 إدارة المستخدمين</h2>
+                <button class="btn-add" onclick="openUserModal()">➕ مستخدم جديد</button>
+            </div>
+
+            <!-- ✅ إحصائيات المستخدمين -->
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalUsers">0</span>
+                    <span class="stat-mini-label">إجمالي المستخدمين</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="activeUsers">0</span>
+                    <span class="stat-mini-label">نشط</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="inactiveUsers">0</span>
+                    <span class="stat-mini-label">غير نشط</span>
+                </div>
+            </div>
+
+            <!-- ✅ قائمة المستخدمين -->
+            <div class="users-list" id="usersList">
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <p>جاري تحميل المستخدمين...</p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- ✅ نافذة إضافة/تعديل مستخدم -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">➕ مستخدم جديد</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editUserId">
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label>اسم المستخدم *</label>
+                        <input type="text" id="userUsername" placeholder="اسم المستخدم" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الاسم الكامل *</label>
+                        <input type="text" id="userFullName" placeholder="الاسم الكامل" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الدور</label>
+                            <select id="userRole">
+                                <option value="user">مستخدم</option>
+                                <option value="cashier">كاشير</option>
+                                <option value="accountant">محاسب</option>
+                                <option value="manager">مدير</option>
+                                <option value="admin">مدير النظام</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>الحالة</label>
+                            <select id="userStatus">
+                                <option value="true">نشط</option>
+                                <option value="false">غير نشط</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور <span id="passRequired">*</span></label>
+                        <input type="password" id="userPassword" placeholder="كلمة المرور">
+                        <small id="userPasswordHint" style="display:none;color:var(--text-light);">اتركه فارغاً إذا كنت لا تريد تغيير كلمة المرور</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('userModal')">إلغاء</button>
+                <button class="btn-success" onclick="saveUser()">💾 حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ نافذة تأكيد الحذف -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header" style="background:#fef3c7;">
+                <h3>⚠️ تأكيد الحذف</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذا المستخدم؟</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
+                <button class="btn-danger" id="confirmDeleteBtn" onclick="deleteUser()">🗑️ حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/users.js"></script>
+</body>
+</html>

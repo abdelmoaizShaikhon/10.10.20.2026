@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المنتجات - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/products.css">
+</head>
+<body>
+    <div id="app">
+        <!-- شريط التنقل العلوي -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏢</span>
+                <span class="brand-name">شركة العبادي</span>
+            </div>
+            <div class="nav-actions">
+                <span class="user-name" id="userName">👤 مدير النظام</span>
+                <button class="btn-nav" onclick="toggleSidebar()">☰</button>
+            </div>
+        </nav>
+
+        <!-- القائمة الجانبية -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>القائمة الرئيسية</h3>
+                <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="nav-icon">📊</span> لوحة التحكم
+                </a>
+                <a href="sales.html">
+                    <span class="nav-icon">🛒</span> نقطة البيع
+                </a>
+                <a href="products.html" class="active">
+                    <span class="nav-icon">📦</span> المنتجات
+                </a>
+                <a href="purchases.html">
+                    <span class="nav-icon">🚚</span> المشتريات
+                </a>
+                <a href="customers.html">
+                    <span class="nav-icon">👤</span> العملاء
+                </a>
+                <a href="suppliers.html">
+                    <span class="nav-icon">🏢</span> الموردين
+                </a>
+                <a href="accounts.html">
+                    <span class="nav-icon">💰</span> الحسابات
+                </a>
+                <a href="expenses.html">
+                    <span class="nav-icon">🧾</span> المصروفات
+                </a>
+                <a href="reports.html">
+                    <span class="nav-icon">📈</span> التقارير
+                </a>
+                <a href="users.html">
+                    <span class="nav-icon">👥</span> المستخدمين
+                </a>
+                <a href="settings.html">
+                    <span class="nav-icon">⚙️</span> الإعدادات
+                </a>
+                <a href="#" onclick="logout()">
+                    <span class="nav-icon">🚪</span> تسجيل الخروج
+                </a>
+            </nav>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2>📦 إدارة المنتجات (الأخشاب)</h2>
+                <button class="btn-add" onclick="openAddModal()">➕ إضافة صنف جديد</button>
+            </div>
+
+            <!-- شريط البحث -->
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 بحث عن صنف..." oninput="filterProducts()">
+                <select id="categoryFilter" onchange="filterProducts()">
+                    <option value="all">جميع الفئات</option>
+                </select>
+                <button class="btn-refresh" onclick="loadProducts()">🔄</button>
+            </div>
+
+            <!-- إحصائيات سريعة -->
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalProducts">0</span>
+                    <span class="stat-mini-label">إجمالي الأصناف</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalPieces">0</span>
+                    <span class="stat-mini-label">إجمالي القطع</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-value" id="totalVolume">0 م³</span>
+                    <span class="stat-mini-label">إجمالي الحجم</span>
+                </div>
+            </div>
+
+            <!-- قائمة المنتجات -->
+            <div class="products-grid" id="productsList">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <p>جاري تحميل المنتجات...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- شريط التنقل السفلي -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">الرئيسية</span>
+            </a>
+            <a href="sales.html">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">بيع</span>
+            </a>
+            <a href="products.html" class="active">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">مخزن</span>
+            </a>
+            <a href="purchases.html">
+                <span class="nav-icon">🚚</span>
+                <span class="nav-label">مشتريات</span>
+            </a>
+            <a href="reports.html">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">تقارير</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- نافذة إضافة/تعديل صنف -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ إضافة صنف جديد</h3>
+                <button class="modal-close" onclick="closeModal('productModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editProductId">
+                <div class="modal-form">
+                    <!-- الباركود واسم الصنف -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الباركود</label>
+                            <input type="text" id="productBarcode" placeholder="الباركود" onkeyup="searchBarcode()">
+                        </div>
+                        <div class="form-group">
+                            <label>اسم الصنف *</label>
+                            <input type="text" id="productName" placeholder="اسم الصنف" required>
+                        </div>
+                    </div>
+
+                    <!-- الفئة والعدد -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الفئة</label>
+                            <input type="text" id="productCategory" placeholder="نوع الخشب (موسكي، زان، ...)">
+                        </div>
+                        <div class="form-group">
+                            <label>العدد *</label>
+                            <input type="number" id="productQuantity" placeholder="العدد" step="1" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- أبعاد الخشب (الطول × العرض × السمك) -->
+                    <div class="form-group" style="background: #f0f7ff; padding: 12px; border-radius: 8px; border: 2px solid #3b82f6;">
+                        <label style="color: #1e40af; font-weight: 800;">📐 أبعاد الخشب (التكعيب)</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>الطول (سم)</label>
+                                <input type="number" id="productLength" placeholder="الطول" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>العرض (سم)</label>
+                                <input type="number" id="productWidth" placeholder="العرض" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>السمك (سم)</label>
+                                <input type="number" id="productThickness" placeholder="السمك" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label>الحجم الإجمالي (متر مكعب)</label>
+                            <input type="text" id="productVolume" readonly style="background: #e8f0fe; font-weight: 700; color: #1e40af;">
+                            <small style="color: #64748b;">يتم حسابه تلقائياً: (الطول × العرض × السمك × العدد) / 1,000,000</small>
+                        </div>
+                    </div>
+
+                    <!-- الأسعار -->
+                    <div class="form-group" style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 2px solid #10b981;">
+                        <label style="color: #059669; font-weight: 800;">💰 الأسعار</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>سعر الشراء للوحدة</label>
+                                <input type="number" id="productBuyPrice" placeholder="سعر الشراء" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>سعر المتر المكعب</label>
+                                <input type="number" id="productPricePerMeter" placeholder="سعر المتر المكعب" step="0.01" min="0" oninput="calculateSellPrice()">
+                            </div>
+                            <div class="form-group">
+                                <label>سعر اللوح (القطعة)</label>
+                                <input type="number" id="productPricePerPiece" placeholder="سعر اللوح" step="0.01" min="0" oninput="calculateSellPrice()">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>الوحدة</label>
+                                <select id="productUnit">
+                                    <option value="قطعة">قطعة</option>
+                                    <option value="متر مكعب">متر مكعب</option>
+                                    <option value="لوح">لوح</option>
+                                    <option value="طقم">طقم</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>سعر البيع النهائي *</label>
+                                <input type="number" id="productSellPrice" placeholder="سعر البيع" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- معلومات إضافية -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الحد الأدنى للمخزون</label>
+                            <input type="number" id="productMinQty" placeholder="الحد الأدنى" step="1" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>موقع التخزين</label>
+                            <input type="text" id="productLocation" placeholder="موقع التخزين">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ملاحظات</label>
+                        <textarea id="productNotes" rows="2" placeholder="ملاحظات إضافية (نوع الخشب، المصدر، ...)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('productModal')">إلغاء</button>
+                <button class="btn-success" onclick="saveProduct()">💾 حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تأكيد الحذف -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header" style="background:#fef3c7;">
+                <h3>⚠️ تأكيد الحذف</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذا المنتج؟</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
+                <button class="btn-danger" id="confirmDeleteBtn" onclick="deleteProduct()">🗑️ حذف</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/products.js"></script>
+</body>
+</html>

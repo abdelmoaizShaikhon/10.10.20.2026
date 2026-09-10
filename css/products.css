@@ -1,0 +1,124 @@
+/* ============================================
+   📦 تنسيق المنتجات - شركة العبادي
+   ============================================ */
+
+.products-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.product-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.product-card:active {
+    transform: scale(0.98);
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.product-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.product-details {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--success);
+    font-size: 14px;
+}
+
+.product-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.product-actions button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.btn-edit {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.btn-edit:hover {
+    background: #bfdbfe;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+}
+
+/* نماذج الإضافة */
+.modal-form .form-group {
+    margin-bottom: 12px;
+}
+
+.modal-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: var(--text-light);
+}
+
+.modal-form input,
+.modal-form select,
+.modal-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: var(--transition);
+    background: white;
+    color: var(--text);
+}
+
+.modal-form input:focus,
+.modal-form select:focus,
+.modal-form textarea:focus {
+    border-color: var(--info);
+}
+
+.modal-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+@media (max-width: 480px) {
+    .modal-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}

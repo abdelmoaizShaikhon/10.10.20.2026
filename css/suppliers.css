@@ -1,0 +1,60 @@
+/* ============================================
+   🏢 تنسيق الموردين - شركة العبادي
+   ============================================ */
+
+.suppliers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.supplier-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.supplier-card:active {
+    transform: scale(0.98);
+}
+
+.supplier-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.supplier-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.supplier-details {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.supplier-balance {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--warning);
+}
+
+.supplier-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.supplier-actions button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition);
+}
