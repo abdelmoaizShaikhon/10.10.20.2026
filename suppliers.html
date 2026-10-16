@@ -6,7 +6,539 @@
     <title>الموردين - شركة العبادي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/suppliers.css">
+
+    <style>
+        :root {
+            --primary: #0f3d3e;
+            --primary-dark: #0a2e2f;
+            --accent: #14b8a6;
+            --accent-light: #5eead4;
+            --ceramic-blue: #0891b2;
+            --gold: #d4af37;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --bg: #f0f4f4;
+            --card: #ffffff;
+            --border: #d1d9d9;
+            --text: #0f3d3e;
+            --text-light: #64748b;
+            --radius: 12px;
+            --shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ============ الجدول ============ */
+        .table-wrapper {
+            background: var(--card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 0 16px 16px;
+        }
+        .table-scroll { max-height: 500px; overflow-y: auto; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1000px; }
+        thead { position: sticky; top: 0; z-index: 5; }
+        thead th {
+            background: #e8f0ef;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            color: var(--primary);
+        }
+        tbody td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+            white-space: nowrap;
+        }
+        tbody tr:hover { background: #f0f5f4; }
+
+        .badge { padding: 4px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; }
+        .badge-paid { background: #d1fae5; color: #059669; }
+        .badge-unpaid { background: #fee2e2; color: #dc2626; }
+        .badge-partial { background: #ffedd5; color: #d97706; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            transition: 0.2s;
+            margin: 1px;
+            white-space: nowrap;
+        }
+        .btn-view { background: #e0f2fe; color: #1e40af; }
+        .btn-view:hover { background: #bae6fd; }
+        .btn-pay { background: #d1fae5; color: #059669; }
+        .btn-pay:hover { background: #a7f3d0; }
+        .btn-refund { background: #fef3c7; color: #92400e; }
+        .btn-refund:hover { background: #fde68a; }
+        .btn-print { background: #fef3c7; color: #92400e; }
+        .btn-print:hover { background: #fde68a; }
+        .btn-edit { background: #e0f2f1; color: #0f766e; }
+        .btn-edit:hover { background: #b2dfdb; }
+        .btn-delete { background: #fee2e2; color: #dc2626; }
+        .btn-delete:hover { background: #fecaca; }
+
+        /* ============ إحصائيات ============ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 16px;
+        }
+        .stat-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .stat-card .number { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
+        .stat-card .label { font-size: 12px; color: var(--text-light); }
+        .stat-card .number.blue { color: var(--ceramic-blue); }
+        .stat-card .number.green { color: var(--success); }
+        .stat-card .number.red { color: var(--danger); }
+        .stat-card .number.orange { color: var(--warning); }
+
+        /* ============ شريط الفلترة ============ */
+        .filter-bar {
+            background: var(--card);
+            padding: 15px;
+            border-radius: var(--radius);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 0 16px 16px;
+        }
+        .filter-bar input, .filter-bar select {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s;
+            background: #fafbfc;
+        }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); background: white; }
+        .filter-bar input { flex: 1; min-width: 200px; }
+        .filter-bar select { min-width: 140px; }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .btn-add:hover { background: #0d9488; }
+
+        .btn-print-debt {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .btn-print-debt:hover { background: #dc2626; }
+
+        /* ============ النوافذ ============ */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15, 61, 62, 0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: modalIn 0.25s ease;
+        }
+        .modal-sm { max-width: 420px; }
+        .modal-lg { max-width: 1000px; }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 14px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .modal-header h3 { margin: 0; font-size: 16px; font-weight: 800; }
+        .modal-close {
+            background: none; border: none;
+            font-size: 22px; cursor: pointer;
+            width: 32px; height: 32px;
+            border-radius: 50%; transition: 0.2s;
+        }
+        .modal-close:hover { background: #e2e8f0; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+            background: #f8fafc;
+        }
+
+        /* ============ الأزرار ============ */
+        .btn-primary, .btn-success, .btn-secondary, .btn-danger, .btn-warning {
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+            border: none;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #0d9488; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-secondary { background: #e2e8f0; color: var(--text); }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--gold); color: white; }
+        .btn-warning:hover { background: #b8962e; }
+
+        /* ============ الحقول ============ */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            background: #fafbfc;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ============ إشعارات ============ */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            font-family: 'Tajawal', sans-serif;
+        }
+        .notif-success { background: #d1fae5; color: #059669; }
+        .notif-error { background: #fee2e2; color: #dc2626; }
+        .notif-info { background: #e0f2f1; color: #0f766e; }
+        .notif-warning { background: #fef3c7; color: #92400e; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ============ تفاصيل المورد ============ */
+        .detail-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+        .detail-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 250px;
+        }
+        .detail-card h4 {
+            border-right: 4px solid var(--accent);
+            padding-right: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .detail-item { display: flex; margin-bottom: 6px; font-size: 13px; }
+        .detail-item .lbl { width: 100px; font-weight: 600; color: var(--text-light); }
+        .detail-item .val { flex: 1; }
+
+        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .summary-mini {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .summary-mini .big { font-size: 20px; font-weight: 800; }
+        .summary-mini .sml { font-size: 10px; color: var(--text-light); }
+
+        /* ============================================
+           تحسينات الموبايل الشاملة
+           ============================================ */
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .table-wrapper { margin: 0 12px 12px; }
+            .filter-bar { margin: 0 12px 12px; }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px !important;
+                text-align: center;
+            }
+            .page-header h2 { font-size: 18px !important; }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 12px;
+            }
+            .stat-card { padding: 12px 8px; border-radius: 10px; }
+            .stat-card .number { font-size: 18px; }
+            .stat-card .label { font-size: 10px; }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+                margin: 0 12px 12px;
+            }
+            .filter-bar input,
+            .filter-bar select {
+                width: 100%;
+                padding: 12px 14px;
+                font-size: 14px;
+                min-width: unset;
+            }
+            .filter-bar .btn-add,
+            .filter-bar .btn-print-debt {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* الجدول → بطاقات */
+            .table-wrapper {
+                margin: 0 12px 12px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                overflow: visible;
+            }
+            .table-scroll { max-height: none; overflow: visible; }
+            table { min-width: unset; width: 100%; display: block; }
+            thead { display: none; }
+            tbody { display: block; }
+            tbody tr {
+                display: block;
+                background: var(--card);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 14px;
+                box-shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+                border: 1px solid var(--border);
+                position: relative;
+            }
+
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px dashed #e2e8f0;
+                text-align: right !important;
+                white-space: normal !important;
+                font-size: 13px;
+                min-height: 36px;
+            }
+            tbody td:last-child {
+                border-bottom: none;
+                padding-top: 12px;
+                margin-top: 6px;
+                border-top: 2px solid #f1f5f9;
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: center;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-light);
+                font-size: 12px;
+                flex-shrink: 0;
+                margin-left: 10px;
+            }
+            tbody td[data-label="#"] { display: none; }
+
+            tbody td[data-label="اسم المورد"] {
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--primary);
+                border-bottom: 2px solid #f1f5f9;
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+            }
+            tbody td[data-label="الحالة"] {
+                position: absolute;
+                top: 14px;
+                left: 14px;
+                border: none;
+                padding: 0;
+                min-height: unset;
+            }
+            tbody td[data-label="الحالة"]::before { display: none; }
+
+            .btn-action {
+                padding: 8px 14px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 60px;
+            }
+
+            /* النوافذ */
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 92vh;
+                border-radius: 20px 20px 0 0;
+                animation: slideUpMobile 0.3s ease;
+            }
+            @keyframes slideUpMobile {
+                from { transform: translateY(100%); }
+                to   { transform: translateY(0); }
+            }
+            .modal-header {
+                padding: 14px 16px;
+                border-radius: 20px 20px 0 0;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .modal-header h3 { font-size: 15px; }
+            .modal-body { padding: 16px; }
+            .modal-footer {
+                padding: 12px 16px;
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+            .modal-footer button { width: 100%; padding: 12px; font-size: 14px; }
+
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .form-group { margin-bottom: 12px; }
+            .form-group label { font-size: 13px; margin-bottom: 6px; }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+
+            .detail-row { flex-direction: column; gap: 12px; }
+            .detail-card { min-width: 100%; padding: 12px; }
+            .summary-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .summary-mini { padding: 10px 6px; }
+            .summary-mini .big { font-size: 16px; }
+
+            #supplierDetailsContent table { min-width: 600px; }
+
+            .notification {
+                top: auto;
+                bottom: 80px;
+                left: 12px;
+                right: 12px;
+                transform: none;
+                text-align: center;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .bottom-nav { display: flex !important; }
+        }
+
+        @media (max-width: 380px) {
+            .stat-card .number { font-size: 16px; }
+            .stat-card .label { font-size: 9px; }
+            .btn-action { font-size: 11px; padding: 7px 10px; min-width: 55px; }
+            .page-header h2 { font-size: 16px !important; }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -27,119 +559,100 @@
                 <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html">
-                    <span class="nav-icon">📊</span> لوحة التحكم
-                </a>
-                <a href="sales.html">
-                    <span class="nav-icon">🛒</span> نقطة البيع
-                </a>
-                <a href="products.html">
-                    <span class="nav-icon">📦</span> المنتجات
-                </a>
-                <a href="purchases.html">
-                    <span class="nav-icon">🚚</span> المشتريات
-                </a>
-                <a href="customers.html">
-                    <span class="nav-icon">👤</span> العملاء
-                </a>
-                <a href="suppliers.html" class="active">
-                    <span class="nav-icon">🏢</span> الموردين
-                </a>
-                <a href="accounts.html">
-                    <span class="nav-icon">💰</span> الحسابات
-                </a>
-                <a href="expenses.html">
-                    <span class="nav-icon">🧾</span> المصروفات
-                </a>
-                <a href="reports.html">
-                    <span class="nav-icon">📈</span> التقارير
-                </a>
-                <a href="users.html">
-                    <span class="nav-icon">👥</span> المستخدمين
-                </a>
-                <a href="settings.html">
-                    <span class="nav-icon">⚙️</span> الإعدادات
-                </a>
-                <a href="#" onclick="logout()">
-                    <span class="nav-icon">🚪</span> تسجيل الخروج
-                </a>
+                <a href="dashboard.html"><span class="nav-icon">📊</span> لوحة التحكم</a>
+                <a href="sales.html"><span class="nav-icon">🛒</span> نقطة البيع</a>
+                <a href="products.html"><span class="nav-icon">📦</span> المنتجات</a>
+                <a href="purchases.html"><span class="nav-icon">🚚</span> المشتريات</a>
+                <a href="customers.html"><span class="nav-icon">👤</span> العملاء</a>
+                <a href="suppliers.html" class="active"><span class="nav-icon">🏢</span> الموردين</a>
+                <a href="accounts.html"><span class="nav-icon">💰</span> الحسابات</a>
+                <a href="expenses.html"><span class="nav-icon">🧾</span> المصروفات</a>
+                <a href="reports.html"><span class="nav-icon">📈</span> التقارير</a>
+                <a href="users.html"><span class="nav-icon">👥</span> المستخدمين</a>
+                <a href="settings.html"><span class="nav-icon">⚙️</span> الإعدادات</a>
+                <a href="#" onclick="logout()"><span class="nav-icon">🚪</span> تسجيل الخروج</a>
             </nav>
         </aside>
 
         <main class="main-content">
-            <div class="page-header">
-                <h2>🏢 إدارة الموردين</h2>
+            <div class="page-header" style="padding:16px;">
+                <h2 style="font-size:20px;font-weight:800;">🏢 إدارة الموردين</h2>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="number blue" id="totalSuppliers">0</div>
+                    <div class="label">عدد الموردين</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number orange" id="totalDebt">0 ج.م</div>
+                    <div class="label">إجمالي المستحقات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number green" id="totalPaid">0 ج.م</div>
+                    <div class="label">إجمالي المدفوع</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number red" id="totalPurchases">0</div>
+                    <div class="label">عدد فواتير الشراء</div>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="🔍 بحث باسم المورد أو الهاتف أو الشركة..." oninput="filterSuppliers()">
+                <select id="debtFilter" onchange="filterSuppliers()">
+                    <option value="all">جميع الموردين</option>
+                    <option value="debt">عليه مستحقات</option>
+                    <option value="clear">مدفوع بالكامل</option>
+                </select>
                 <button class="btn-add" onclick="openSupplierModal()">➕ مورد جديد</button>
+                <button class="btn-print-debt" onclick="printDebtSuppliers()">🖨️ طباعة المستحقين</button>
             </div>
 
-            <!-- ✅ إحصائيات الموردين -->
-            <div class="stats-mini">
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalSuppliers">0</span>
-                    <span class="stat-mini-label">إجمالي الموردين</span>
-                </div>
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalDebt">0 ج.م</span>
-                    <span class="stat-mini-label">إجمالي المستحقات</span>
-                </div>
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalPaid">0 ج.م</span>
-                    <span class="stat-mini-label">إجمالي المدفوع</span>
-                </div>
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalPurchases">0</span>
-                    <span class="stat-mini-label">عدد فواتير الشراء</span>
-                </div>
-            </div>
-
-            <!-- ✅ شريط البحث -->
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="🔍 بحث عن مورد..." oninput="filterSuppliers()">
-            </div>
-
-            <!-- ✅ قائمة الموردين -->
-            <div class="suppliers-list" id="suppliersList">
-                <div class="empty-state">
-                    <div class="empty-icon">🏢</div>
-                    <p>جاري تحميل الموردين...</p>
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم المورد</th>
+                                <th>الشركة</th>
+                                <th>الهاتف</th>
+                                <th>الرصيد الافتتاحي</th>
+                                <th>المشتريات</th>
+                                <th>المدفوع</th>
+                                <th>المتبقي</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTable">
+                            <tr><td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">⏳ جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="dashboard.html">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">الرئيسية</span>
-            </a>
-            <a href="sales.html">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">بيع</span>
-            </a>
-            <a href="products.html">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">مخزن</span>
-            </a>
-            <a href="purchases.html">
-                <span class="nav-icon">🚚</span>
-                <span class="nav-label">مشتريات</span>
-            </a>
-            <a href="reports.html">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">تقارير</span>
-            </a>
+            <a href="dashboard.html"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></a>
+            <a href="sales.html"><span class="nav-icon">🛒</span><span class="nav-label">بيع</span></a>
+            <a href="products.html"><span class="nav-icon">📦</span><span class="nav-label">مخزن</span></a>
+            <a href="purchases.html"><span class="nav-icon">🚚</span><span class="nav-label">مشتريات</span></a>
+            <a href="reports.html"><span class="nav-icon">📈</span><span class="nav-label">تقارير</span></a>
         </nav>
     </div>
 
-    <!-- ✅ نافذة إضافة/تعديل مورد -->
+    <!-- نافذة إضافة/تعديل مورد -->
     <div class="modal-overlay" id="supplierModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="supplierModalTitle">➕ مورد جديد</h3>
-                <button class="modal-close" onclick="closeModal('supplierModal')">✕</button>
+            <div class="modal-header" style="background: linear-gradient(135deg, #0f766e, #14b8a6);">
+                <h3 id="supplierModalTitle" style="color:white;">➕ مورد جديد</h3>
+                <button class="modal-close" onclick="closeModal('supplierModal')" style="color:white;">✕</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editSupplierId">
-                <div class="modal-form">
+                <div class="form-row">
                     <div class="form-group">
                         <label>اسم المورد *</label>
                         <input type="text" id="supplierName" placeholder="اسم المورد">
@@ -148,20 +661,20 @@
                         <label>اسم الشركة</label>
                         <input type="text" id="supplierCompany" placeholder="اسم الشركة">
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>رقم الهاتف</label>
-                            <input type="text" id="supplierPhone" placeholder="رقم الهاتف">
-                        </div>
-                        <div class="form-group">
-                            <label>الرصيد الافتتاحي</label>
-                            <input type="number" id="supplierBalance" value="0" step="0.01">
-                        </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="supplierPhone" placeholder="رقم الهاتف">
                     </div>
                     <div class="form-group">
-                        <label>العنوان</label>
-                        <textarea id="supplierAddress" rows="2" placeholder="العنوان"></textarea>
+                        <label>الرصيد الافتتاحي</label>
+                        <input type="number" id="supplierBalance" value="0" step="0.01">
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <textarea id="supplierAddress" rows="2" placeholder="العنوان"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -171,11 +684,11 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة تفاصيل المورد -->
+    <!-- نافذة تفاصيل المورد -->
     <div class="modal-overlay" id="supplierDetailsModal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header" style="background:#8b5cf6;">
-                <h3 style="color:white;">📋 تفاصيل المورد</h3>
+        <div class="modal-content modal-lg">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0f3d3e, #0f766e);">
+                <h3 style="color:white;">📋 تقرير المورد</h3>
                 <button class="modal-close" onclick="closeModal('supplierDetailsModal')" style="color:white;">✕</button>
             </div>
             <div class="modal-body" id="supplierDetailsContent">
@@ -183,19 +696,20 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('supplierDetailsModal')">إغلاق</button>
-                <button class="btn-primary" onclick="window.print()">🖨️ طباعة</button>
+                <button class="btn-warning" onclick="window.print()">🖨️ طباعة</button>
             </div>
         </div>
     </div>
 
-    <!-- ✅ نافذة إضافة دفعة -->
+    <!-- نافذة إضافة دفعة -->
     <div class="modal-overlay" id="paymentModal">
-        <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-content modal-sm">
             <div class="modal-header" style="background:#d1fae5;">
                 <h3 style="color:#059669;">💵 إضافة دفعة للمورد</h3>
                 <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="paySupplierId">
                 <div class="form-group">
                     <label>المورد</label>
                     <input type="text" id="paySupplierName" readonly style="background:#f8fafc;font-weight:700;">
@@ -206,43 +720,42 @@
                 </div>
                 <div class="form-group">
                     <label>المبلغ المدفوع *</label>
-                    <input type="number" id="payAmount" step="0.01" min="0.01" placeholder="أدخل المبلغ" required>
+                    <input type="number" id="payAmount" step="0.01" min="0.01" placeholder="أدخل المبلغ">
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>طريقة الدفع</label>
-                        <select id="payMethod">
-                            <option value="نقدي">💰 نقدي</option>
-                            <option value="تحويل بنكي">🏦 تحويل بنكي</option>
-                            <option value="شيك">📋 شيك</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>طريقة الدفع</label>
+                    <select id="payMethod">
+                        <option value="نقدي">💰 نقدي</option>
+                        <option value="تحويل بنكي">🏦 تحويل بنكي</option>
+                        <option value="شيك">📋 شيك</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>ملاحظات</label>
-                    <textarea id="payNote" rows="2" placeholder="ملاحظات إضافية"></textarea>
+                    <textarea id="payNote" rows="2" placeholder="ملاحظات"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('paymentModal')">إلغاء</button>
-                <button class="btn-success" onclick="addPayment()">✅ تأكيد الدفع</button>
+                <button class="btn-success" onclick="addPayment()">✅ تأكيد</button>
             </div>
         </div>
     </div>
 
-    <!-- ✅ نافذة تأكيد الحذف -->
+    <!-- نافذة تأكيد الحذف (مستويين) -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content modal-sm">
-            <div class="modal-header" style="background:#fef3c7;">
-                <h3>⚠️ تأكيد الحذف</h3>
-                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+            <div class="modal-header" id="confirmModalHeader" style="background:#fef3c7;">
+                <h3 id="confirmModalTitle">⚠️ تأكيد الحذف</h3>
+                <button class="modal-close" id="confirmModalClose" onclick="closeModal('confirmModal')">✕</button>
             </div>
             <div class="modal-body">
-                <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذا المورد؟</p>
+                <p style="text-align:center;font-size:15px;line-height:1.7;" id="confirmMessage">هل أنت متأكد؟</p>
+                <div id="confirmExtraInfo" style="display:none;margin-top:15px;"></div>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
-                <button class="btn-danger" onclick="deleteSupplier()">🗑️ حذف</button>
+                <button class="btn-danger" id="confirmDeleteBtn" onclick="deleteSupplier()">🗑️ حذف</button>
             </div>
         </div>
     </div>
@@ -252,6 +765,785 @@
     <script src="js/db.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/suppliers.js"></script>
+
+    <script>
+    // ============================================
+    // المتغيرات العامة
+    // ============================================
+    let allSuppliers = [];
+    let filteredSuppliers = [];
+    let allPurchases = [];
+    let supplierToDelete = null;
+    let deleteStage = 0;
+
+    // ============================================
+    // بدء التشغيل
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (typeof checkAuth === 'function') await checkAuth();
+        await loadPurchases();
+        await loadSuppliers();
+        await loadStats();
+    });
+
+    // ============================================
+    // دوال مساعدة
+    // ============================================
+    function formatNum(num) {
+        if (num === undefined || num === null) return '0';
+        const n = Number(num);
+        return isNaN(n) ? '0' : n.toLocaleString('en-EG');
+    }
+
+    function showNotification(msg, type = 'info') {
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+
+        const div = document.createElement('div');
+        div.className = `notification notif-${type}`;
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => {
+            div.style.opacity = '0';
+            div.style.transition = '0.3s';
+            setTimeout(() => div.remove(), 300);
+        }, 2800);
+    }
+
+    // ============================================
+    // تحميل البيانات
+    // ============================================
+    async function loadPurchases() {
+        try {
+            const { data, error } = await supabase.from('purchases').select('*');
+            if (error) throw error;
+            allPurchases = data || [];
+        } catch (err) {
+            console.warn('لا يمكن تحميل المشتريات:', err.message);
+            allPurchases = [];
+        }
+    }
+
+    async function loadSuppliers() {
+        try {
+            const { data, error } = await supabase
+                .from('suppliers')
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+
+            allSuppliers = data || [];
+            filteredSuppliers = [...allSuppliers];
+            renderSuppliers(filteredSuppliers);
+        } catch (err) {
+            console.error('خطأ في تحميل الموردين:', err);
+            document.getElementById('suppliersTable').innerHTML = `
+                <tr><td colspan="10" style="text-align:center;padding:40px;color:#dc2626;">
+                    ⚠️ حدث خطأ: ${err.message}
+                </td></tr>`;
+        }
+    }
+
+    async function loadStats() {
+        try {
+            const totalSuppliersCount = allSuppliers.length;
+            let totalDebt = 0;
+            let totalPaid = 0;
+
+            allSuppliers.forEach(s => {
+                const remaining = getSupplierRemaining(s.id);
+                if (remaining > 0) totalDebt += remaining;
+                totalPaid += getSupplierTotalPaid(s.id);
+            });
+
+            document.getElementById('totalSuppliers').textContent = totalSuppliersCount;
+            document.getElementById('totalDebt').textContent = formatNum(totalDebt) + ' ج.م';
+            document.getElementById('totalPaid').textContent = formatNum(totalPaid) + ' ج.م';
+            document.getElementById('totalPurchases').textContent = allPurchases.length;
+        } catch (err) {
+            console.error('خطأ في الإحصائيات:', err);
+        }
+    }
+
+    // ============================================
+    // حسابات المورد
+    // ============================================
+    function getSupplierTotalPurchases(supplierId) {
+        return allPurchases
+            .filter(p => p.supplier_id == supplierId)
+            .reduce((sum, p) => sum + (Number(p.total_amount) || 0), 0);
+    }
+
+    function getSupplierTotalPaid(supplierId) {
+        return allPurchases
+            .filter(p => p.supplier_id == supplierId)
+            .reduce((sum, p) => sum + (Number(p.paid_amount) || 0), 0);
+    }
+
+    function getSupplierRemaining(supplierId) {
+        const s = allSuppliers.find(x => x.id == supplierId);
+        const balance = s ? (Number(s.balance) || 0) : 0;
+        return balance + getSupplierTotalPurchases(supplierId) - getSupplierTotalPaid(supplierId);
+    }
+
+    function getSupplierPurchasesCount(supplierId) {
+        return allPurchases.filter(p => p.supplier_id == supplierId).length;
+    }
+
+    // ============================================
+    // عرض الموردين
+    // ============================================
+    function renderSuppliers(list) {
+        const tbody = document.getElementById('suppliersTable');
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#94a3b8;">لا يوجد موردين</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = list.map((s, i) => {
+            const supplierId = s.id;
+            const total = getSupplierTotalPurchases(supplierId);
+            const paid = getSupplierTotalPaid(supplierId);
+            const remaining = getSupplierRemaining(supplierId);
+            const statusClass = remaining <= 0 ? 'badge-paid' : (paid > 0 ? 'badge-partial' : 'badge-unpaid');
+            const statusText = remaining <= 0 ? '✅ مدفوع' : (paid > 0 ? '⏳ جزئي' : '❌ غير مدفوع');
+            const safeName = (s.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            return `<tr>
+                <td data-label="#">${i + 1}</td>
+                <td data-label="اسم المورد" style="font-weight:700;">${s.name || 'بدون اسم'}</td>
+                <td data-label="الشركة">${s.company_name || '-'}</td>
+                <td data-label="الهاتف">${s.phone || '-'}</td>
+                <td data-label="الرصيد الافتتاحي" style="color:var(--warning);font-weight:600;">${formatNum(s.balance || 0)} ج.م</td>
+                <td data-label="المشتريات" style="color:var(--ceramic-blue);font-weight:600;">${formatNum(total)} ج.م</td>
+                <td data-label="المدفوع" style="color:var(--success);font-weight:600;">${formatNum(paid)} ج.م</td>
+                <td data-label="المتبقي" style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700;">
+                    ${remaining < 0 ? 'رصيد موجب: ' + formatNum(Math.abs(remaining)) : formatNum(remaining)} ج.م
+                </td>
+                <td data-label="الحالة"><span class="badge ${statusClass}">${statusText}</span></td>
+                <td data-label="إجراءات">
+                    <button class="btn-action btn-view" onclick="viewSupplierDetails(${supplierId})">📋 تقرير</button>
+                    <button class="btn-action btn-edit" onclick="editSupplier(${supplierId})">✏️ تعديل</button>
+                    <button class="btn-action btn-pay" onclick="openPaymentModal(${supplierId})">💵 دفع</button>
+                    <button class="btn-action btn-print" onclick="printSupplierReportDirect(${supplierId})">🖨️</button>
+                    <button class="btn-action btn-delete" onclick="confirmDeleteSupplier(${supplierId}, '${safeName}')">🗑️ حذف</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ============================================
+    // فلترة الموردين
+    // ============================================
+    function filterSuppliers() {
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const debt = document.getElementById('debtFilter').value;
+
+        filteredSuppliers = allSuppliers.filter(s => {
+            const matchSearch = !search ||
+                (s.name || '').toLowerCase().includes(search) ||
+                (s.phone || '').includes(search) ||
+                (s.company_name || '').toLowerCase().includes(search);
+            const remaining = getSupplierRemaining(s.id);
+            const matchDebt = debt === 'all' ||
+                (debt === 'debt' && remaining > 0) ||
+                (debt === 'clear' && remaining <= 0);
+            return matchSearch && matchDebt;
+        });
+
+        renderSuppliers(filteredSuppliers);
+    }
+
+    // ============================================
+    // نافذة إضافة/تعديل مورد
+    // ============================================
+    function openSupplierModal(id = null) {
+        document.getElementById('supplierModalTitle').textContent = id ? '✏️ تعديل مورد' : '➕ مورد جديد';
+        document.getElementById('editSupplierId').value = id || '';
+
+        if (id) {
+            const s = allSuppliers.find(x => x.id == id);
+            if (s) {
+                document.getElementById('supplierName').value = s.name || '';
+                document.getElementById('supplierCompany').value = s.company_name || '';
+                document.getElementById('supplierPhone').value = s.phone || '';
+                document.getElementById('supplierBalance').value = s.balance || 0;
+                document.getElementById('supplierAddress').value = s.address || '';
+            }
+        } else {
+            document.getElementById('supplierName').value = '';
+            document.getElementById('supplierCompany').value = '';
+            document.getElementById('supplierPhone').value = '';
+            document.getElementById('supplierBalance').value = 0;
+            document.getElementById('supplierAddress').value = '';
+        }
+
+        openModal('supplierModal');
+    }
+
+    function editSupplier(id) { openSupplierModal(id); }
+
+    // ============================================
+    // حفظ المورد
+    // ============================================
+    async function saveSupplier() {
+        const id = document.getElementById('editSupplierId').value;
+        const name = document.getElementById('supplierName').value.trim();
+
+        if (!name) {
+            showNotification('الرجاء إدخال اسم المورد', 'error');
+            return;
+        }
+
+        const payload = {
+            name,
+            company_name: document.getElementById('supplierCompany').value.trim(),
+            phone: document.getElementById('supplierPhone').value.trim(),
+            balance: parseFloat(document.getElementById('supplierBalance').value) || 0,
+            address: document.getElementById('supplierAddress').value.trim()
+        };
+
+        try {
+            let error;
+            if (id) {
+                ({ error } = await supabase.from('suppliers').update(payload).eq('id', id));
+            } else {
+                ({ error } = await supabase.from('suppliers').insert([payload]));
+            }
+
+            if (error) throw error;
+
+            showNotification(id ? '✅ تم تعديل المورد بنجاح' : '✅ تم إضافة المورد بنجاح', 'success');
+            closeModal('supplierModal');
+            await loadSuppliers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حفظ المورد:', err);
+            showNotification('حدث خطأ: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================
+    // عرض تفاصيل المورد
+    // ============================================
+    async function viewSupplierDetails(id) {
+        const content = document.getElementById('supplierDetailsContent');
+        content.innerHTML = '<p style="text-align:center;padding:20px;">جاري التحميل...</p>';
+        openModal('supplierDetailsModal');
+
+        const s = allSuppliers.find(x => x.id == id);
+        if (!s) {
+            content.innerHTML = '<p style="text-align:center;color:#dc2626;">المورد غير موجود</p>';
+            return;
+        }
+
+        const supplierPurchases = allPurchases
+            .filter(p => p.supplier_id == id)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        const total = getSupplierTotalPurchases(id);
+        const paid = getSupplierTotalPaid(id);
+        const remaining = getSupplierRemaining(id);
+
+        let rows = supplierPurchases.map((p, i) => {
+            const pTotal = Number(p.total_amount) || 0;
+            const pPaid = Number(p.paid_amount) || 0;
+            const pRemaining = Number(p.remaining_amount) || (pTotal - pPaid);
+            return `<tr>
+                <td data-label="#">${i + 1}</td>
+                <td data-label="رقم الفاتورة"><strong>${p.invoice_number || '#' + p.id}</strong></td>
+                <td data-label="التاريخ">${p.created_at ? new Date(p.created_at).toLocaleDateString('ar-EG') : ''}</td>
+                <td data-label="الإجمالي" style="color:var(--ceramic-blue);font-weight:600;">${formatNum(pTotal)} ج.م</td>
+                <td data-label="المدفوع" style="color:var(--success);font-weight:600;">${formatNum(pPaid)} ج.م</td>
+                <td data-label="المتبقي" style="color:${pRemaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700;">${formatNum(pRemaining)} ج.م</td>
+            </tr>`;
+        }).join('');
+
+        content.innerHTML = `
+            <div style="background:var(--card);padding:16px 20px;border-radius:var(--radius);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px;">
+                <div>
+                    <h2 style="font-size:22px;font-weight:800;color:var(--text);">${s.name}</h2>
+                    <div style="display:flex;gap:15px;flex-wrap:wrap;font-size:13px;color:var(--text-light);margin-top:4px;">
+                        <span><strong>الشركة:</strong> ${s.company_name || '-'}</span>
+                        <span><strong>الهاتف:</strong> ${s.phone || '-'}</span>
+                        <span><strong>الرصيد الافتتاحي:</strong> ${formatNum(s.balance || 0)} ج.م</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:15px;flex-wrap:wrap;">
+                    <div style="text-align:center;padding:8px 16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+                        <div style="font-size:20px;font-weight:800;color:#0891b2;">${formatNum(total)} ج.م</div>
+                        <div style="font-size:10px;color:var(--text-light);">إجمالي المشتريات</div>
+                    </div>
+                    <div style="text-align:center;padding:8px 16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+                        <div style="font-size:20px;font-weight:800;color:#10b981;">${formatNum(paid)} ج.م</div>
+                        <div style="font-size:10px;color:var(--text-light);">إجمالي المدفوع</div>
+                    </div>
+                    <div style="text-align:center;padding:8px 16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+                        <div style="font-size:20px;font-weight:800;color:${remaining > 0 ? '#ef4444' : '#10b981'};">${formatNum(remaining)} ج.م</div>
+                        <div style="font-size:10px;color:var(--text-light);">المتبقي</div>
+                    </div>
+                </div>
+            </div>
+            <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;">
+                <div style="padding:12px 16px;background:#e8f0ef;font-weight:700;color:var(--primary);">
+                    📄 فواتير المشتريات (${supplierPurchases.length})
+                </div>
+                <div style="overflow-x:auto;max-height:350px;overflow-y:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:600px;">
+                        <thead style="position:sticky;top:0;z-index:5;">
+                            <tr style="background:#e8f0ef;">
+                                <th style="padding:8px 6px;border:1px solid var(--border);">#</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">رقم الفاتورة</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">التاريخ</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">الإجمالي</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">المدفوع</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">المتبقي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94a3b8;">لا توجد فواتير</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    // ============================================
+    // نافذة إضافة دفعة
+    // ============================================
+    function openPaymentModal(id) {
+        const s = allSuppliers.find(x => x.id == id);
+        if (!s) return;
+
+        const remaining = getSupplierRemaining(id);
+        if (remaining <= 0) {
+            showNotification('لا توجد مستحقات على هذا المورد', 'info');
+            return;
+        }
+
+        document.getElementById('paySupplierId').value = id;
+        document.getElementById('paySupplierName').value = s.name;
+        document.getElementById('payCurrentDebt').value = formatNum(remaining) + ' ج.م';
+        document.getElementById('payAmount').value = '';
+        document.getElementById('payMethod').value = 'نقدي';
+        document.getElementById('payNote').value = '';
+
+        openModal('paymentModal');
+    }
+
+    async function addPayment() {
+        const id = document.getElementById('paySupplierId').value;
+        const amount = parseFloat(document.getElementById('payAmount').value);
+        const method = document.getElementById('payMethod').value;
+        const note = document.getElementById('payNote').value.trim();
+
+        if (!id || !amount || amount <= 0) {
+            showNotification('الرجاء إدخال مبلغ صحيح', 'error');
+            return;
+        }
+
+        const s = allSuppliers.find(x => x.id == id);
+        if (!s) return;
+
+        const currentDebt = getSupplierRemaining(id);
+        if (amount > currentDebt) {
+            showNotification('المبلغ أكبر من المستحق', 'error');
+            return;
+        }
+
+        const newBalance = Number(s.balance || 0) - amount;
+
+        try {
+            // محاولة تسجيل الدفعة في جدول payments
+            try {
+                await supabase.from('payments').insert([{
+                    supplier_id: id,
+                    amount: amount,
+                    method: method,
+                    note: note,
+                    type: 'supplier_payment',
+                    payment_date: new Date().toISOString()
+                }]);
+            } catch (e) { /* جدول الدفعات غير موجود */ }
+
+            // تحديث رصيد المورد
+            const { error: updErr } = await supabase
+                .from('suppliers')
+                .update({ balance: newBalance })
+                .eq('id', id);
+
+            if (updErr) throw updErr;
+
+            showNotification('✅ تم تسجيل الدفعة بنجاح', 'success');
+            closeModal('paymentModal');
+            await loadSuppliers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في إضافة الدفعة:', err);
+            showNotification('حدث خطأ: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================
+    // تأكيد حذف المورد (مستويين)
+    // ============================================
+    function confirmDeleteSupplier(id, name) {
+        supplierToDelete = id;
+        const purchasesCount = getSupplierPurchasesCount(id);
+        const remaining = getSupplierRemaining(id);
+        const hasActivity = purchasesCount > 0 || Math.abs(remaining) > 0.01;
+
+        const msgEl = document.getElementById('confirmMessage');
+        const extraEl = document.getElementById('confirmExtraInfo');
+        const titleEl = document.getElementById('confirmModalTitle');
+        const headerEl = document.getElementById('confirmModalHeader');
+        const btnEl = document.getElementById('confirmDeleteBtn');
+        const closeEl = document.getElementById('confirmModalClose');
+
+        // إعادة تعيين الألوان
+        titleEl.style.color = '';
+        closeEl.style.color = '';
+
+        if (hasActivity) {
+            // المرحلة الأولى: تحذير من وجود نشاط
+            deleteStage = 1;
+            headerEl.style.background = '#fee2e2';
+            titleEl.textContent = '⚠️ تحذير: يوجد نشاط';
+            msgEl.innerHTML = `المورد <strong style="color:#dc2626;">"${name}"</strong> لديه:<br>
+                <strong style="color:#dc2626;">${purchasesCount}</strong> فاتورة مشتريات<br>
+                ورصيد <strong style="color:${remaining > 0 ? '#dc2626' : '#059669'};">${formatNum(Math.abs(remaining))} ج.م</strong> ${remaining > 0 ? 'مستحق' : 'موجب'}<br><br>
+                هل تريد المتابعة؟`;
+            extraEl.style.display = 'block';
+            extraEl.innerHTML = `
+                <div style="padding:12px;background:#fee2e2;border-radius:8px;border:1px solid #dc2626;">
+                    <p style="margin:0;font-size:13px;color:#dc2626;font-weight:700;text-align:center;">
+                        ⚠️ سيتم حذف جميع فواتير المشتريات (${purchasesCount}) المرتبطة بهذا المورد نهائياً
+                    </p>
+                </div>
+            `;
+            btnEl.textContent = '⚠️ متابعة الحذف';
+            btnEl.style.background = '#f59e0b';
+        } else {
+            // لا يوجد نشاط: تأكيد عادي
+            deleteStage = 2;
+            headerEl.style.background = '#fef3c7';
+            titleEl.textContent = '⚠️ تأكيد الحذف';
+            msgEl.innerHTML = `هل أنت متأكد من حذف المورد <strong style="color:#dc2626;">"${name}"</strong>؟<br><small style="color:#64748b;">لا يمكن التراجع عن هذا الإجراء</small>`;
+            extraEl.style.display = 'none';
+            btnEl.textContent = '🗑️ حذف';
+            btnEl.style.background = '#dc2626';
+        }
+
+        openModal('confirmModal');
+    }
+
+    // ============================================
+    // تنفيذ الحذف
+    // ============================================
+    async function deleteSupplier() {
+        if (!supplierToDelete) {
+            showNotification('لم يتم تحديد المورد', 'error');
+            return;
+        }
+
+        const id = supplierToDelete;
+        const purchasesCount = getSupplierPurchasesCount(id);
+        const remaining = getSupplierRemaining(id);
+        const hasActivity = purchasesCount > 0 || Math.abs(remaining) > 0.01;
+
+        // المرحلة الأولى: طلب تأكيد ثاني
+        if (deleteStage === 1 && hasActivity) {
+            const s = allSuppliers.find(x => x.id == id);
+            const name = s ? s.name : '';
+
+            deleteStage = 2;
+            const headerEl = document.getElementById('confirmModalHeader');
+            const titleEl = document.getElementById('confirmModalTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const extraEl = document.getElementById('confirmExtraInfo');
+            const btnEl = document.getElementById('confirmDeleteBtn');
+            const closeEl = document.getElementById('confirmModalClose');
+
+            headerEl.style.background = '#dc2626';
+            titleEl.textContent = '🚨 تأكيد نهائي';
+            titleEl.style.color = 'white';
+            closeEl.style.color = 'white';
+
+            msgEl.innerHTML = `
+                <strong style="color:#dc2626;font-size:16px;">تأكيد نهائي!</strong><br><br>
+                سيتم حذف المورد <strong>"${name}"</strong> و<strong style="color:#dc2626;">${purchasesCount} فاتورة</strong> نهائياً.<br><br>
+                <span style="color:#dc2626;font-weight:700;">هل أنت متأكد 100%؟</span>
+            `;
+            extraEl.innerHTML = `
+                <div style="padding:10px;background:#dc2626;border-radius:8px;">
+                    <p style="margin:0;font-size:13px;color:white;font-weight:700;text-align:center;">
+                        🚨 لا يمكن التراجع عن هذا الإجراء
+                    </p>
+                </div>
+            `;
+            btnEl.textContent = '🗑️ نعم، احذف نهائياً';
+            btnEl.style.background = '#991b1b';
+            return;
+        }
+
+        // المرحلة النهائية: التنفيذ
+        try {
+            // حذف فواتير المشتريات
+            if (purchasesCount > 0) {
+                const { error: purchasesErr } = await supabase
+                    .from('purchases')
+                    .delete()
+                    .eq('supplier_id', id);
+                if (purchasesErr) throw new Error('فشل حذف الفواتير: ' + purchasesErr.message);
+            }
+
+            // حذف الدفعات المرتبطة (إن وجدت)
+            try {
+                await supabase.from('payments').delete().eq('supplier_id', id);
+            } catch (e) { /* غير موجود */ }
+
+            // حذف المورد
+            const { error: supErr } = await supabase
+                .from('suppliers')
+                .delete()
+                .eq('id', id);
+            if (supErr) throw supErr;
+
+            showNotification(`✅ تم حذف المورد ${purchasesCount > 0 ? 'و ' + purchasesCount + ' فاتورة' : ''} بنجاح`, 'success');
+            closeModal('confirmModal');
+
+            supplierToDelete = null;
+            deleteStage = 0;
+
+            await loadPurchases();
+            await loadSuppliers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حذف المورد:', err);
+            showNotification('حدث خطأ أثناء الحذف: ' + err.message, 'error');
+            closeModal('confirmModal');
+            supplierToDelete = null;
+            deleteStage = 0;
+        }
+    }
+
+    // ============================================
+    // طباعة تقرير المورد
+    // ============================================
+    function printSupplierReportDirect(supplierId) {
+        const s = allSuppliers.find(x => x.id == supplierId);
+        if (!s) return;
+
+        const supplierPurchases = allPurchases
+            .filter(p => p.supplier_id == supplierId)
+            .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        const total = getSupplierTotalPurchases(supplierId);
+        const paid = getSupplierTotalPaid(supplierId);
+        const remaining = getSupplierRemaining(supplierId);
+
+        let rows = supplierPurchases.map((p, i) => {
+            const pTotal = Number(p.total_amount) || 0;
+            const pPaid = Number(p.paid_amount) || 0;
+            const pRemaining = Number(p.remaining_amount) || (pTotal - pPaid);
+            return `<tr>
+                <td>${i + 1}</td>
+                <td>${p.invoice_number || '#' + p.id}</td>
+                <td>${new Date(p.created_at).toLocaleDateString('en-GB')}</td>
+                <td>${pTotal.toFixed(2)}</td>
+                <td>${pPaid.toFixed(2)}</td>
+                <td>${pRemaining.toFixed(2)}</td>
+            </tr>`;
+        }).join('');
+
+        const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
+        <title>تقرير المورد ${s.name}</title>
+        <style>
+            @page { size: A4; margin: 10mm; }
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { font-family: 'Tajawal', Arial, sans-serif; direction: rtl; color: #000; background: #fff; font-size: 12px; }
+            .header { text-align: center; padding: 10px; border-bottom: 3px solid #0f766e; margin-bottom: 15px; }
+            .header h2 { font-size: 22px; color: #0f3d3e; }
+            .info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+            .info-table td { border: 1px solid #000; padding: 5px 8px; font-size: 12px; }
+            .info-table .lbl { font-weight: bold; background: #f0f0f0; width: 18%; }
+            .data-table { width: 100%; border-collapse: collapse; }
+            .data-table th, .data-table td { border: 1px solid #000; padding: 5px; text-align: center; font-size: 12px; }
+            .data-table th { background: #0f766e; color: #fff; font-weight: bold; }
+            .data-table tfoot td { background: #f0f0f0; font-weight: bold; }
+            .summary-box { width: 60%; margin-right: auto; margin-top: 10px; border-collapse: collapse; }
+            .summary-box td { border: 1px solid #000; padding: 6px 10px; font-size: 12px; }
+            .summary-box .lbl { font-weight: bold; background: #f0f0f0; }
+            .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 40px; }
+            .signatures div { text-align: center; font-size: 13px; font-weight: bold; }
+            .signatures .line { border-top: 1px dotted #000; width: 180px; margin-top: 5px; }
+        </style></head><body>
+            <div class="header"><h2>🏢 تقرير حساب المورد - شركة العبادي</h2></div>
+            <table class="info-table">
+                <tr>
+                    <td class="lbl">اسم المورد</td><td>${s.name}</td>
+                    <td class="lbl">الشركة</td><td>${s.company_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="lbl">الهاتف</td><td>${s.phone || '-'}</td>
+                    <td class="lbl">الرصيد الافتتاحي</td><td>${formatNum(s.balance || 0)} ج.م</td>
+                </tr>
+                <tr>
+                    <td class="lbl">التاريخ</td><td>${new Date().toLocaleDateString('en-GB')}</td>
+                    <td class="lbl">عدد الفواتير</td><td>${supplierPurchases.length}</td>
+                </tr>
+            </table>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>رقم الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>الإجمالي</th>
+                        <th>المدفوع</th>
+                        <th>المتبقي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows || '<tr><td colspan="6" style="text-align:center;padding:15px;">لا توجد فواتير</td></tr>'}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align:left;">الإجمالي</td>
+                        <td>${total.toFixed(2)}</td>
+                        <td>${paid.toFixed(2)}</td>
+                        <td>${(total - paid).toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <table class="summary-box">
+                <tr><td class="lbl">إجمالي المشتريات</td><td style="text-align:center;">${total.toFixed(2)}</td></tr>
+                <tr><td class="lbl">إجمالي المدفوع</td><td style="text-align:center;">${paid.toFixed(2)}</td></tr>
+                <tr><td class="lbl">الرصيد المستحق</td><td style="text-align:center;font-weight:bold;">${remaining.toFixed(2)}</td></tr>
+            </table>
+            <div class="signatures">
+                <div>توقيع المحاسب<div class="line"></div></div>
+                <div>توقيع المستلم<div class="line"></div></div>
+            </div>
+            <script>window.print();setTimeout(function(){window.close();},1000);<\/script>
+        </body></html>`;
+
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        if (printWindow) {
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        }
+    }
+
+    // ============================================
+    // طباعة المستحقين
+    // ============================================
+    function printDebtSuppliers() {
+        const debtSuppliers = allSuppliers
+            .filter(s => getSupplierRemaining(s.id) > 0)
+            .sort((a, b) => getSupplierRemaining(b.id) - getSupplierRemaining(a.id));
+
+        if (debtSuppliers.length === 0) {
+            showNotification('لا يوجد موردين عليهم مستحقات', 'info');
+            return;
+        }
+
+        let totalDebtAll = 0;
+        let rows = debtSuppliers.map((s, i) => {
+            const remaining = getSupplierRemaining(s.id);
+            totalDebtAll += remaining;
+            return `<tr>
+                <td style="padding:6px 4px;border:1px solid #000;text-align:center;font-size:18px;">${i + 1}</td>
+                <td style="padding:6px 4px;border:1px solid #000;text-align:right;font-weight:bold;font-size:18px;">${s.name}</td>
+                <td style="padding:6px 4px;border:1px solid #000;text-align:center;font-weight:bold;color:#dc2626;font-size:18px;">${formatNum(remaining)} ج.م</td>
+            </tr>`;
+        }).join('');
+
+        const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير المستحقين - الموردين</title>
+        <style>
+            *{margin:0;padding:0;box-sizing:border-box;}
+            @page { size: 80mm auto; margin: 0; }
+            body{font-family:'Times New Roman', Times, serif;padding:5px;background:white;direction:rtl;width:80mm;margin:0 auto;}
+            .header{text-align:center;margin-bottom:15px;border-bottom:2px solid #000;padding-bottom:8px;}
+            .header h2{margin:0;font-size:20px;color:#000;font-weight:bold;}
+            .header p{margin:2px 0;font-size:18px;color:#000;}
+            .summary-box{text-align:center;margin:10px 0;padding:8px;border:1px solid #000;border-radius:4px;background:#f8fafc;}
+            .summary-box .big{font-size:20px;font-weight:bold;color:#dc2626;}
+            .summary-box .sml{font-size:18px;color:#000;}
+            table{width:100%;border-collapse:collapse;margin-top:8px;font-size:18px;}
+            th,td{border:1px solid #000;padding:6px 4px;text-align:center;color:#000;}
+            th{background:#f1f5f9;font-weight:bold;font-size:18px;color:#000;}
+            .total-row{background:#f1f5f9;font-weight:bold;font-size:18px;color:#000;}
+            .footer{text-align:center;margin-top:15px;font-size:18px;color:#000;border-top:1px solid #000;padding-top:8px;}
+        </style></head><body>
+            <div class="header">
+                <h2>📋 تقرير المستحقين - الموردين</h2>
+                <p>${new Date().toLocaleDateString('ar-EG')}</p>
+            </div>
+            <div class="summary-box">
+                <div class="big">${formatNum(totalDebtAll)} ج.م</div>
+                <div class="sml">إجمالي المستحقات</div>
+                <div class="sml">عدد الموردين: ${debtSuppliers.length}</div>
+            </div>
+            <table>
+                <thead><tr>
+                    <th style="width:30px;">#</th>
+                    <th style="text-align:right;">اسم المورد</th>
+                    <th style="width:120px;">المبلغ المستحق</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align:left;">الإجمالي الكلي</td>
+                        <td style="font-weight:bold;color:#dc2626;">${formatNum(totalDebtAll)} ج.م</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="footer">
+                <p>شركة العبادي</p>
+            </div>
+            <script>window.print();setTimeout(function(){window.close();},1500);<\/script>
+        </body></html>`;
+
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if (printWindow) {
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        }
+    }
+
+    // ============================================
+    // نوافذ منبثقة
+    // ============================================
+    function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+    }
+
+    function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+        if (id === 'confirmModal') {
+            supplierToDelete = null;
+            deleteStage = 0;
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+            e.target.classList.remove('active');
+            if (e.target.id === 'confirmModal') {
+                supplierToDelete = null;
+                deleteStage = 0;
+            }
+        }
+    });
+    </script>
 </body>
 </html>
