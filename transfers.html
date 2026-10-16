@@ -114,7 +114,6 @@
         .stat-card .number.red { color: var(--danger); }
         .stat-card .number.orange { color: var(--warning); }
         .stat-card .number.purple { color: var(--purple); }
-        .stat-card .number.gold { color: var(--gold); }
 
         /* ============ شريط الفلترة ============ */
         .filter-bar {
@@ -631,6 +630,33 @@
 
             .bottom-nav { display: flex !important; }
         }
+
+        /* ============================================
+           بطاقة ملخص (report-card)
+           ============================================ */
+        .report-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin: 0 16px 16px;
+        }
+        .report-card .card-header {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .report-card .card-body {
+            padding: 15px;
+        }
     </style>
 </head>
 <body>
@@ -676,17 +702,17 @@
             <!-- 📊 بطاقة المبيعات المدفوعة -->
             <div class="sales-summary-card">
                 <div class="item">
-                    <div class="value" id="salesPaidTotal">0</div>
+                    <div class="value" id="salesPaidTotal">0 ج.م</div>
                     <div class="label">💰 إجمالي المبيعات المدفوعة</div>
                     <div class="sub" id="salesPaidCount">0 فاتورة</div>
                 </div>
                 <div class="item">
-                    <div class="value" id="transfersTotal">0</div>
+                    <div class="value" id="transfersTotal">0 ج.م</div>
                     <div class="label">💸 إجمالي التحويلات</div>
                     <div class="sub" id="transfersCount">0 عملية</div>
                 </div>
                 <div class="item">
-                    <div class="value" id="remainingToTransfer">0</div>
+                    <div class="value" id="remainingToTransfer">0 ج.م</div>
                     <div class="label">⚠️ المتبقي للتحويل</div>
                     <div class="sub">من المبيعات المدفوعة</div>
                 </div>
@@ -729,12 +755,12 @@
             </div>
 
             <!-- 💰 أرصدة الأشخاص -->
-            <div class="report-card" style="margin: 0 16px 16px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden;">
-                <div style="padding: 12px 18px; background: #f8fafc; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div class="report-card">
+                <div class="card-header">
                     <span>💰 أرصدة الأشخاص</span>
                     <button class="btn-primary" onclick="loadBalances()" style="padding: 6px 14px; font-size: 12px;">🔄 تحديث</button>
                 </div>
-                <div style="padding: 15px;">
+                <div class="card-body">
                     <div id="balancesContainer" class="balances-grid">
                         <p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">جاري التحميل...</p>
                     </div>
@@ -742,11 +768,11 @@
             </div>
 
             <!-- 📱 تفصيل المحافظ الإلكترونية -->
-            <div class="report-card" style="margin: 0 16px 16px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden;">
-                <div style="padding: 12px 18px; background: #f8fafc; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 14px;">
-                    📱 تفصيل المحافظ الإلكترونية
+            <div class="report-card">
+                <div class="card-header">
+                    <span>📱 تفصيل المحافظ الإلكترونية</span>
                 </div>
-                <div style="padding: 15px;">
+                <div class="card-body">
                     <div id="walletsContainer" class="wallets-grid">
                         <p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">لا توجد محافظ</p>
                     </div>
@@ -837,7 +863,6 @@
                     </select>
                 </div>
 
-                <!-- حقول إضافية حسب الطريقة -->
                 <div id="extraFields"></div>
 
                 <div class="form-group">
@@ -904,15 +929,20 @@
     // بدء التشغيل
     // ============================================
     document.addEventListener('DOMContentLoaded', async () => {
-        if (typeof checkAuth === 'function') await checkAuth();
-        await loadSales();
-        await loadTransfers();
-        await loadStats();
-        await loadBalances();
-        await loadWalletsDetail();
+        try {
+            if (typeof checkAuth === 'function') await checkAuth();
+        } catch (e) { console.warn('Auth:', e); }
 
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('transferDate').value = today;
+        try { await loadSales(); } catch (e) { console.warn('Sales:', e); allSales = []; }
+        try { await loadTransfers(); } catch (e) { console.warn('Transfers:', e); allTransfers = []; }
+        try { loadStats(); } catch (e) { console.warn('Stats:', e); }
+        try { loadBalances(); } catch (e) { console.warn('Balances:', e); }
+        try { loadWalletsDetail(); } catch (e) { console.warn('Wallets:', e); }
+
+        const dateInput = document.getElementById('transferDate');
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
     });
 
     // ============================================
@@ -930,6 +960,12 @@
             const dt = new Date(d);
             return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('ar-EG');
         } catch (e) { return '-'; }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/[&<>"']/g, (s) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[s]));
     }
 
     function showNotification(msg, type = 'info') {
@@ -961,9 +997,6 @@
         }
     }
 
-    // ============================================
-    // حساب إجمالي المبيعات المدفوعة
-    // ============================================
     function getTotalPaidSales() {
         return allSales.reduce((sum, s) => sum + (Number(s.paid_amount) || 0), 0);
     }
@@ -979,7 +1012,8 @@
                 .order('transfer_date', { ascending: false });
 
             if (error) {
-                if (error.code === '42P01') {
+                if (error.code === '42P01' || error.message.includes('does not exist')) {
+                    console.warn('جدول transfers غير موجود - استخدام التخزين المحلي');
                     allTransfers = JSON.parse(localStorage.getItem('transfers') || '[]');
                 } else {
                     throw error;
@@ -987,59 +1021,47 @@
             } else {
                 allTransfers = data || [];
             }
-
-            filteredTransfers = [...allTransfers];
-            renderTransfers(filteredTransfers);
         } catch (err) {
-            console.error('خطأ في تحميل التحويلات:', err);
+            console.warn('خطأ في تحميل التحويلات - استخدام التخزين المحلي:', err.message);
             allTransfers = JSON.parse(localStorage.getItem('transfers') || '[]');
-            filteredTransfers = [...allTransfers];
-            renderTransfers(filteredTransfers);
         }
+
+        filteredTransfers = [...allTransfers];
+        renderTransfers(filteredTransfers);
     }
 
     // ============================================
     // تحميل الإحصائيات
     // ============================================
-    async function loadStats() {
+    function loadStats() {
         try {
-            // إجمالي المبيعات المدفوعة
             const totalPaidSales = getTotalPaidSales();
             const paidInvoicesCount = allSales.filter(s => Number(s.paid_amount) > 0).length;
 
-            // إجمالي التحويلات
             const totalTransfers = allTransfers.reduce((s, t) => s + (Number(t.amount) || 0), 0);
             const transfersCount = allTransfers.length;
-
-            // المتبقي للتحويل
             const remaining = totalPaidSales - totalTransfers;
 
-            document.getElementById('salesPaidTotal').textContent = formatNum(totalPaidSales) + ' ج.م';
-            document.getElementById('salesPaidCount').textContent = paidInvoicesCount + ' فاتورة';
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
 
-            document.getElementById('transfersTotal').textContent = formatNum(totalTransfers) + ' ج.م';
-            document.getElementById('transfersCount').textContent = transfersCount + ' عملية';
+            setText('salesPaidTotal', formatNum(totalPaidSales) + ' ج.م');
+            setText('salesPaidCount', paidInvoicesCount + ' فاتورة');
+            setText('transfersTotal', formatNum(totalTransfers) + ' ج.م');
+            setText('transfersCount', transfersCount + ' عملية');
+            setText('remainingToTransfer', formatNum(remaining) + ' ج.م');
 
-            document.getElementById('remainingToTransfer').textContent = formatNum(remaining) + ' ج.م';
+            const cashAmount = allTransfers.filter(t => t.method === 'كاش').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const bankAmount = allTransfers.filter(t => t.method === 'بنك').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const walletAmount = allTransfers.filter(t => t.method === 'محفظة').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+            const emailAmount = allTransfers.filter(t => t.method === 'بريد').reduce((s, t) => s + (Number(t.amount) || 0), 0);
 
-            // الإحصائيات حسب الطريقة
-            const cashAmount = allTransfers
-                .filter(t => t.method === 'كاش')
-                .reduce((s, t) => s + (Number(t.amount) || 0), 0);
-            const bankAmount = allTransfers
-                .filter(t => t.method === 'بنك')
-                .reduce((s, t) => s + (Number(t.amount) || 0), 0);
-            const walletAmount = allTransfers
-                .filter(t => t.method === 'محفظة')
-                .reduce((s, t) => s + (Number(t.amount) || 0), 0);
-            const emailAmount = allTransfers
-                .filter(t => t.method === 'بريد')
-                .reduce((s, t) => s + (Number(t.amount) || 0), 0);
-
-            document.getElementById('cashAmount').textContent = formatNum(cashAmount) + ' ج.م';
-            document.getElementById('bankAmount').textContent = formatNum(bankAmount) + ' ج.م';
-            document.getElementById('walletAmount').textContent = formatNum(walletAmount) + ' ج.م';
-            document.getElementById('emailAmount').textContent = formatNum(emailAmount) + ' ج.م';
+            setText('cashAmount', formatNum(cashAmount) + ' ج.م');
+            setText('bankAmount', formatNum(bankAmount) + ' ج.م');
+            setText('walletAmount', formatNum(walletAmount) + ' ج.م');
+            setText('emailAmount', formatNum(emailAmount) + ' ج.م');
         } catch (err) {
             console.error('خطأ في الإحصائيات:', err);
         }
@@ -1050,6 +1072,7 @@
     // ============================================
     function loadWalletsDetail() {
         const container = document.getElementById('walletsContainer');
+        if (!container) return;
 
         const walletTransfers = allTransfers.filter(t => t.method === 'محفظة');
 
@@ -1080,7 +1103,7 @@
             if (name.includes('أورنج') || name.includes('اورنج')) return 'wallet-orange';
             if (name.includes('اتصالات')) return 'wallet-etisalat';
             if (name.includes('انستاباي') || name.includes('إنستاباي')) return 'wallet-instapay';
-            if (name.includes('وي') || name.includes('WE')) return 'wallet-we';
+            if (name.includes('وي') || name === 'WE') return 'wallet-we';
             return 'wallet-other';
         };
 
@@ -1089,13 +1112,13 @@
             if (name.includes('أورنج') || name.includes('اورنج')) return '🟠';
             if (name.includes('اتصالات')) return '🟢';
             if (name.includes('انستاباي') || name.includes('إنستاباي')) return '🔵';
-            if (name.includes('وي') || name.includes('WE')) return '🟣';
+            if (name.includes('وي') || name === 'WE') return '🟣';
             return '📱';
         };
 
         container.innerHTML = walletsList.map(w => `
             <div class="wallet-box ${getWalletClass(w.name)}">
-                <div class="name">${getWalletIcon(w.name)} ${w.name}</div>
+                <div class="name">${getWalletIcon(w.name)} ${escapeHtml(w.name)}</div>
                 <div class="amount">${formatNum(w.amount)} ج.م</div>
                 <div class="count">${w.count} عملية</div>
             </div>
@@ -1107,26 +1130,24 @@
     // ============================================
     function loadBalances() {
         const container = document.getElementById('balancesContainer');
+        if (!container) return;
 
         const balances = {};
 
         allTransfers.forEach(t => {
             const amount = Number(t.amount) || 0;
+            const fromP = t.from_person || 'غير معروف';
+            const toP = t.to_person || 'غير معروف';
 
-            // المستلم
-            if (!balances[t.to_person]) balances[t.to_person] = { received: 0, sent: 0 };
-            balances[t.to_person].received += amount;
+            if (!balances[toP]) balances[toP] = { received: 0, sent: 0 };
+            balances[toP].received += amount;
 
-            // المرسل
-            if (!balances[t.from_person]) balances[t.from_person] = { received: 0, sent: 0 };
-            balances[t.from_person].sent += amount;
+            if (!balances[fromP]) balances[fromP] = { received: 0, sent: 0 };
+            balances[fromP].sent += amount;
         });
 
         const list = Object.entries(balances).map(([name, b]) => ({
-            name,
-            received: b.received,
-            sent: b.sent,
-            net: b.received - b.sent
+            name, received: b.received, sent: b.sent, net: b.received - b.sent
         })).sort((a, b) => b.net - a.net);
 
         if (list.length === 0) {
@@ -1141,7 +1162,7 @@
 
             return `
                 <div class="balance-card">
-                    <div class="name">👤 ${p.name}</div>
+                    <div class="name">👤 ${escapeHtml(p.name)}</div>
                     <div class="row"><span>📥 استلم:</span><strong style="color:#059669;">${formatNum(p.received)} ج.م</strong></div>
                     <div class="row"><span>📤 أرسل:</span><strong style="color:#dc2626;">${formatNum(p.sent)} ج.م</strong></div>
                     <div class="net ${netClass}">
@@ -1158,71 +1179,81 @@
     // ============================================
     function renderTransfers(list) {
         const tbody = document.getElementById('transfersTable');
+        if (!tbody) return;
+
         if (!list || list.length === 0) {
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">لا توجد تحويلات</td></tr>';
             return;
         }
 
-        tbody.innerHTML = list.map((t, i) => {
+        let html = '';
+        list.forEach((t, i) => {
             let extra = {};
             try {
                 extra = typeof t.extra_data === 'string' ? JSON.parse(t.extra_data) : (t.extra_data || {});
             } catch (e) { extra = {}; }
 
-            let methodBadge;
-            if (t.method === 'كاش') {
+            let methodBadge = '';
+            const method = t.method || '';
+            if (method === 'كاش') {
                 methodBadge = '<span class="badge badge-cash">💵 كاش</span>';
-            } else if (t.method === 'بنك') {
-                methodBadge = `<span class="badge badge-bank">🏦 ${extra.bank_name || 'بنكي'}</span>`;
-            } else if (t.method === 'محفظة') {
+            } else if (method === 'بنك') {
+                methodBadge = `<span class="badge badge-bank">🏦 ${escapeHtml(extra.bank_name || 'بنكي')}</span>`;
+            } else if (method === 'محفظة') {
                 const walletName = extra.wallet_name || 'محفظة';
                 let walletClass = 'badge-wallet';
                 if (walletName.includes('فودافون')) walletClass = 'badge-vodafone';
                 else if (walletName.includes('أورنج') || walletName.includes('اورنج')) walletClass = 'badge-orange';
                 else if (walletName.includes('اتصالات')) walletClass = 'badge-etisalat';
                 else if (walletName.includes('انستاباي') || walletName.includes('إنستاباي')) walletClass = 'badge-instapay';
-                else if (walletName.includes('وي') || walletName.includes('WE')) walletClass = 'badge-we';
-                methodBadge = `<span class="badge ${walletClass}">📱 ${walletName}</span>`;
-            } else if (t.method === 'بريد') {
-                methodBadge = `<span class="badge badge-email">📧 ${extra.email_to || 'بريد'}</span>`;
+                else if (walletName.includes('وي') || walletName === 'WE') walletClass = 'badge-we';
+                methodBadge = `<span class="badge ${walletClass}">📱 ${escapeHtml(walletName)}</span>`;
+            } else if (method === 'بريد') {
+                methodBadge = `<span class="badge badge-email">📧 ${escapeHtml(extra.email_to || 'بريد')}</span>`;
             } else {
-                methodBadge = `<span class="badge badge-cash">${t.method}</span>`;
+                methodBadge = `<span class="badge badge-cash">${escapeHtml(method)}</span>`;
             }
 
-            return `<tr>
+            html += `<tr>
                 <td data-label="#">${i + 1}</td>
                 <td data-label="التاريخ">${formatDate(t.transfer_date)}</td>
-                <td data-label="من" style="font-weight:700;color:#dc2626;">${t.from_person || '-'}</td>
-                <td data-label="إلى" style="font-weight:700;color:#059669;">${t.to_person || '-'}</td>
+                <td data-label="من" style="font-weight:700;color:#dc2626;">${escapeHtml(t.from_person || '-')}</td>
+                <td data-label="إلى" style="font-weight:700;color:#059669;">${escapeHtml(t.to_person || '-')}</td>
                 <td data-label="المبلغ" style="color:var(--accent);font-weight:900;font-size:15px;">${formatNum(t.amount)} ج.م</td>
                 <td data-label="طريقة التحويل">${methodBadge}</td>
-                <td data-label="البيان">${t.note || '-'}</td>
+                <td data-label="البيان">${escapeHtml(t.note || '-')}</td>
                 <td data-label="إجراءات">
-                    <button class="btn-action btn-view" onclick="viewTransfer(${t.id})">👁️</button>
-                    <button class="btn-action btn-print" onclick="printTransferReceipt(${t.id})">🖨️</button>
-                    <button class="btn-action btn-delete" onclick="confirmDeleteTransfer(${t.id})">🗑️</button>
+                    <button class="btn-action btn-view" onclick="viewTransfer('${t.id}')" type="button">👁️</button>
+                    <button class="btn-action btn-print" onclick="printTransferReceipt('${t.id}')" type="button">🖨️</button>
+                    <button class="btn-action btn-delete" onclick="confirmDeleteTransfer('${t.id}')" type="button">🗑️</button>
                 </td>
             </tr>`;
-        }).join('');
+        });
+
+        tbody.innerHTML = html;
     }
 
     // ============================================
     // فلترة التحويلات
     // ============================================
     function filterTransfers() {
-        const from = document.getElementById('dateFrom').value;
-        const to = document.getElementById('dateTo').value;
-        const method = document.getElementById('methodFilter').value;
-        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const from = document.getElementById('dateFrom')?.value || '';
+        const to = document.getElementById('dateTo')?.value || '';
+        const method = document.getElementById('methodFilter')?.value || 'all';
+        const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
         filteredTransfers = allTransfers.filter(t => {
             if (from) {
-                const tDate = new Date(t.transfer_date).toISOString().split('T')[0];
-                if (tDate < from) return false;
+                try {
+                    const tDate = new Date(t.transfer_date).toISOString().split('T')[0];
+                    if (tDate < from) return false;
+                } catch (e) {}
             }
             if (to) {
-                const tDate = new Date(t.transfer_date).toISOString().split('T')[0];
-                if (tDate > to) return false;
+                try {
+                    const tDate = new Date(t.transfer_date).toISOString().split('T')[0];
+                    if (tDate > to) return false;
+                } catch (e) {}
             }
             if (method !== 'all' && t.method !== method) return false;
             if (search) {
@@ -1241,20 +1272,28 @@
     // فتح نافذة تحويل جديد
     // ============================================
     function openTransferModal() {
-        document.getElementById('transferModalTitle').textContent = '➕ تحويل جديد';
-        document.getElementById('editTransferId').value = '';
-        document.getElementById('fromPerson').value = '';
-        document.getElementById('toPerson').value = '';
-        document.getElementById('transferAmount').value = '';
-        document.getElementById('transferDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('transferMethod').value = 'كاش';
-        document.getElementById('transferNote').value = '';
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.value = val;
+        };
 
-        // تحديث المتاح للتحويل
+        const titleEl = document.getElementById('transferModalTitle');
+        if (titleEl) titleEl.textContent = '➕ تحويل جديد';
+
+        setVal('editTransferId', '');
+        setVal('fromPerson', '');
+        setVal('toPerson', '');
+        setVal('transferAmount', '');
+        setVal('transferDate', new Date().toISOString().split('T')[0]);
+        setVal('transferMethod', 'كاش');
+        setVal('transferNote', '');
+
         const totalPaid = getTotalPaidSales();
         const totalTransfers = allTransfers.reduce((s, t) => s + (Number(t.amount) || 0), 0);
         const available = totalPaid - totalTransfers;
-        document.getElementById('availableForTransfer').textContent = formatNum(available) + ' ج.م';
+
+        const availEl = document.getElementById('availableForTransfer');
+        if (availEl) availEl.textContent = formatNum(available) + ' ج.م';
 
         onMethodChange();
         openModal('transferModal');
@@ -1264,8 +1303,11 @@
     // حقول إضافية حسب طريقة التحويل
     // ============================================
     function onMethodChange() {
-        const method = document.getElementById('transferMethod').value;
+        const methodEl = document.getElementById('transferMethod');
+        if (!methodEl) return;
+        const method = methodEl.value;
         const extra = document.getElementById('extraFields');
+        if (!extra) return;
 
         if (method === 'كاش') {
             extra.innerHTML = `
@@ -1340,10 +1382,10 @@
     }
 
     function onWalletChange() {
-        const walletName = document.getElementById('walletName')?.value;
+        const walletEl = document.getElementById('walletName');
         const otherGroup = document.getElementById('otherWalletGroup');
-        if (otherGroup) {
-            otherGroup.style.display = walletName === 'أخرى' ? 'block' : 'none';
+        if (walletEl && otherGroup) {
+            otherGroup.style.display = walletEl.value === 'أخرى' ? 'block' : 'none';
         }
     }
 
@@ -1351,21 +1393,24 @@
     // حفظ التحويل
     // ============================================
     async function saveTransfer() {
-        const id = document.getElementById('editTransferId').value;
-        const fromPerson = document.getElementById('fromPerson').value.trim();
-        const toPerson = document.getElementById('toPerson').value.trim();
-        const amount = parseFloat(document.getElementById('transferAmount').value);
-        const transferDate = document.getElementById('transferDate').value;
-        const method = document.getElementById('transferMethod').value;
-        const note = document.getElementById('transferNote').value.trim();
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        };
 
-        // التحقق
+        const id = getVal('editTransferId');
+        const fromPerson = getVal('fromPerson').trim();
+        const toPerson = getVal('toPerson').trim();
+        const amount = parseFloat(getVal('transferAmount'));
+        const transferDate = getVal('transferDate');
+        const method = getVal('transferMethod');
+        const note = getVal('transferNote').trim();
+
         if (!fromPerson) { showNotification('❌ أدخل اسم المحوِّل', 'error'); return; }
         if (!toPerson) { showNotification('❌ أدخل اسم المستلم', 'error'); return; }
         if (!amount || amount <= 0) { showNotification('❌ أدخل مبلغ صحيح', 'error'); return; }
         if (!transferDate) { showNotification('❌ حدد التاريخ', 'error'); return; }
 
-        // التحقق من المبلغ المتاح (من المبيعات المدفوعة)
         const totalPaid = getTotalPaidSales();
         const totalExistingTransfers = allTransfers
             .filter(t => t.id != id)
@@ -1377,31 +1422,34 @@
             return;
         }
 
-        // تفاصيل إضافية
         const extraData = {};
-        if (method === 'كاش') {
-            extraData.cash_note = document.getElementById('cashReceiptNote')?.value.trim() || '';
-        } else if (method === 'بنك') {
-            const bankName = document.getElementById('bankName')?.value.trim() || '';
-            if (!bankName) { showNotification('❌ أدخل اسم البنك', 'error'); return; }
-            extraData.bank_name = bankName;
-            extraData.bank_account = document.getElementById('bankAccount')?.value.trim() || '';
-            extraData.bank_ref = document.getElementById('bankRef')?.value.trim() || '';
-        } else if (method === 'محفظة') {
-            let walletName = document.getElementById('walletName')?.value || '';
-            if (walletName === 'أخرى') {
-                walletName = document.getElementById('otherWalletName')?.value.trim() || '';
-                if (!walletName) { showNotification('❌ أدخل اسم المحفظة', 'error'); return; }
+        try {
+            if (method === 'كاش') {
+                extraData.cash_note = getVal('cashReceiptNote').trim();
+            } else if (method === 'بنك') {
+                const bankName = getVal('bankName').trim();
+                if (!bankName) { showNotification('❌ أدخل اسم البنك', 'error'); return; }
+                extraData.bank_name = bankName;
+                extraData.bank_account = getVal('bankAccount').trim();
+                extraData.bank_ref = getVal('bankRef').trim();
+            } else if (method === 'محفظة') {
+                let walletName = getVal('walletName');
+                if (walletName === 'أخرى') {
+                    walletName = getVal('otherWalletName').trim();
+                    if (!walletName) { showNotification('❌ أدخل اسم المحفظة', 'error'); return; }
+                }
+                extraData.wallet_name = walletName;
+                extraData.wallet_number = getVal('walletNumber').trim();
+                extraData.wallet_ref = getVal('walletRef').trim();
+            } else if (method === 'بريد') {
+                const emailTo = getVal('emailTo').trim();
+                if (!emailTo) { showNotification('❌ أدخل البريد الإلكتروني', 'error'); return; }
+                extraData.email_to = emailTo;
+                extraData.email_subject = getVal('emailSubject').trim();
+                extraData.email_notes = getVal('emailNotes').trim();
             }
-            extraData.wallet_name = walletName;
-            extraData.wallet_number = document.getElementById('walletNumber')?.value.trim() || '';
-            extraData.wallet_ref = document.getElementById('walletRef')?.value.trim() || '';
-        } else if (method === 'بريد') {
-            const emailTo = document.getElementById('emailTo')?.value.trim() || '';
-            if (!emailTo) { showNotification('❌ أدخل البريد الإلكتروني', 'error'); return; }
-            extraData.email_to = emailTo;
-            extraData.email_subject = document.getElementById('emailSubject')?.value.trim() || '';
-            extraData.email_notes = document.getElementById('emailNotes')?.value.trim() || '';
+        } catch (e) {
+            console.error('خطأ في جمع التفاصيل الإضافية:', e);
         }
 
         const payload = {
@@ -1424,19 +1472,19 @@
             }
 
             if (error) {
-                if (error.code === '42P01') {
+                if (error.code === '42P01' || error.message.includes('does not exist')) {
                     saveToLocalStorage(payload, id);
-                } else {
-                    throw error;
+                    return;
                 }
-            } else {
-                showNotification(id ? '✅ تم تعديل التحويل' : '✅ تم حفظ التحويل بنجاح', 'success');
-                closeModal('transferModal');
-                await loadTransfers();
-                await loadStats();
-                loadBalances();
-                loadWalletsDetail();
+                throw error;
             }
+
+            showNotification(id ? '✅ تم تعديل التحويل' : '✅ تم حفظ التحويل بنجاح', 'success');
+            closeModal('transferModal');
+            await loadTransfers();
+            loadStats();
+            loadBalances();
+            loadWalletsDetail();
         } catch (err) {
             console.error('خطأ في حفظ التحويل:', err);
             saveToLocalStorage(payload, id);
@@ -1478,57 +1526,68 @@
         } catch (e) { extra = {}; }
 
         const methodBadge = {
-            'كاش': { class: 'badge-cash', icon: '💵', label: 'كاش باليد' },
-            'بنك': { class: 'badge-bank', icon: '🏦', label: 'تحويل بنكي' },
-            'محفظة': { class: 'badge-wallet', icon: '📱', label: 'محفظة إلكترونية' },
-            'بريد': { class: 'badge-email', icon: '📧', label: 'بريد إلكتروني' }
-        }[t.method] || { class: 'badge-cash', icon: '💵', label: t.method };
+            'كاش': { icon: '💵', label: 'كاش باليد' },
+            'بنك': { icon: '🏦', label: 'تحويل بنكي' },
+            'محفظة': { icon: '📱', label: 'محفظة إلكترونية' },
+            'بريد': { icon: '📧', label: 'بريد إلكتروني' }
+        }[t.method] || { icon: '💵', label: t.method };
 
         let extraRows = '';
+        const rowHtml = (label, value, color = '') => 
+            `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;">
+                <span style="font-weight:700;color:#64748b;">${label}</span>
+                <span style="${color ? 'font-weight:700;color:' + color + ';' : ''}">${escapeHtml(value)}</span>
+            </div>`;
+
         if (t.method === 'كاش' && extra.cash_note) {
-            extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">ملاحظة الاستلام</span><span>${extra.cash_note}</span></div>`;
+            extraRows += rowHtml('ملاحظة الاستلام', extra.cash_note);
         } else if (t.method === 'بنك') {
-            if (extra.bank_name) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">🏦 البنك</span><span style="font-weight:700;">${extra.bank_name}</span></div>`;
-            if (extra.bank_account) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">رقم الحساب</span><span>${extra.bank_account}</span></div>`;
-            if (extra.bank_ref) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">رقم العملية</span><span>${extra.bank_ref}</span></div>`;
+            if (extra.bank_name) extraRows += rowHtml('🏦 البنك', extra.bank_name, '#1e40af');
+            if (extra.bank_account) extraRows += rowHtml('رقم الحساب', extra.bank_account);
+            if (extra.bank_ref) extraRows += rowHtml('رقم العملية', extra.bank_ref);
         } else if (t.method === 'محفظة') {
-            if (extra.wallet_name) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">📱 المحفظة</span><span style="font-weight:700;color:#92400e;">${extra.wallet_name}</span></div>`;
-            if (extra.wallet_number) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">رقم المحفظة</span><span>${extra.wallet_number}</span></div>`;
-            if (extra.wallet_ref) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">رقم العملية</span><span>${extra.wallet_ref}</span></div>`;
+            if (extra.wallet_name) extraRows += rowHtml('📱 المحفظة', extra.wallet_name, '#92400e');
+            if (extra.wallet_number) extraRows += rowHtml('رقم المحفظة', extra.wallet_number);
+            if (extra.wallet_ref) extraRows += rowHtml('رقم العملية', extra.wallet_ref);
         } else if (t.method === 'بريد') {
-            if (extra.email_to) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">📧 البريد</span><span>${extra.email_to}</span></div>`;
-            if (extra.email_subject) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">الموضوع</span><span>${extra.email_subject}</span></div>`;
-            if (extra.email_notes) extraRows += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">ملاحظات</span><span>${extra.email_notes}</span></div>`;
+            if (extra.email_to) extraRows += rowHtml('📧 البريد', extra.email_to);
+            if (extra.email_subject) extraRows += rowHtml('الموضوع', extra.email_subject);
+            if (extra.email_notes) extraRows += rowHtml('ملاحظات', extra.email_notes);
         }
 
-        document.getElementById('detailsContent').innerHTML = `
-            <div style="text-align:center;padding:20px;background:linear-gradient(135deg,#0f766e,#14b8a6);border-radius:12px;margin-bottom:15px;color:white;">
-                <div style="font-size:36px;font-weight:900;margin-bottom:5px;">${formatNum(t.amount)} ج.م</div>
-                <div style="font-size:13px;opacity:0.9;">${methodBadge.icon} ${methodBadge.label}</div>
-            </div>
-            <div style="background:#f8fafc;padding:16px;border-radius:10px;border:1px solid var(--border);">
-                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">📅 التاريخ</span><span>${formatDate(t.transfer_date)}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">👤 من</span><span style="font-weight:700;color:#dc2626;">${t.from_person}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">👤 إلى</span><span style="font-weight:700;color:#059669;">${t.to_person}</span></div>
-                ${t.note ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">📝 البيان</span><span>${t.note}</span></div>` : ''}
-                ${extraRows}
-            </div>
-        `;
+        const content = document.getElementById('detailsContent');
+        if (content) {
+            content.innerHTML = `
+                <div style="text-align:center;padding:20px;background:linear-gradient(135deg,#0f766e,#14b8a6);border-radius:12px;margin-bottom:15px;color:white;">
+                    <div style="font-size:36px;font-weight:900;margin-bottom:5px;">${formatNum(t.amount)} ج.م</div>
+                    <div style="font-size:13px;opacity:0.9;">${methodBadge.icon} ${methodBadge.label}</div>
+                </div>
+                <div style="background:#f8fafc;padding:16px;border-radius:10px;border:1px solid var(--border);">
+                    ${rowHtml('📅 التاريخ', formatDate(t.transfer_date))}
+                    ${rowHtml('👤 من', t.from_person, '#dc2626')}
+                    ${rowHtml('👤 إلى', t.to_person, '#059669')}
+                    ${t.note ? rowHtml('📝 البيان', t.note) : ''}
+                    ${extraRows}
+                </div>
+            `;
+        }
 
         openModal('detailsModal');
     }
 
     // ============================================
-    // حذف التحويل
-    // ============================================
+    // حذف التحويل    // ============================================
     function confirmDeleteTransfer(id) {
         transferToDelete = id;
         const t = allTransfers.find(x => x.id == id);
         const amount = t ? formatNum(t.amount) : '0';
-        document.getElementById('confirmMessage').innerHTML = `
-            هل أنت متأكد من حذف التحويل بمبلغ <strong style="color:#dc2626;">${amount} ج.م</strong>؟
-            <br><small style="color:#64748b;">لا يمكن التراجع</small>
-        `;
+        const msgEl = document.getElementById('confirmMessage');
+        if (msgEl) {
+            msgEl.innerHTML = `
+                هل أنت متأكد من حذف التحويل بمبلغ <strong style="color:#dc2626;">${amount} ج.م</strong>؟
+                <br><small style="color:#64748b;">لا يمكن التراجع</small>
+            `;
+        }
         openModal('confirmModal');
     }
 
@@ -1538,8 +1597,9 @@
 
         try {
             const { error } = await supabase.from('transfers').delete().eq('id', id);
-            if (error && error.code !== '42P01') throw error;
+            if (error && error.code !== '42P01' && !error.message.includes('does not exist')) throw error;
 
+            // حذف من التخزين المحلي
             let transfers = JSON.parse(localStorage.getItem('transfers') || '[]');
             transfers = transfers.filter(t => t.id != id);
             localStorage.setItem('transfers', JSON.stringify(transfers));
@@ -1549,7 +1609,7 @@
             transferToDelete = null;
 
             await loadTransfers();
-            await loadStats();
+            loadStats();
             loadBalances();
             loadWalletsDetail();
         } catch (err) {
@@ -1580,19 +1640,21 @@
         }[t.method] || t.method;
 
         let extraRows = '';
+        const trRow = (lbl, val) => `<tr><td style="font-weight:bold;background:#f0f0f0;width:35%;">${lbl}</td><td>${escapeHtml(val)}</td></tr>`;
+
         if (t.method === 'كاش' && extra.cash_note) {
-            extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">ملاحظة</td><td>${extra.cash_note}</td></tr>`;
+            extraRows += trRow('ملاحظة', extra.cash_note);
         } else if (t.method === 'بنك') {
-            if (extra.bank_name) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">البنك</td><td>${extra.bank_name}</td></tr>`;
-            if (extra.bank_account) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">رقم الحساب</td><td>${extra.bank_account}</td></tr>`;
-            if (extra.bank_ref) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">رقم العملية</td><td>${extra.bank_ref}</td></tr>`;
+            if (extra.bank_name) extraRows += trRow('البنك', extra.bank_name);
+            if (extra.bank_account) extraRows += trRow('رقم الحساب', extra.bank_account);
+            if (extra.bank_ref) extraRows += trRow('رقم العملية', extra.bank_ref);
         } else if (t.method === 'محفظة') {
-            if (extra.wallet_name) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">المحفظة</td><td>${extra.wallet_name}</td></tr>`;
-            if (extra.wallet_number) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">رقم المحفظة</td><td>${extra.wallet_number}</td></tr>`;
-            if (extra.wallet_ref) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">رقم العملية</td><td>${extra.wallet_ref}</td></tr>`;
+            if (extra.wallet_name) extraRows += trRow('المحفظة', extra.wallet_name);
+            if (extra.wallet_number) extraRows += trRow('رقم المحفظة', extra.wallet_number);
+            if (extra.wallet_ref) extraRows += trRow('رقم العملية', extra.wallet_ref);
         } else if (t.method === 'بريد') {
-            if (extra.email_to) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">البريد</td><td>${extra.email_to}</td></tr>`;
-            if (extra.email_subject) extraRows += `<tr><td style="font-weight:bold;background:#f0f0f0;">الموضوع</td><td>${extra.email_subject}</td></tr>`;
+            if (extra.email_to) extraRows += trRow('البريد', extra.email_to);
+            if (extra.email_subject) extraRows += trRow('الموضوع', extra.email_subject);
         }
 
         const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
@@ -1623,13 +1685,13 @@
                 <div class="label">${methodLabel}</div>
             </div>
             <table>
-                <tr><td style="font-weight:bold;background:#f0f0f0;width:30%;">رقم الإيصال</td><td>TRF-${String(t.id).padStart(6, '0')}</td></tr>
+                <tr><td style="font-weight:bold;background:#f0f0f0;width:35%;">رقم الإيصال</td><td>TRF-${String(t.id).padStart(6, '0')}</td></tr>
                 <tr><td style="font-weight:bold;background:#f0f0f0;">التاريخ</td><td>${formatDate(t.transfer_date)}</td></tr>
-                <tr><td style="font-weight:bold;background:#f0f0f0;">من (المحوِّل)</td><td>${t.from_person}</td></tr>
-                <tr><td style="font-weight:bold;background:#f0f0f0;">إلى (المستلم)</td><td>${t.to_person}</td></tr>
+                <tr><td style="font-weight:bold;background:#f0f0f0;">من (المحوِّل)</td><td>${escapeHtml(t.from_person)}</td></tr>
+                <tr><td style="font-weight:bold;background:#f0f0f0;">إلى (المستلم)</td><td>${escapeHtml(t.to_person)}</td></tr>
                 <tr><td style="font-weight:bold;background:#f0f0f0;">طريقة التحويل</td><td>${methodLabel}</td></tr>
                 ${extraRows}
-                ${t.note ? `<tr><td style="font-weight:bold;background:#f0f0f0;">البيان</td><td>${t.note}</td></tr>` : ''}
+                ${t.note ? trRow('البيان', t.note) : ''}
             </table>
             <div class="signatures">
                 <div>توقيع المحوِّل<div class="line"></div></div>
@@ -1681,11 +1743,11 @@
             return `<tr>
                 <td>${i + 1}</td>
                 <td>${formatDate(t.transfer_date)}</td>
-                <td>${t.from_person}</td>
-                <td>${t.to_person}</td>
+                <td>${escapeHtml(t.from_person)}</td>
+                <td>${escapeHtml(t.to_person)}</td>
                 <td style="font-weight:bold;">${formatNum(t.amount)}</td>
-                <td>${methodLabel}</td>
-                <td style="text-align:right;">${t.note || '-'}</td>
+                <td>${escapeHtml(methodLabel)}</td>
+                <td style="text-align:right;">${escapeHtml(t.note || '-')}</td>
             </tr>`;
         }).join('');
 
@@ -1765,6 +1827,21 @@
             }
         }
     });
+
+    // إتاحة الدوال عالمياً
+    window.openTransferModal = openTransferModal;
+    window.saveTransfer = saveTransfer;
+    window.viewTransfer = viewTransfer;
+    window.confirmDeleteTransfer = confirmDeleteTransfer;
+    window.deleteTransfer = deleteTransfer;
+    window.printTransferReceipt = printTransferReceipt;
+    window.printTransfersReport = printTransfersReport;
+    window.filterTransfers = filterTransfers;
+    window.loadBalances = loadBalances;
+    window.onMethodChange = onMethodChange;
+    window.onWalletChange = onWalletChange;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
     </script>
 </body>
 </html>
