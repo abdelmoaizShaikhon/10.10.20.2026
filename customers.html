@@ -88,8 +88,6 @@
         .btn-edit:hover { background: #b2dfdb; }
         .btn-delete { background: #fee2e2; color: #dc2626; }
         .btn-delete:hover { background: #fecaca; }
-        .btn-print { background: #fef3c7; color: #92400e; }
-        .btn-print:hover { background: #fde68a; }
 
         /* ============ إحصائيات ============ */
         .stats-row {
@@ -165,7 +163,7 @@
             justify-content: center;
             padding: 16px;
         }
-        .modal-overlay.active, .modal-overlay.show { display: flex; }
+        .modal-overlay.active { display: flex; }
 
         .modal-content {
             background: white;
@@ -296,45 +294,194 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        /* ============ تفاصيل العميل ============ */
-        .detail-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
-        .detail-card {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            flex: 1;
-            min-width: 250px;
-        }
-        .detail-card h4 {
-            border-right: 4px solid var(--accent);
-            padding-right: 10px;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        .detail-item { display: flex; margin-bottom: 6px; font-size: 13px; }
-        .detail-item .lbl { width: 100px; font-weight: 600; color: var(--text-light); }
-        .detail-item .val { flex: 1; }
-
-        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .summary-mini {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .summary-mini .big { font-size: 20px; font-weight: 800; }
-        .summary-mini .sml { font-size: 10px; color: var(--text-light); }
-
-        /* ============ الجوال ============ */
-        @media (max-width: 768px) {
+        /* ============================================
+           تحسينات الموبايل الشاملة
+           ============================================ */
+        @media (max-width: 1024px) {
             .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .detail-row { flex-direction: column; }
-            .summary-cards { grid-template-columns: repeat(2, 1fr); }
-            .modal-content { width: 95%; }
-            .form-row { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; }
+            .table-wrapper { margin: 0 12px 12px; }
+            .filter-bar { margin: 0 12px 12px; }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px !important;
+                text-align: center;
+            }
+            .page-header h2 { font-size: 18px !important; }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 12px;
+            }
+            .stat-card { padding: 12px 8px; border-radius: 10px; }
+            .stat-card .number { font-size: 18px; }
+            .stat-card .label { font-size: 10px; }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+                margin: 0 12px 12px;
+            }
+            .filter-bar input,
+            .filter-bar select {
+                width: 100%;
+                padding: 12px 14px;
+                font-size: 14px;
+                min-width: unset;
+            }
+            .filter-bar .btn-add {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* الجدول → بطاقات */
+            .table-wrapper {
+                margin: 0 12px 12px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                overflow: visible;
+            }
+            .table-scroll { max-height: none; overflow: visible; }
+            table { min-width: unset; width: 100%; display: block; }
+            thead { display: none; }
+            tbody { display: block; }
+            tbody tr {
+                display: block;
+                background: var(--card);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 14px;
+                box-shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+                border: 1px solid var(--border);
+                position: relative;
+            }
+
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px dashed #e2e8f0;
+                text-align: right !important;
+                white-space: normal !important;
+                font-size: 13px;
+                min-height: 36px;
+            }
+            tbody td:last-child {
+                border-bottom: none;
+                padding-top: 12px;
+                margin-top: 6px;
+                border-top: 2px solid #f1f5f9;
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: center;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-light);
+                font-size: 12px;
+                flex-shrink: 0;
+                margin-left: 10px;
+            }
+            tbody td[data-label="#"],
+            tbody td[data-label="الخصم"] { display: none; }
+
+            tbody td[data-label="الاسم"] {
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--primary);
+                border-bottom: 2px solid #f1f5f9;
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+            }
+            tbody td[data-label="النوع"] {
+                position: absolute;
+                top: 14px;
+                left: 14px;
+                border: none;
+                padding: 0;
+                min-height: unset;
+            }
+            tbody td[data-label="النوع"]::before { display: none; }
+
+            .btn-action {
+                padding: 8px 14px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 70px;
+            }
+
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 92vh;
+                border-radius: 20px 20px 0 0;
+                animation: slideUpMobile 0.3s ease;
+            }
+            @keyframes slideUpMobile {
+                from { transform: translateY(100%); }
+                to   { transform: translateY(0); }
+            }
+            .modal-header {
+                padding: 14px 16px;
+                border-radius: 20px 20px 0 0;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .modal-header h3 { font-size: 15px; }
+            .modal-body { padding: 16px; }
+            .modal-footer {
+                padding: 12px 16px;
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+            .modal-footer button { width: 100%; padding: 12px; font-size: 14px; }
+
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .form-group { margin-bottom: 12px; }
+            .form-group label { font-size: 13px; margin-bottom: 6px; }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+
+            #customerDetailsContent table { min-width: 500px; }
+
+            .notification {
+                top: auto;
+                bottom: 80px;
+                left: 12px;
+                right: 12px;
+                transform: none;
+                text-align: center;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .bottom-nav { display: flex !important; }
+        }
+
+        @media (max-width: 380px) {
+            .stat-card .number { font-size: 16px; }
+            .stat-card .label { font-size: 9px; }
+            .btn-action { font-size: 11px; padding: 7px 10px; min-width: 60px; }
+            .page-header h2 { font-size: 16px !important; }
         }
     </style>
 </head>
@@ -377,7 +524,6 @@
                 <h2 style="font-size:20px;font-weight:800;">👤 إدارة العملاء</h2>
             </div>
 
-            <!-- إحصائيات -->
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="number blue" id="totalCustomers">0</div>
@@ -397,7 +543,6 @@
                 </div>
             </div>
 
-            <!-- فلترة -->
             <div class="filter-bar">
                 <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="filterCustomers()">
                 <select id="typeFilter" onchange="filterCustomers()">
@@ -414,7 +559,6 @@
                 <button class="btn-add" onclick="openCustomerModal()">➕ عميل جديد</button>
             </div>
 
-            <!-- الجدول -->
             <div class="table-wrapper">
                 <div class="table-scroll">
                     <table>
@@ -558,20 +702,16 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة تأكيد الحذف (مستويين) -->
+    <!-- نافذة تأكيد الحذف (مستويين) -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content modal-sm">
             <div class="modal-header" id="confirmModalHeader" style="background:#fef3c7;">
                 <h3 id="confirmModalTitle">⚠️ تأكيد الحذف</h3>
-                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+                <button class="modal-close" id="confirmModalClose" onclick="closeModal('confirmModal')">✕</button>
             </div>
             <div class="modal-body">
                 <p style="text-align:center;font-size:15px;line-height:1.7;" id="confirmMessage">هل أنت متأكد؟</p>
-                <div id="confirmExtraInfo" style="display:none;margin-top:15px;padding:12px;background:#fee2e2;border-radius:8px;border:1px solid #dc2626;">
-                    <p style="margin:0;font-size:13px;color:#dc2626;font-weight:700;text-align:center;">
-                        ⚠️ تحذير: سيتم حذف جميع الفواتير المرتبطة بهذا العميل
-                    </p>
-                </div>
+                <div id="confirmExtraInfo" style="display:none;margin-top:15px;"></div>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
@@ -594,7 +734,7 @@
     let filteredCustomers = [];
     let allSales = [];
     let customerToDelete = null;
-    let deleteStage = 0; // 0 = لم يبدأ، 1 = التأكيد الأول، 2 = التأكيد النهائي
+    let deleteStage = 0;
 
     // ============================================
     // بدء التشغيل
@@ -635,9 +775,7 @@
     // ============================================
     async function loadSales() {
         try {
-            const { data, error } = await supabase
-                .from('sales')
-                .select('*');
+            const { data, error } = await supabase.from('sales').select('*');
             if (error) throw error;
             allSales = data || [];
         } catch (err) {
@@ -647,7 +785,7 @@
     }
 
     // ============================================
-    // حساب مستحقات العميل من الفواتير
+    // حسابات العميل
     // ============================================
     function getCustomerTotalPurchases(customerId) {
         return allSales
@@ -662,7 +800,6 @@
     }
 
     function getCustomerRemaining(customerId) {
-        // استخدام الرصيد المخزّن إذا وُجد، وإلا حساب الفرق
         const c = allCustomers.find(x => x.id == customerId);
         if (c && c.balance !== undefined && c.balance !== null && Number(c.balance) !== 0) {
             return Number(c.balance);
@@ -693,7 +830,7 @@
             console.error('خطأ في تحميل العملاء:', err);
             document.getElementById('customersTable').innerHTML = `
                 <tr><td colspan="10" style="text-align:center;padding:40px;color:#dc2626;">
-                    ⚠️ حدث خطأ في تحميل العملاء: ${err.message}
+                    ⚠️ حدث خطأ: ${err.message}
                 </td></tr>`;
         }
     }
@@ -703,7 +840,6 @@
     // ============================================
     async function loadStats() {
         try {
-            const totalCustomers = allCustomers.length;
             let totalDebt = 0;
             let totalPaid = 0;
             let totalInvoices = 0;
@@ -715,23 +851,17 @@
                 totalInvoices += getCustomerInvoicesCount(c.id);
             });
 
-            // إضافة الرصيد المخزّن
-            allCustomers.forEach(c => {
-                const bal = Number(c.balance || 0);
-                if (bal > 0 && getCustomerRemaining(c.id) <= 0) totalDebt += bal;
-            });
-
-            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalCustomers').textContent = allCustomers.length;
             document.getElementById('totalDebt').textContent = formatNum(totalDebt) + ' ج.م';
             document.getElementById('totalPaid').textContent = formatNum(totalPaid) + ' ج.م';
             document.getElementById('totalSales').textContent = totalInvoices;
         } catch (err) {
-            console.error('خطأ في تحميل الإحصائيات:', err);
+            console.error('خطأ في الإحصائيات:', err);
         }
     }
 
     // ============================================
-    // عرض العملاء في الجدول
+    // عرض العملاء
     // ============================================
     function renderCustomers(list) {
         const tbody = document.getElementById('customersTable');
@@ -751,22 +881,22 @@
             const safeName = (c.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
             return `<tr>
-                <td>${i + 1}</td>
-                <td style="font-weight:700;">${c.name || 'بدون اسم'}</td>
-                <td><span class="badge ${badgeClass}">${c.type || 'عادي'}</span></td>
-                <td>${c.discount || 0}%</td>
-                <td>${c.phone || '-'}</td>
-                <td style="color:#0891b2;font-weight:600;">${formatNum(total)} ج.م</td>
-                <td style="color:#10b981;font-weight:600;">${formatNum(paid)} ج.م</td>
-                <td style="color:${remaining > 0 ? '#ef4444' : '#10b981'};font-weight:700;">
+                <td data-label="#">${i + 1}</td>
+                <td data-label="الاسم">${c.name || 'بدون اسم'}</td>
+                <td data-label="النوع"><span class="badge ${badgeClass}">${c.type || 'عادي'}</span></td>
+                <td data-label="الخصم">${c.discount || 0}%</td>
+                <td data-label="الهاتف">${c.phone || '-'}</td>
+                <td data-label="المشتريات" style="color:#0891b2;font-weight:600;">${formatNum(total)} ج.م</td>
+                <td data-label="المدفوع" style="color:#10b981;font-weight:600;">${formatNum(paid)} ج.م</td>
+                <td data-label="المتبقي" style="color:${remaining > 0 ? '#ef4444' : '#10b981'};font-weight:700;">
                     ${remaining < 0 ? 'رصيد موجب: ' + formatNum(Math.abs(remaining)) : formatNum(remaining)} ج.م
                 </td>
-                <td><span class="badge ${statusClass}">${statusText}</span></td>
-                <td>
-                    <button class="btn-action btn-view" onclick="viewCustomerDetails(${customerId})" title="عرض التقرير">📋 تقرير</button>
-                    <button class="btn-action btn-edit" onclick="editCustomer(${customerId})" title="تعديل">✏️ تعديل</button>
-                    <button class="btn-action btn-pay" onclick="openPaymentModal(${customerId})" title="إضافة دفعة">💵 دفع</button>
-                    <button class="btn-action btn-delete" onclick="confirmDeleteCustomer(${customerId}, '${safeName}')" title="حذف">🗑️ حذف</button>
+                <td data-label="الحالة"><span class="badge ${statusClass}">${statusText}</span></td>
+                <td data-label="إجراءات">
+                    <button class="btn-action btn-view" onclick="viewCustomerDetails(${customerId})">📋 تقرير</button>
+                    <button class="btn-action btn-edit" onclick="editCustomer(${customerId})">✏️ تعديل</button>
+                    <button class="btn-action btn-pay" onclick="openPaymentModal(${customerId})">💵 دفع</button>
+                    <button class="btn-action btn-delete" onclick="confirmDeleteCustomer(${customerId}, '${safeName}')">🗑️ حذف</button>
                 </td>
             </tr>`;
         }).join('');
@@ -894,12 +1024,12 @@
             const invPaid = Number(inv.paid_amount) || 0;
             const invRemaining = Number(inv.remaining_amount) || (invTotal - invPaid);
             return `<tr>
-                <td>${i + 1}</td>
-                <td><strong>${inv.invoice_number || '#' + inv.id}</strong></td>
-                <td>${inv.created_at ? new Date(inv.created_at).toLocaleDateString('ar-EG') : ''}</td>
-                <td style="color:#0891b2;font-weight:600;">${formatNum(invTotal)} ج.م</td>
-                <td style="color:#059669;font-weight:600;">${formatNum(invPaid)} ج.م</td>
-                <td style="color:${invRemaining > 0 ? '#ef4444' : '#10b981'};font-weight:700;">${formatNum(invRemaining)} ج.م</td>
+                <td data-label="#">${i + 1}</td>
+                <td data-label="رقم الفاتورة"><strong>${inv.invoice_number || '#' + inv.id}</strong></td>
+                <td data-label="التاريخ">${inv.created_at ? new Date(inv.created_at).toLocaleDateString('ar-EG') : ''}</td>
+                <td data-label="الإجمالي" style="color:#0891b2;font-weight:600;">${formatNum(invTotal)} ج.م</td>
+                <td data-label="المدفوع" style="color:#059669;font-weight:600;">${formatNum(invPaid)} ج.م</td>
+                <td data-label="المتبقي" style="color:${invRemaining > 0 ? '#ef4444' : '#10b981'};font-weight:700;">${formatNum(invRemaining)} ج.م</td>
             </tr>`;
         }).join('');
 
@@ -911,7 +1041,6 @@
                         <span><strong>النوع:</strong> ${c.type || 'عادي'}</span>
                         <span><strong>الخصم:</strong> ${c.discount || 0}%</span>
                         <span><strong>الهاتف:</strong> ${c.phone || '-'}</span>
-                        <span><strong>العنوان:</strong> ${c.address || '-'}</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:15px;flex-wrap:wrap;">
@@ -934,7 +1063,7 @@
                     📄 الفواتير (${customerInvoices.length})
                 </div>
                 <div style="overflow-x:auto;max-height:350px;overflow-y:auto;">
-                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:500px;">
                         <thead style="position:sticky;top:0;z-index:5;">
                             <tr style="background:#e8f0ef;">
                                 <th style="padding:8px 6px;border:1px solid var(--border);">#</th>
@@ -988,7 +1117,6 @@
         const newBalance = Number(c.balance || 0) - amount;
 
         try {
-            // محاولة تسجيل الدفعة في جدول payments (إن وجد)
             try {
                 await supabase.from('payments').insert([{
                     customer_id: id,
@@ -999,7 +1127,6 @@
                 }]);
             } catch (e) { /* جدول الدفعات غير موجود */ }
 
-            // تحديث رصيد العميل
             const { error: updErr } = await supabase
                 .from('customers')
                 .update({ balance: newBalance })
@@ -1018,7 +1145,7 @@
     }
 
     // ============================================
-    // ✅ تأكيد حذف العميل (نظام مزدوج)
+    // تأكيد حذف العميل (مستويين)
     // ============================================
     function confirmDeleteCustomer(id, name) {
         customerToDelete = id;
@@ -1030,29 +1157,32 @@
         const titleEl = document.getElementById('confirmModalTitle');
         const headerEl = document.getElementById('confirmModalHeader');
         const btnEl = document.getElementById('confirmDeleteBtn');
+        const closeEl = document.getElementById('confirmModalClose');
+
+        // إعادة تعيين الألوان
+        titleEl.style.color = '';
+        closeEl.style.color = '';
 
         if (hasInvoices) {
-            // ✅ المرحلة الأولى: تحذير من وجود فواتير
             deleteStage = 1;
             headerEl.style.background = '#fee2e2';
             titleEl.textContent = '⚠️ تحذير: فواتير مرتبطة';
-            msgEl.innerHTML = `العميل <strong style="color:#dc2626;">"${name}"</strong> لديه <strong style="color:#dc2626;">${invoicesCount} فاتورة</strong>.<br><br>
-                هل تريد المتابعة؟`;
+            msgEl.innerHTML = `العميل <strong style="color:#dc2626;">"${name}"</strong> لديه <strong style="color:#dc2626;">${invoicesCount} فاتورة</strong>.<br><br>هل تريد المتابعة؟`;
             extraEl.style.display = 'block';
             extraEl.innerHTML = `
-                <p style="margin:0;font-size:13px;color:#dc2626;font-weight:700;text-align:center;">
-                    ⚠️ سيتم حذف جميع الفواتير (${invoicesCount}) المرتبطة بهذا العميل نهائياً
-                </p>
+                <div style="padding:12px;background:#fee2e2;border-radius:8px;border:1px solid #dc2626;">
+                    <p style="margin:0;font-size:13px;color:#dc2626;font-weight:700;text-align:center;">
+                        ⚠️ سيتم حذف جميع الفواتير (${invoicesCount}) المرتبطة بهذا العميل نهائياً
+                    </p>
+                </div>
             `;
             btnEl.textContent = '⚠️ متابعة الحذف';
             btnEl.style.background = '#f59e0b';
         } else {
-            // ✅ لا توجد فواتير: تأكيد عادي
             deleteStage = 2;
             headerEl.style.background = '#fef3c7';
             titleEl.textContent = '⚠️ تأكيد الحذف';
-            msgEl.innerHTML = `هل أنت متأكد من حذف العميل <strong style="color:#dc2626;">"${name}"</strong>؟<br>
-                <small style="color:#64748b;">لا يمكن التراجع عن هذا الإجراء</small>`;
+            msgEl.innerHTML = `هل أنت متأكد من حذف العميل <strong style="color:#dc2626;">"${name}"</strong>؟<br><small style="color:#64748b;">لا يمكن التراجع عن هذا الإجراء</small>`;
             extraEl.style.display = 'none';
             btnEl.textContent = '🗑️ حذف';
             btnEl.style.background = '#dc2626';
@@ -1062,7 +1192,7 @@
     }
 
     // ============================================
-    // ✅ تنفيذ الحذف (مع التأكيد المزدوج)
+    // تنفيذ الحذف
     // ============================================
     async function deleteCustomer() {
         if (!customerToDelete) {
@@ -1073,7 +1203,7 @@
         const id = customerToDelete;
         const invoicesCount = getCustomerInvoicesCount(id);
 
-        // ✅ المرحلة الأولى: إذا كان لديه فواتير، نطلب التأكيد الثاني
+        // المرحلة الأولى: طلب تأكيد ثاني
         if (deleteStage === 1 && invoicesCount > 0) {
             const c = allCustomers.find(x => x.id == id);
             const name = c ? c.name : '';
@@ -1084,59 +1214,59 @@
             const msgEl = document.getElementById('confirmMessage');
             const extraEl = document.getElementById('confirmExtraInfo');
             const btnEl = document.getElementById('confirmDeleteBtn');
+            const closeEl = document.getElementById('confirmModalClose');
 
             headerEl.style.background = '#dc2626';
             titleEl.textContent = '🚨 تأكيد نهائي';
             titleEl.style.color = 'white';
-            document.querySelector('#confirmModal .modal-close').style.color = 'white';
+            closeEl.style.color = 'white';
+
             msgEl.innerHTML = `
                 <strong style="color:#dc2626;font-size:16px;">تأكيد نهائي!</strong><br><br>
                 سيتم حذف العميل <strong>"${name}"</strong> و<strong style="color:#dc2626;">${invoicesCount} فاتورة</strong> نهائياً.<br><br>
                 <span style="color:#dc2626;font-weight:700;">هل أنت متأكد 100%؟</span>
             `;
             extraEl.innerHTML = `
-                <p style="margin:0;font-size:13px;color:white;font-weight:700;text-align:center;background:#dc2626;padding:8px;border-radius:6px;">
-                    🚨 لا يمكن التراجع عن هذا الإجراء
-                </p>
+                <div style="padding:10px;background:#dc2626;border-radius:8px;">
+                    <p style="margin:0;font-size:13px;color:white;font-weight:700;text-align:center;">
+                        🚨 لا يمكن التراجع عن هذا الإجراء
+                    </p>
+                </div>
             `;
             btnEl.textContent = '🗑️ نعم، احذف نهائياً';
             btnEl.style.background = '#991b1b';
             return;
         }
 
-        // ✅ المرحلة النهائية: تنفيذ الحذف
+        // المرحلة النهائية: التنفيذ
         try {
-            // 1. حذف جميع فواتير العميل من جدول sales
+            // حذف الفواتير
             if (invoicesCount > 0) {
                 const { error: salesErr } = await supabase
                     .from('sales')
                     .delete()
                     .eq('customer_id', id);
-
                 if (salesErr) throw new Error('فشل حذف الفواتير: ' + salesErr.message);
             }
 
-            // 2. حذف الدفعات المرتبطة (إن وجدت)
+            // حذف الدفعات
             try {
                 await supabase.from('payments').delete().eq('customer_id', id);
-            } catch (e) { /* جدول الدفعات غير موجود */ }
+            } catch (e) { /* غير موجود */ }
 
-            // 3. حذف العميل
+            // حذف العميل
             const { error: custErr } = await supabase
                 .from('customers')
                 .delete()
                 .eq('id', id);
-
             if (custErr) throw custErr;
 
             showNotification(`✅ تم حذف العميل ${invoicesCount > 0 ? 'و ' + invoicesCount + ' فاتورة' : ''} بنجاح`, 'success');
             closeModal('confirmModal');
 
-            // إعادة تعيين
             customerToDelete = null;
             deleteStage = 0;
 
-            // إعادة تحميل البيانات
             await loadSales();
             await loadCustomers();
             await loadStats();
@@ -1160,14 +1290,12 @@
     function closeModal(id) {
         const el = document.getElementById(id);
         if (el) el.classList.remove('active');
-        // إعادة تعيين حالة الحذف
         if (id === 'confirmModal') {
             customerToDelete = null;
             deleteStage = 0;
         }
     }
 
-    // إغلاق عند النقر على الخلفية
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('active');
