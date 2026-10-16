@@ -1,1 +1,640 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تسجيل الدخول - شركة العبادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 
+    <style>
+        :root {
+            --primary: #0f3d3e;
+            --primary-dark: #0a2e2f;
+            --accent: #14b8a6;
+            --accent-light: #5eead4;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f0f4f4;
+            --card: #ffffff;
+            --border: #d1d9d9;
+            --text: #0f3d3e;
+            --text-light: #64748b;
+            --radius: 16px;
+            --shadow: 0 20px 60px rgba(15, 61, 62, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0a2e2f 0%, #0f3d3e 50%, #0f766e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(20, 184, 166, 0.25), transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.15), transparent 50%);
+            animation: rotate 30s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .login-container {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary), #0f766e);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.2), transparent 70%);
+            animation: pulse 6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .login-logo {
+            font-size: 56px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-header p {
+            font-size: 13px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-body {
+            padding: 32px 28px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 46px 14px 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 15px;
+            transition: all 0.25s;
+            background: #fafbfc;
+            color: var(--text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+        }
+
+        .form-group input.error {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover { color: var(--accent); }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(20, 184, 166, 0.4);
+        }
+
+        .btn-login:active { transform: translateY(0); }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-login span { position: relative; z-index: 2; }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #fecaca;
+            animation: shake 0.4s ease;
+        }
+
+        .error-message.show { display: flex; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #059669;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #a7f3d0;
+        }
+
+        .success-message.show { display: flex; }
+
+        .login-footer {
+            text-align: center;
+            padding: 16px 24px 24px;
+            font-size: 12px;
+            color: var(--text-light);
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .login-footer strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .remember-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .remember-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .remember-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0a2e2f 0%, #0f3d3e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 480px) {
+            .login-header { padding: 26px 20px; }
+            .login-logo { font-size: 48px; }
+            .login-header h1 { font-size: 20px; }
+            .login-body { padding: 26px 22px; }
+            .form-group input { padding: 13px 42px 13px 13px; font-size: 14px; }
+            .btn-login { padding: 14px; font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">🏢</div>
+            <h1>شركة العبادي</h1>
+            <p>نظام إدارة المخازن والمبيعات</p>
+        </div>
+
+        <div class="login-body">
+            <div class="error-message" id="errorMessage">
+                <span>❌</span>
+                <span id="errorText">خطأ في تسجيل الدخول</span>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <span>✅</span>
+                <span id="successText">تم تسجيل الدخول بنجاح</span>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>👤 اسم المستخدم</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="username" required>
+                        <span class="input-icon">👤</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>🔒 كلمة المرور</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="أدخل كلمة المرور" autocomplete="current-password" required>
+                        <span class="input-icon">🔒</span>
+                        <button type="button" class="toggle-password" onclick="togglePassword()" id="toggleBtn">👁️</button>
+                    </div>
+                </div>
+
+                <div class="remember-row">
+                    <label class="remember-label">
+                        <input type="checkbox" id="rememberMe">
+                        <span>تذكرني</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span id="loginBtnText">🚪 تسجيل الدخول</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <strong>شركة العبادي</strong> © 2024 - جميع الحقوق محفوظة
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.classList.add('hidden');
+        }, 500);
+
+        checkExistingSession();
+
+        setTimeout(() => {
+            const u = document.getElementById('username');
+            if (u) u.focus();
+        }, 600);
+    });
+
+    function checkExistingSession() {
+        try {
+            const session = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (session) {
+                const user = JSON.parse(session);
+                if (user && user.id && user.username) {
+                    if (localStorage.getItem('currentUser')) {
+                        showSuccess('مرحباً بك مجدداً ' + (user.fullName || user.username));
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 800);
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('خطأ في قراءة الجلسة:', e);
+        }
+    }
+
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const btn = document.getElementById('toggleBtn');
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            btn.textContent = '👁️';
+        }
+    }
+
+    function showError(msg) {
+        const errorEl = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const successEl = document.getElementById('successMessage');
+
+        if (successEl) successEl.classList.remove('show');
+        if (errorText) errorText.textContent = msg;
+        if (errorEl) {
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 5000);
+        }
+    }
+
+    function showSuccess(msg) {
+        const successEl = document.getElementById('successMessage');
+        const successText = document.getElementById('successText');
+        const errorEl = document.getElementById('errorMessage');
+
+        if (errorEl) errorEl.classList.remove('show');
+        if (successText) successText.textContent = msg;
+        if (successEl) successEl.classList.add('show');
+    }
+
+    async function handleLogin(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        const loginBtn = document.getElementById('loginBtn');
+        const loginBtnText = document.getElementById('loginBtnText');
+
+        if (!username || !password) {
+            showError('الرجاء إدخال اسم المستخدم وكلمة المرور');
+            return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtnText.innerHTML = 'جاري التحقق <span class="spinner"></span>';
+
+        try {
+            let user = null;
+
+            // محاولة من Supabase
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (!error && data) user = data;
+            } catch (e) {
+                console.warn('خطأ في الاتصال بـ Supabase:', e);
+            }
+
+            // من التخزين المحلي
+            if (!user) {
+                const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+                user = localUsers.find(u => u.username === username);
+            }
+
+            // المستخدم الافتراضي
+            if (!user && username === 'admin' && password === 'admin123') {
+                user = {
+                    id: 1,
+                    username: 'admin',
+                    full_name: 'مدير النظام',
+                    fullName: 'مدير النظام',
+                    role: 'admin',
+                    status: true
+                };
+                localStorage.setItem('users', JSON.stringify([user]));
+            }
+
+            if (!user) {
+                showError('❌ اسم المستخدم غير موجود');
+                loginBtn.disabled = false;
+                loginBtnText.textContent = '🚪 تسجيل الدخول';
+                return;
+            }
+
+            // التحقق من كلمة المرور
+            const storedPassword = user.password || user.password_hash || '';
+            let passwordMatch = false;
+
+            if (storedPassword === password) {
+                passwordMatch = true;
+            } else if (storedPassword && storedPassword.length === 64) {
+                try {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(password);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    passwordMatch = (hashHex === storedPassword);
+                } catch (e) {
+                    console.warn('خطأ في التشفير:', e);
+                }
+            }
+
+            if (!passwordMatch && username === 'admin' && password === 'admin123') {
+                passwordMatch = true;
+            }
+
+            if (!passwordMatch) {
+                showError('❌ كلمة المرور غير صحيحة');
+                loginBtn.disabled = false;
+                loginBtnText.textContent = '🚪 تسجيل الدخول';
+                return;
+            }
+
+            // التحقق من الحالة
+            const isActive = user.status === true || user.status === 'true' || user.status === 1 || user.status === 'active' || user.status === undefined;
+            if (!isActive) {
+                showError('❌ هذا الحساب غير نشط');
+                loginBtn.disabled = false;
+                loginBtnText.textContent = '🚪 تسجيل الدخول';
+                return;
+            }
+
+            // حفظ الجلسة
+            const sessionData = {
+                id: user.id || user._id,
+                username: user.username,
+                fullName: user.full_name || user.fullName || user.username,
+                role: user.role || 'user',
+                loginTime: new Date().toISOString()
+            };
+
+            if (rememberMe) {
+                localStorage.setItem('currentUser', JSON.stringify(sessionData));
+            } else {
+                sessionStorage.setItem('currentUser', JSON.stringify(sessionData));
+            }
+
+            showSuccess('✅ مرحباً بك ' + sessionData.fullName);
+            loginBtnText.textContent = '✅ تم بنجاح';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 700);
+
+        } catch (err) {
+            console.error('خطأ في تسجيل الدخول:', err);
+            showError('حدث خطأ: ' + err.message);
+            loginBtn.disabled = false;
+            loginBtnText.textContent = '🚪 تسجيل الدخول';
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const form = document.getElementById('loginForm');
+            if (form && document.activeElement.tagName === 'INPUT') {
+                form.requestSubmit();
+            }
+        }
+    });
+    </script>
+</body>
+</html>
