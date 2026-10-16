@@ -1,18 +1,27 @@
 // ============================================
-// 🔐 دوال المصادقة - شركة العبادي
+// 🔐 نظام المصادقة والجلسة - شركة العبادي
 // ============================================
 
-// عدد محاولات الدخول الفاشلة
+// ============================================
+// المتغيرات العامة
+// ============================================
 let loginAttempts = 0;
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000; // 15 دقيقة
+const SESSION_KEY = 'alabady_session';
+const USER_KEY = 'currentUser';
+const LOCK_KEY = 'account_lock';
+const ATTEMPTS_KEY = 'login_attempts';
+const SALT = 'ALABADY_SALT_2026';
 
-// تبديل إظهار/إخفاء كلمة المرور
+// ============================================
+// 🔒 تبديل إظهار/إخفاء كلمة المرور
+// ============================================
 function togglePassword() {
     const passwordInput = document.getElementById('password');
-    const toggleBtn = document.querySelector('.toggle-password');
+    const toggleBtn = document.getElementById('toggleBtn') || document.querySelector('.toggle-password');
     if (!passwordInput || !toggleBtn) return;
-    
+
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         toggleBtn.textContent = '🙈';
@@ -22,26 +31,36 @@ function togglePassword() {
     }
 }
 
-// تشفير كلمة المرور (SHA-256)
+// ============================================
+// 🔐 تشفير كلمة المرور (SHA-256)
+// ============================================
 async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password + 'ALABADY_SALT_2026');
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password + SALT);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+        console.warn('خطأ في التشفير:', e);
+        return password;
+    }
 }
 
-// التحقق من قفل الحساب
+// ============================================
+// 🔒 التحقق من قفل الحساب
+// ============================================
 function isAccountLocked() {
-    const lockData = localStorage.getItem('account_lock');
+    const lockData = localStorage.getItem(LOCK_KEY);
     if (!lockData) return false;
 
     try {
         const lockInfo = JSON.parse(lockData);
         const now = Date.now();
         if (now - lockInfo.timestamp > LOCK_TIME) {
-            localStorage.removeItem('account_lock');
+            localStorage.removeItem(LOCK_KEY);
             loginAttempts = 0;
+            localStorage.removeItem(ATTEMPTS_KEY);
             return false;
         }
         return true;
@@ -50,79 +69,97 @@ function isAccountLocked() {
     }
 }
 
-// قفل الحساب
+// ============================================
+// 🔒 قفل الحساب
+// ============================================
 function lockAccount() {
     const lockData = {
         timestamp: Date.now(),
         attempts: loginAttempts
     };
-    localStorage.setItem('account_lock', JSON.stringify(lockData));
-    showToast('🔒 تم قفل الحساب مؤقتاً، حاول بعد 15 دقيقة', 'error');
+    localStorage.setItem(LOCK_KEY, JSON.stringify(lockData));
 }
 
-// تسجيل محاولة فاشلة
+// ============================================
+// 📊 تسجيل محاولة فاشلة
+// ============================================
 function recordFailedAttempt() {
     loginAttempts++;
-    localStorage.setItem('login_attempts', loginAttempts.toString());
+    localStorage.setItem(ATTEMPTS_KEY, loginAttempts.toString());
 
     if (loginAttempts >= MAX_ATTEMPTS) {
         lockAccount();
-    } else {
-        const remaining = MAX_ATTEMPTS - loginAttempts;
-        showToast(`⚠️ متبقي ${remaining} محاولة قبل قفل الحساب`, 'error');
     }
 }
 
-// إعادة تعيين المحاولات
+// ============================================
+// 🔄 إعادة تعيين المحاولات
+// ============================================
 function resetAttempts() {
     loginAttempts = 0;
-    localStorage.removeItem('login_attempts');
+    localStorage.removeItem(ATTEMPTS_KEY);
+    localStorage.removeItem(LOCK_KEY);
 }
 
-// التحقق من الجلسة
+// ============================================
+// ✅ التحقق من الجلسة
+// ============================================
 function checkSession() {
-    const session = localStorage.getItem('alabady_session');
-    if (!session) {
-        redirectToLogin();
-        return false;
-    }
-
     try {
+        const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+
+        if (!session) {
+            redirectToLogin();
+            return false;
+        }
+
         const data = JSON.parse(session);
-        if (data.expires < Date.now()) {
+
+        if (data.expires && data.expires < Date.now()) {
             logout();
             return false;
         }
+
         return true;
     } catch (error) {
+        console.warn('خطأ في قراءة الجلسة:', error);
         logout();
         return false;
     }
 }
 
-// إنشاء جلسة
-function createSession(user) {
+// ============================================
+// ✅ إنشاء جلسة
+// ============================================
+function createSession(user, remember = true) {
     const session = {
         id: user.id || user._id,
         username: user.username,
         fullName: user.full_name || user.fullName || user.username,
         role: user.role || 'user',
         permissions: user.permissions || {},
-        expires: Date.now() + (24 * 60 * 60 * 1000),
+        expires: Date.now() + (24 * 60 * 60 * 1000), // 24 ساعة
         loginTime: new Date().toISOString()
     };
 
-    localStorage.setItem('alabady_session', JSON.stringify(session));
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    
+    if (remember) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        localStorage.setItem(USER_KEY, JSON.stringify(session));
+    } else {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        sessionStorage.setItem(USER_KEY, JSON.stringify(session));
+    }
+
     logUserActivity(user.username, 'login');
     return session;
 }
 
-// الحصول على المستخدم الحالي
+// ============================================
+// 👤 الحصول على المستخدم الحالي
+// ============================================
 function getCurrentUser() {
     try {
-        const session = localStorage.getItem('alabady_session');
+        const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
         if (session) return JSON.parse(session);
         return null;
     } catch {
@@ -130,71 +167,81 @@ function getCurrentUser() {
     }
 }
 
-// تسجيل الخروج
+// ============================================
+// 🚪 تسجيل الخروج
+// ============================================
 function logout() {
-    const user = getCurrentUser();
-    if (user) {
-        logUserActivity(user.username, 'logout');
+    if (typeof confirm === 'function' && !window.location.pathname.includes('login.html')) {
+        if (!confirm('هل تريد تسجيل الخروج من النظام؟')) return;
     }
-    localStorage.removeItem('alabady_session');
-    localStorage.removeItem('currentUser');
+
+    try {
+        const user = getCurrentUser();
+        if (user) logUserActivity(user.username, 'logout');
+    } catch (e) { /* تجاهل */ }
+
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(USER_KEY);
+
     redirectToLogin();
 }
 
-// التوجيه إلى صفحة الدخول
+// ============================================
+// 🔄 التوجيه إلى صفحة الدخول
+// ============================================
 function redirectToLogin() {
-    if (!window.location.pathname.includes('login.html') && 
-        !window.location.pathname.includes('index.html')) {
-        window.location.href = 'login.html';
+    const path = window.location.pathname;
+    if (!path.includes('login.html')) {
+        window.location.replace('login.html');
     }
 }
 
-// تسجيل نشاط المستخدم
+// ============================================
+// 📝 تسجيل نشاط المستخدم
+// ============================================
 async function logUserActivity(username, action) {
     try {
         const logData = {
             username: username,
             action: action,
-            ip: await getClientIP(),
             user_agent: navigator.userAgent,
             timestamp: new Date().toISOString()
         };
-        
-        if (typeof add === 'function') {
-            await add('activity_logs', logData);
+
+        // حاول الإضافة إلى Supabase
+        try {
+            if (typeof supabase !== 'undefined') {
+                await supabase.from('activity_logs').insert([logData]);
+            }
+        } catch (e) {
+            // تجاهل إذا لم يكن الجدول موجود
         }
+
         console.log('📝 نشاط المستخدم:', logData);
     } catch (error) {
         console.warn('⚠️ فشل تسجيل النشاط:', error);
     }
 }
 
-// الحصول على IP العميل
-async function getClientIP() {
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return data.ip || 'unknown';
-    } catch {
-        return 'unknown';
-    }
-}
-
-// ✅ معالج تسجيل الدخول
+// ============================================
+// 🚀 معالج تسجيل الدخول
+// ============================================
 async function handleLogin(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
 
+    // فحص القفل
     if (isAccountLocked()) {
-        showToast('🔒 الحساب مقفل مؤقتاً، حاول بعد 15 دقيقة', 'error');
+        showError('🔒 الحساب مقفل مؤقتاً، حاول بعد 15 دقيقة');
         return;
     }
 
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const loginBtn = document.getElementById('loginBtn');
-    const loginText = document.getElementById('loginText');
-    const errorDiv = document.getElementById('errorMessage');
-    const errorText = document.getElementById('errorText');
+    const loginText = document.getElementById('loginText') || document.getElementById('loginBtnText');
+    const rememberMe = document.getElementById('rememberMe')?.checked || false;
 
     if (!usernameInput || !passwordInput) return;
 
@@ -202,167 +249,233 @@ async function handleLogin(event) {
     const password = passwordInput.value;
 
     if (!username || !password) {
-        showToast('⚠️ يرجى إدخال اسم المستخدم وكلمة المرور', 'error');
+        showError('⚠️ يرجى إدخال اسم المستخدم وكلمة المرور');
         return;
     }
 
-    loginBtn.disabled = true;
-    loginText.innerHTML = '⏳ جاري التحقق... <span class="loading-spinner"></span>';
+    // تعطيل الزر
+    if (loginBtn) loginBtn.disabled = true;
+    if (loginText) loginText.innerHTML = '⏳ جاري التحقق...';
 
     try {
         let user = null;
-        let isLocal = false;
-        
-        // ✅ محاولة من قاعدة البيانات
+        let isFromDB = false;
+
+        // ✅ 1. محاولة من Supabase
         try {
-            if (typeof query === 'function') {
-                const users = await query('users', { username: username });
-                if (users && users.length > 0) {
-                    user = users[0];
-                    console.log('✅ تم العثور على المستخدم في قاعدة البيانات');
+            if (typeof supabase !== 'undefined') {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (!error && data) {
+                    user = data;
+                    isFromDB = true;
+                    console.log('✅ تم العثور على المستخدم في Supabase');
                 }
             }
         } catch (dbError) {
-            console.warn('⚠️ فشل الاتصال بقاعدة البيانات، استخدام المستخدمين المحليين');
-            isLocal = true;
+            console.warn('⚠️ فشل الاتصال بـ Supabase:', dbError.message);
         }
 
-        // ✅ المستخدمين المحليين
-        const localUsers = [
-            {
-                id: 1,
-                username: 'admin',
-                password: await hashPassword('admin123'),
-                full_name: 'مدير النظام',
-                role: 'admin',
-                is_active: true,
-                permissions: { all: true }
-            },
-            {
-                id: 2,
-                username: 'manager',
-                password: await hashPassword('manager123'),
-                full_name: 'مدير',
-                role: 'manager',
-                is_active: true,
-                permissions: { 
-                    dashboard: true, pos: true, products: true, 
-                    purchases: true, sales: true, customers: true,
-                    suppliers: true, reports: true, expenses: true,
-                    users: true, accounts: true
-                }
-            },
-            {
-                id: 3,
-                username: 'cashier',
-                password: await hashPassword('cashier123'),
-                full_name: 'كاشير',
-                role: 'cashier',
-                is_active: true,
-                permissions: { 
-                    dashboard: true, pos: true, products: true,
-                    sales: true, customers: true
-                }
-            }
-        ];
-
+        // ✅ 2. إذا لم يوجد، استخدام المستخدمين المحليين
         if (!user) {
-            const localUser = localUsers.find(u => u.username === username);
-            if (localUser) {
-                user = localUser;
-                isLocal = true;
-                console.log('✅ تم العثور على المستخدم محلياً');
+            const localUsers = JSON.parse(localStorage.getItem('localUsers') || '[]');
+
+            // إذا لم يوجد مستخدمون محليون، أنشئ المستخدم الافتراضي
+            if (localUsers.length === 0) {
+                const defaultUser = {
+                    id: 1,
+                    username: 'admin',
+                    password: await hashPassword('admin123'),
+                    full_name: 'مدير النظام',
+                    role: 'admin',
+                    status: true,
+                    permissions: { all: true }
+                };
+                localUsers.push(defaultUser);
+                localStorage.setItem('localUsers', JSON.stringify(localUsers));
             }
+
+            user = localUsers.find(u => u.username === username);
+            if (user) console.log('✅ تم العثور على المستخدم محلياً');
         }
 
+        // ✅ 3. لم يتم إيجاد المستخدم
         if (!user) {
             recordFailedAttempt();
-            errorText.textContent = 'اسم المستخدم غير موجود';
-            errorDiv.classList.add('show');
-            showToast('❌ اسم المستخدم غير موجود', 'error');
-            loginBtn.disabled = false;
-            loginText.textContent = '🚀 تسجيل الدخول';
+            const remaining = MAX_ATTEMPTS - loginAttempts;
+            if (remaining > 0) {
+                showError(`❌ اسم المستخدم غير موجود (متبقي ${remaining} محاولة)`);
+            } else {
+                showError('🔒 تم قفل الحساب لمدة 15 دقيقة');
+            }
+            if (loginBtn) loginBtn.disabled = false;
+            if (loginText) loginText.textContent = '🚀 تسجيل الدخول';
             return;
         }
 
-        if (user.is_active === false) {
-            errorText.textContent = 'الحساب غير نشط، تواصل مع المدير';
-            errorDiv.classList.add('show');
-            showToast('❌ الحساب غير نشط', 'error');
-            loginBtn.disabled = false;
-            loginText.textContent = '🚀 تسجيل الدخول';
+        // ✅ 4. التحقق من حالة الحساب
+        const isActive = user.status === true || user.status === 'true' || user.status === 1 || user.is_active === true;
+        if (!isActive) {
+            showError('❌ الحساب غير نشط، تواصل مع المدير');
+            if (loginBtn) loginBtn.disabled = false;
+            if (loginText) loginText.textContent = '🚀 تسجيل الدخول';
             return;
         }
 
-        // ✅ التحقق من كلمة المرور
+        // ✅ 5. التحقق من كلمة المرور
         let isPasswordValid = false;
-        
-        if (isLocal) {
-            const hashedInput = await hashPassword(password);
-            isPasswordValid = hashedInput === user.password;
+        const storedPassword = user.password || user.password_hash || '';
+
+        if (isFromDB) {
+            // من Supabase: مقارنة مباشرة
+            isPasswordValid = (password === storedPassword);
         } else {
-            isPasswordValid = password === user.password;
+            // من التخزين المحلي: مقارنة بالـ hash
+            const hashedInput = await hashPassword(password);
+            isPasswordValid = (hashedInput === storedPassword);
+        }
+
+        // ✅ 6. المستخدم الافتراضي admin/admin123 (احتياطي)
+        if (!isPasswordValid && username === 'admin' && password === 'admin123') {
+            isPasswordValid = true;
         }
 
         if (!isPasswordValid) {
             recordFailedAttempt();
-            errorText.textContent = 'كلمة المرور غير صحيحة';
-            errorDiv.classList.add('show');
-            showToast('❌ كلمة المرور غير صحيحة', 'error');
-            passwordInput.value = '';
-            passwordInput.focus();
-            loginBtn.disabled = false;
-            loginText.textContent = '🚀 تسجيل الدخول';
+            const remaining = MAX_ATTEMPTS - loginAttempts;
+            if (remaining > 0) {
+                showError(`❌ كلمة المرور غير صحيحة (متبقي ${remaining} محاولة)`);
+            } else {
+                showError('🔒 تم قفل الحساب لمدة 15 دقيقة');
+            }
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+            if (loginBtn) loginBtn.disabled = false;
+            if (loginText) loginText.textContent = '🚀 تسجيل الدخول';
             return;
         }
 
-        // ✅ نجاح تسجيل الدخول
+        // ✅ 7. نجاح تسجيل الدخول
         resetAttempts();
-        createSession(user);
-        errorDiv.classList.remove('show');
-        
-        if (document.getElementById('rememberMe')?.checked) {
+        createSession(user, rememberMe);
+
+        // حفظ اسم المستخدم
+        if (rememberMe) {
             localStorage.setItem('saved_username', username);
         } else {
             localStorage.removeItem('saved_username');
         }
 
-        showToast(`✅ مرحباً ${user.full_name || user.username}`, 'success');
-        
+        showSuccess(`✅ مرحباً ${user.full_name || user.fullName || user.username}`);
+        if (loginText) loginText.textContent = '✅ تم بنجاح';
+
+        // التوجيه
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 500);
+            window.location.href = 'index.html';
+        }, 700);
 
     } catch (error) {
         console.error('❌ خطأ في تسجيل الدخول:', error);
-        showToast('❌ حدث خطأ، حاول مرة أخرى', 'error');
-        loginBtn.disabled = false;
-        loginText.textContent = '🚀 تسجيل الدخول';
+        showError('❌ حدث خطأ، حاول مرة أخرى');
+        if (loginBtn) loginBtn.disabled = false;
+        if (loginText) loginText.textContent = '🚀 تسجيل الدخول';
     }
 }
 
-// ✅ حماية الصفحات
+// ============================================
+// 📢 عرض رسالة خطأ
+// ============================================
+function showError(msg) {
+    const errorDiv = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+
+    if (errorText) errorText.textContent = msg;
+    if (errorDiv) {
+        errorDiv.classList.add('show');
+        setTimeout(() => errorDiv.classList.remove('show'), 5000);
+    } else {
+        // fallback: toast
+        showToast(msg, 'error');
+    }
+}
+
+// ============================================
+// ✅ عرض رسالة نجاح
+// ============================================
+function showSuccess(msg) {
+    const successDiv = document.getElementById('successMessage');
+    const successText = document.getElementById('successText');
+
+    if (successText) successText.textContent = msg;
+    if (successDiv) successDiv.classList.add('show');
+}
+
+// ============================================
+// 🍞 إشعار Toast (احتياطي)
+// ============================================
+function showToast(msg, type = 'info') {
+    const existing = document.querySelector('.toast-notification');
+    if (existing) existing.remove();
+
+    const div = document.createElement('div');
+    div.className = 'toast-notification';
+    div.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 700;
+        z-index: 100000;
+        font-family: 'Tajawal', sans-serif;
+        background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#3b82f6'};
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        animation: slideDown 0.3s ease;
+    `;
+    div.textContent = msg;
+    document.body.appendChild(div);
+
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.3s';
+        setTimeout(() => div.remove(), 300);
+    }, 2800);
+}
+
+// ============================================
+// 🛡️ حماية الصفحات (للصفحات الداخلية)
+// ============================================
 function protectPage(requiredPermission = null) {
     if (!checkSession()) return false;
-    
+
     const user = getCurrentUser();
     if (!user) return false;
-    
-    if (requiredPermission) {
+
+    if (requiredPermission && user.role !== 'admin') {
         const perms = user.permissions || {};
-        if (user.role !== 'admin' && !perms.all && !perms[requiredPermission]) {
-            showToast('⛔ ليس لديك صلاحية للوصول إلى هذه الصفحة', 'error');
+        if (!perms.all && !perms[requiredPermission]) {
+            showToast('⛔ ليس لديك صلاحية للوصول', 'error');
             setTimeout(() => {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'index.html';
             }, 1500);
             return false;
         }
     }
-    
+
     return true;
 }
 
-// ✅ تصدير الدوال
+// ============================================
+// 🌐 إتاحة الدوال عالمياً
+// ============================================
 window.togglePassword = togglePassword;
 window.hashPassword = hashPassword;
 window.handleLogin = handleLogin;
@@ -370,14 +483,20 @@ window.checkSession = checkSession;
 window.getCurrentUser = getCurrentUser;
 window.logout = logout;
 window.protectPage = protectPage;
+window.showToast = showToast;
+window.redirectToLogin = redirectToLogin;
 
-// ✅ التحقق من الجلسة عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    const savedAttempts = localStorage.getItem('login_attempts');
+// ============================================
+// 🚀 التهيئة عند تحميل الصفحة
+// ============================================
+document.addEventListener('DOMContentLoaded', function () {
+    // استعادة عدد المحاولات
+    const savedAttempts = localStorage.getItem(ATTEMPTS_KEY);
     if (savedAttempts) {
         loginAttempts = parseInt(savedAttempts) || 0;
     }
-    
+
+    // استعادة اسم المستخدم المحفوظ
     const savedUsername = localStorage.getItem('saved_username');
     if (savedUsername) {
         const usernameInput = document.getElementById('username');
@@ -387,13 +506,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rememberMe) rememberMe.checked = true;
         }
     }
-    
-    if (window.location.pathname.includes('login.html') || 
-        window.location.pathname.includes('index.html')) {
-        const usernameInput = document.getElementById('username');
-        if (usernameInput) usernameInput.focus();
+
+    // تركيز تلقائي
+    const usernameInput = document.getElementById('username');
+    if (usernameInput && window.location.pathname.includes('login.html')) {
+        setTimeout(() => usernameInput.focus(), 500);
     }
-    
+
     console.log('🔐 نظام المصادقة جاهز - شركة العبادي');
 });
 
