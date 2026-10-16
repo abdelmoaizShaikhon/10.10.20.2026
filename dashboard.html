@@ -6,222 +6,46 @@
     <title>لوحة التحكم - شركة العبادي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 
     <style>
-        :root {
-            --primary: #0f3d3e;
-            --primary-dark: #0a2e2f;
-            --accent: #14b8a6;
-            --accent-light: #5eead4;
-            --ceramic-blue: #0891b2;
-            --gold: #d4af37;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --purple: #8b5cf6;
-            --bg: #f0f4f4;
-            --card: #ffffff;
-            --border: #d1d9d9;
-            --text: #0f3d3e;
-            --text-light: #64748b;
-            --radius: 12px;
-            --shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* ============================================
-           قسم الترحيب
-           ============================================ */
-        .welcome-section {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary), #0f766e);
-            color: white;
-            padding: 30px 24px;
-            border-radius: 16px;
-            margin: 16px;
-            box-shadow: 0 10px 30px rgba(15, 61, 62, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .welcome-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(20, 184, 166, 0.15), transparent 70%);
-            animation: pulse 8s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        .welcome-section h2 {
-            font-size: 26px;
-            font-weight: 900;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 2;
-        }
-        .welcome-section p {
-            font-size: 14px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ============================================
-           القوائم السريعة
-           ============================================ */
-        .quick-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 14px;
-            padding: 0 16px 16px;
-        }
-        .quick-card {
-            background: var(--card);
-            padding: 24px 16px;
-            border-radius: var(--radius);
-            text-align: center;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.25s;
-            text-decoration: none;
-            color: var(--text);
+        .auth-guard {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0a2e2f 0%, #0f3d3e 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
+            justify-content: center;
+            z-index: 99999;
+            color: white;
+            font-family: 'Tajawal', sans-serif;
+            transition: opacity 0.4s;
         }
-        .quick-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent);
-            transform: scaleX(0);
-            transition: transform 0.3s;
+        .auth-guard.hidden { opacity: 0; pointer-events: none; }
+        .auth-guard .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #14b8a6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
         }
-        .quick-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(15, 61, 62, 0.15);
-            border-color: var(--accent);
-        }
-        .quick-card:hover::before {
-            transform: scaleX(1);
-        }
-        .quick-icon {
-            font-size: 36px;
-            line-height: 1;
-            transition: transform 0.3s;
-        }
-        .quick-card:hover .quick-icon {
-            transform: scale(1.15) rotate(-5deg);
-        }
-        .quick-label {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .quick-desc {
-            font-size: 11px;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        /* ألوان الحدود العلوية للبطاقات */
-        .quick-card.pos::before { background: var(--accent); }
-        .quick-card.products::before { background: var(--ceramic-blue); }
-        .quick-card.purchases::before { background: var(--gold); }
-        .quick-card.customers::before { background: var(--purple); }
-        .quick-card.suppliers::before { background: var(--info); }
-        .quick-card.accounts::before { background: var(--success); }
-        .quick-card.transfers::before { background: var(--warning); }
-        .quick-card.expenses::before { background: var(--danger); }
-        .quick-card.reports::before { background: #6d28d9; }
-        .quick-card.users::before { background: #0891b2; }
-        .quick-card.settings::before { background: #64748b; }
-
-        /* ============================================
-           قسم المعلومات
-           ============================================ */
-        .info-section {
-            background: var(--card);
-            padding: 20px;
-            border-radius: var(--radius);
-            margin: 0 16px 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-        .info-section h4 {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 12px;
-            padding-right: 10px;
-            border-right: 4px solid var(--accent);
-        }
-        .info-section p {
-            font-size: 13px;
-            color: var(--text-light);
-            line-height: 1.8;
-            margin-bottom: 6px;
-        }
-        .info-section p strong {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        /* ============================================
-           تحسينات الموبايل
-           ============================================ */
-        @media (max-width: 768px) {
-            .welcome-section {
-                padding: 22px 18px;
-                margin: 12px;
-                border-radius: 14px;
-            }
-            .welcome-section h2 { font-size: 20px; }
-            .welcome-section p { font-size: 12px; }
-
-            .quick-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                padding: 0 12px 12px;
-            }
-            .quick-card {
-                padding: 18px 10px;
-            }
-            .quick-icon { font-size: 28px; }
-            .quick-label { font-size: 12px; }
-            .quick-desc { font-size: 10px; }
-
-            .info-section {
-                margin: 0 12px 12px;
-                padding: 16px;
-            }
-            .info-section h4 { font-size: 14px; }
-            .info-section p { font-size: 12px; }
-        }
-
-        @media (max-width: 380px) {
-            .quick-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .quick-card { padding: 14px 8px; }
-            .quick-icon { font-size: 24px; }
-            .quick-label { font-size: 11px; }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .auth-guard p { font-size: 15px; font-weight: 700; opacity: 0.9; }
+        .auth-guard .lock-icon { font-size: 56px; margin-bottom: 16px; }
     </style>
 </head>
 <body>
-    <div id="app">
+
+    <!-- حماية الصفحة -->
+    <div class="auth-guard" id="authGuard">
+        <div class="spinner"></div>
+        <p>جاري التحقق من الجلسة...</p>
+    </div>
+
+    <div id="app" style="display:none;">
         <nav class="navbar">
             <div class="nav-brand">
                 <span class="brand-icon">🏢</span>
@@ -256,88 +80,36 @@
         </aside>
 
         <main class="main-content">
-            <!-- قسم الترحيب -->
             <div class="welcome-section">
                 <h2>📊 لوحة التحكم</h2>
                 <p>مرحباً بك في شركة العبادي - نظام إدارة المخازن والمبيعات</p>
             </div>
 
-            <!-- القوائم السريعة -->
-            <div class="quick-grid">
-                <a href="sales.html" class="quick-card pos">
-                    <span class="quick-icon">🛒</span>
-                    <span class="quick-label">نقطة البيع</span>
-                    <span class="quick-desc">إصدار فاتورة جديدة</span>
+            <div class="quick-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;padding:0 16px 16px;">
+                <a href="sales.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">🛒</div>
+                    <div style="font-size:14px;font-weight:800;">نقطة البيع</div>
                 </a>
-
-                <a href="products.html" class="quick-card products">
-                    <span class="quick-icon">📦</span>
-                    <span class="quick-label">المنتجات</span>
-                    <span class="quick-desc">إدارة المخزون</span>
+                <a href="products.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">📦</div>
+                    <div style="font-size:14px;font-weight:800;">المنتجات</div>
                 </a>
-
-                <a href="purchases.html" class="quick-card purchases">
-                    <span class="quick-icon">🚚</span>
-                    <span class="quick-label">المشتريات</span>
-                    <span class="quick-desc">فواتير الشراء</span>
+                <a href="purchases.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">🚚</div>
+                    <div style="font-size:14px;font-weight:800;">المشتريات</div>
                 </a>
-
-                <a href="customers.html" class="quick-card customers">
-                    <span class="quick-icon">👤</span>
-                    <span class="quick-label">العملاء</span>
-                    <span class="quick-desc">حسابات العملاء</span>
+                <a href="customers.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">👤</div>
+                    <div style="font-size:14px;font-weight:800;">العملاء</div>
                 </a>
-
-                <a href="suppliers.html" class="quick-card suppliers">
-                    <span class="quick-icon">🏢</span>
-                    <span class="quick-label">الموردين</span>
-                    <span class="quick-desc">حسابات الموردين</span>
+                <a href="transfers.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">💸</div>
+                    <div style="font-size:14px;font-weight:800;">التحويلات</div>
                 </a>
-
-                <a href="accounts.html" class="quick-card accounts">
-                    <span class="quick-icon">💰</span>
-                    <span class="quick-label">الحسابات</span>
-                    <span class="quick-desc">إدارة الأرصدة</span>
+                <a href="reports.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
+                    <div style="font-size:36px;margin-bottom:8px;">📈</div>
+                    <div style="font-size:14px;font-weight:800;">التقارير</div>
                 </a>
-
-                <a href="transfers.html" class="quick-card transfers">
-                    <span class="quick-icon">💸</span>
-                    <span class="quick-label">التحويلات</span>
-                    <span class="quick-desc">تحويلات مالية</span>
-                </a>
-
-                <a href="expenses.html" class="quick-card expenses">
-                    <span class="quick-icon">🧾</span>
-                    <span class="quick-label">المصروفات</span>
-                    <span class="quick-desc">تسجيل المصروفات</span>
-                </a>
-
-                <a href="reports.html" class="quick-card reports">
-                    <span class="quick-icon">📈</span>
-                    <span class="quick-label">التقارير</span>
-                    <span class="quick-desc">تقارير شاملة</span>
-                </a>
-
-                <a href="users.html" class="quick-card users">
-                    <span class="quick-icon">👥</span>
-                    <span class="quick-label">المستخدمين</span>
-                    <span class="quick-desc">إدارة الصلاحيات</span>
-                </a>
-
-                <a href="settings.html" class="quick-card settings">
-                    <span class="quick-icon">⚙️</span>
-                    <span class="quick-label">الإعدادات</span>
-                    <span class="quick-desc">إعدادات النظام</span>
-                </a>
-            </div>
-
-            <!-- قسم معلومات النظام -->
-            <div class="info-section">
-                <h4>ℹ️ معلومات النظام</h4>
-                <p><strong>الإصدار:</strong> 1.0.0</p>
-                <p><strong>النظام:</strong> إدارة المخازن والمبيعات والحسابات</p>
-                <p><strong>المستخدم الحالي:</strong> <span id="currentUserInfo">مدير النظام</span></p>
-                <p><strong>التاريخ:</strong> <span id="currentDate">-</span></p>
             </div>
         </main>
 
@@ -358,37 +130,55 @@
     <script src="js/app.js"></script>
 
     <script>
-    // ============================================
-    // عرض التاريخ الحالي
-    // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
-        // تاريخ اليوم
-        const dateEl = document.getElementById('currentDate');
-        if (dateEl) {
-            const now = new Date();
-            dateEl.textContent = now.toLocaleDateString('ar-EG', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        // اسم المستخدم الحالي
-        const userInfoEl = document.getElementById('currentUserInfo');
-        const userNameEl = document.getElementById('userName');
+    (function checkSession() {
         try {
-            const userData = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-            if (userData) {
-                const user = JSON.parse(userData);
-                const name = user.fullName || user.username || 'مدير النظام';
-                if (userInfoEl) userInfoEl.textContent = name;
-                if (userNameEl) userNameEl.textContent = '👤 ' + name;
+            const session = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+
+            if (!session) {
+                const guard = document.getElementById('authGuard');
+                if (guard) {
+                    guard.innerHTML = '<div class="lock-icon">🔒</div><p>يجب تسجيل الدخول أولاً...</p>';
+                }
+                setTimeout(() => window.location.replace('login.html'), 800);
+                return;
             }
+
+            const user = JSON.parse(session);
+            if (!user || !user.username) {
+                localStorage.removeItem('currentUser');
+                sessionStorage.removeItem('currentUser');
+                window.location.replace('login.html');
+                return;
+            }
+
+            setTimeout(() => {
+                const guard = document.getElementById('authGuard');
+                const app = document.getElementById('app');
+                if (guard) guard.classList.add('hidden');
+                if (app) app.style.display = '';
+                setTimeout(() => { if (guard) guard.style.display = 'none'; }, 400);
+
+                const userNameEl = document.getElementById('userName');
+                const name = user.fullName || user.full_name || user.username || 'مدير النظام';
+                if (userNameEl) userNameEl.textContent = '👤 ' + name;
+            }, 300);
+
         } catch (e) {
-            console.warn('خطأ في تحميل بيانات المستخدم:', e);
+            console.error('خطأ:', e);
+            localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentUser');
+            window.location.replace('login.html');
         }
-    });
+    })();
+
+    function logout() {
+        if (confirm('هل تريد تسجيل الخروج من النظام؟')) {
+            localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentUser');
+            window.location.replace('login.html');
+        }
+    }
+    window.logout = logout;
     </script>
 </body>
 </html>
