@@ -6,7 +6,502 @@
     <title>المشتريات - شركة العبادي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/purchases.css">
+
+    <style>
+        :root {
+            --primary: #0f3d3e;
+            --primary-dark: #0a2e2f;
+            --accent: #14b8a6;
+            --accent-light: #5eead4;
+            --ceramic-blue: #0891b2;
+            --gold: #d4af37;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --bg: #f0f4f4;
+            --card: #ffffff;
+            --border: #d1d9d9;
+            --text: #0f3d3e;
+            --text-light: #64748b;
+            --radius: 12px;
+            --shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ============ الجدول ============ */
+        .table-wrapper {
+            background: var(--card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 0 16px 16px;
+        }
+        .table-scroll { max-height: 500px; overflow-y: auto; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+        thead { position: sticky; top: 0; z-index: 5; }
+        thead th {
+            background: #e8f0ef;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            color: var(--primary);
+        }
+        tbody td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+            white-space: nowrap;
+        }
+        tbody tr:hover { background: #f0f5f4; }
+
+        .badge { padding: 4px 12px; border-radius: 15px; font-size: 11px; font-weight: 600; }
+        .badge-paid { background: #d1fae5; color: #059669; }
+        .badge-pending { background: #ffedd5; color: #d97706; }
+        .badge-partial { background: #fef3c7; color: #92400e; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            transition: 0.2s;
+            margin: 1px;
+            white-space: nowrap;
+        }
+        .btn-view { background: #e0f2fe; color: #1e40af; }
+        .btn-view:hover { background: #bae6fd; }
+        .btn-print { background: #fef3c7; color: #92400e; }
+        .btn-print:hover { background: #fde68a; }
+        .btn-edit { background: #e0f2f1; color: #0f766e; }
+        .btn-edit:hover { background: #b2dfdb; }
+        .btn-delete { background: #fee2e2; color: #dc2626; }
+        .btn-delete:hover { background: #fecaca; }
+
+        /* ============ إحصائيات ============ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 16px;
+        }
+        .stat-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .stat-card .number { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
+        .stat-card .label { font-size: 12px; color: var(--text-light); }
+        .stat-card .number.blue { color: var(--ceramic-blue); }
+        .stat-card .number.green { color: var(--success); }
+        .stat-card .number.red { color: var(--danger); }
+
+        /* ============ شريط الفلترة ============ */
+        .filter-bar {
+            background: var(--card);
+            padding: 15px;
+            border-radius: var(--radius);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 0 16px 16px;
+        }
+        .filter-bar input, .filter-bar select {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s;
+            background: #fafbfc;
+        }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); background: white; }
+        .filter-bar input { flex: 1; min-width: 130px; }
+        .filter-bar select { min-width: 140px; }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .btn-add:hover { background: #0d9488; }
+
+        .btn-gold {
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .btn-gold:hover { background: #b8962e; }
+
+        /* ============ النوافذ ============ */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15, 61, 62, 0.6);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: modalIn 0.25s ease;
+        }
+        .modal-sm { max-width: 420px; }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 14px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .modal-header h3 { margin: 0; font-size: 16px; font-weight: 800; }
+        .modal-close {
+            background: none; border: none;
+            font-size: 22px; cursor: pointer;
+            width: 32px; height: 32px;
+            border-radius: 50%; transition: 0.2s;
+        }
+        .modal-close:hover { background: #e2e8f0; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+            background: #f8fafc;
+        }
+
+        /* ============ الأزرار ============ */
+        .btn-primary, .btn-success, .btn-secondary, .btn-danger, .btn-warning {
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+            border: none;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #0d9488; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-secondary { background: #e2e8f0; color: var(--text); }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--gold); color: white; }
+        .btn-warning:hover { background: #b8962e; }
+
+        /* ============ الحقول ============ */
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            background: #fafbfc;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ============ إشعارات ============ */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            font-family: 'Tajawal', sans-serif;
+        }
+        .notif-success { background: #d1fae5; color: #059669; }
+        .notif-error { background: #fee2e2; color: #dc2626; }
+        .notif-info { background: #e0f2f1; color: #0f766e; }
+        .notif-warning { background: #fef3c7; color: #92400e; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ============================================
+           تحسينات الموبايل الشاملة
+           ============================================ */
+        @media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .table-wrapper { margin: 0 12px 12px; }
+            .filter-bar { margin: 0 12px 12px; }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px !important;
+                text-align: center;
+            }
+            .page-header h2 { font-size: 18px !important; }
+
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                padding: 12px;
+            }
+            .stat-card { padding: 10px 4px; border-radius: 10px; }
+            .stat-card .number { font-size: 15px; }
+            .stat-card .label { font-size: 9px; }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+                margin: 0 12px 12px;
+            }
+            .filter-bar input,
+            .filter-bar select {
+                width: 100%;
+                padding: 12px 14px;
+                font-size: 14px;
+                min-width: unset;
+            }
+            .filter-bar .btn-add,
+            .filter-bar .btn-gold {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* الجدول → بطاقات */
+            .table-wrapper {
+                margin: 0 12px 12px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                overflow: visible;
+            }
+            .table-scroll { max-height: none; overflow: visible; }
+            table { min-width: unset; width: 100%; display: block; }
+            thead { display: none; }
+            tbody { display: block; }
+            tbody tr {
+                display: block;
+                background: var(--card);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 14px;
+                box-shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+                border: 1px solid var(--border);
+                position: relative;
+            }
+
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px dashed #e2e8f0;
+                text-align: right !important;
+                white-space: normal !important;
+                font-size: 13px;
+                min-height: 36px;
+            }
+            tbody td:last-child {
+                border-bottom: none;
+                padding-top: 12px;
+                margin-top: 6px;
+                border-top: 2px solid #f1f5f9;
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: center;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-light);
+                font-size: 12px;
+                flex-shrink: 0;
+                margin-left: 10px;
+            }
+            tbody td[data-label="#"] { display: none; }
+
+            tbody td[data-label="رقم الفاتورة"] {
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--primary);
+                border-bottom: 2px solid #f1f5f9;
+                padding-bottom: 10px;
+                margin-bottom: 4px;
+            }
+            tbody td[data-label="الحالة"] {
+                position: absolute;
+                top: 14px;
+                left: 14px;
+                border: none;
+                padding: 0;
+                min-height: unset;
+            }
+            tbody td[data-label="الحالة"]::before { display: none; }
+
+            .btn-action {
+                padding: 8px 14px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 60px;
+            }
+
+            /* النوافذ */
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 92vh;
+                border-radius: 20px 20px 0 0;
+                animation: slideUpMobile 0.3s ease;
+            }
+            @keyframes slideUpMobile {
+                from { transform: translateY(100%); }
+                to   { transform: translateY(0); }
+            }
+            .modal-header {
+                padding: 14px 16px;
+                border-radius: 20px 20px 0 0;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .modal-header h3 { font-size: 15px; }
+            .modal-body { padding: 16px; }
+            .modal-footer {
+                padding: 12px 16px;
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+            .modal-footer button { width: 100%; padding: 12px; font-size: 14px; }
+
+            .form-row,
+            .form-row-2 { grid-template-columns: 1fr; gap: 0; }
+            .form-group { margin-bottom: 12px; }
+            .form-group label { font-size: 13px; margin-bottom: 6px; }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+
+            #purchaseDetails table { min-width: 500px; }
+
+            .notification {
+                top: auto;
+                bottom: 80px;
+                left: 12px;
+                right: 12px;
+                transform: none;
+                text-align: center;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .bottom-nav { display: flex !important; }
+        }
+
+        @media (max-width: 380px) {
+            .stat-card .number { font-size: 13px; }
+            .stat-card .label { font-size: 8px; }
+            .btn-action { font-size: 11px; padding: 7px 10px; min-width: 55px; }
+            .page-header h2 { font-size: 16px !important; }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -27,68 +522,41 @@
                 <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html">
-                    <span class="nav-icon">📊</span> لوحة التحكم
-                </a>
-                <a href="sales.html">
-                    <span class="nav-icon">🛒</span> نقطة البيع
-                </a>
-                <a href="products.html">
-                    <span class="nav-icon">📦</span> المنتجات
-                </a>
-                <a href="purchases.html" class="active">
-                    <span class="nav-icon">🚚</span> المشتريات
-                </a>
-                <a href="customers.html">
-                    <span class="nav-icon">👤</span> العملاء
-                </a>
-                <a href="suppliers.html">
-                    <span class="nav-icon">🏢</span> الموردين
-                </a>
-                <a href="accounts.html">
-                    <span class="nav-icon">💰</span> الحسابات
-                </a>
-                <a href="expenses.html">
-                    <span class="nav-icon">🧾</span> المصروفات
-                </a>
-                <a href="reports.html">
-                    <span class="nav-icon">📈</span> التقارير
-                </a>
-                <a href="users.html">
-                    <span class="nav-icon">👥</span> المستخدمين
-                </a>
-                <a href="settings.html">
-                    <span class="nav-icon">⚙️</span> الإعدادات
-                </a>
-                <a href="#" onclick="logout()">
-                    <span class="nav-icon">🚪</span> تسجيل الخروج
-                </a>
+                <a href="dashboard.html"><span class="nav-icon">📊</span> لوحة التحكم</a>
+                <a href="sales.html"><span class="nav-icon">🛒</span> نقطة البيع</a>
+                <a href="products.html"><span class="nav-icon">📦</span> المنتجات</a>
+                <a href="purchases.html" class="active"><span class="nav-icon">🚚</span> المشتريات</a>
+                <a href="customers.html"><span class="nav-icon">👤</span> العملاء</a>
+                <a href="suppliers.html"><span class="nav-icon">🏢</span> الموردين</a>
+                <a href="accounts.html"><span class="nav-icon">💰</span> الحسابات</a>
+                <a href="expenses.html"><span class="nav-icon">🧾</span> المصروفات</a>
+                <a href="reports.html"><span class="nav-icon">📈</span> التقارير</a>
+                <a href="users.html"><span class="nav-icon">👥</span> المستخدمين</a>
+                <a href="settings.html"><span class="nav-icon">⚙️</span> الإعدادات</a>
+                <a href="#" onclick="logout()"><span class="nav-icon">🚪</span> تسجيل الخروج</a>
             </nav>
         </aside>
 
         <main class="main-content">
-            <div class="page-header">
-                <h2>🚚 إدارة المشتريات</h2>
-                <button class="btn-add" onclick="openPurchaseModal()">➕ فاتورة شراء جديدة</button>
+            <div class="page-header" style="padding:16px;">
+                <h2 style="font-size:20px;font-weight:800;">🚚 إدارة المشتريات</h2>
             </div>
 
-            <!-- ✅ إحصائيات المشتريات -->
-            <div class="stats-mini">
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalPurchases">0</span>
-                    <span class="stat-mini-label">عدد الفواتير</span>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="number blue" id="totalPurchases">0</div>
+                    <div class="label">عدد الفواتير</div>
                 </div>
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalAmount">0 ج.م</span>
-                    <span class="stat-mini-label">إجمالي المشتريات</span>
+                <div class="stat-card">
+                    <div class="number green" id="totalAmount">0 ج.م</div>
+                    <div class="label">إجمالي المشتريات</div>
                 </div>
-                <div class="stat-mini">
-                    <span class="stat-mini-value" id="totalRemaining">0 ج.م</span>
-                    <span class="stat-mini-label">المتبقي للموردين</span>
+                <div class="stat-card">
+                    <div class="number red" id="totalRemaining">0 ج.م</div>
+                    <div class="label">المتبقي للموردين</div>
                 </div>
             </div>
 
-            <!-- ✅ شريط الفلترة -->
             <div class="filter-bar">
                 <input type="date" id="dateFrom" onchange="filterPurchases()">
                 <input type="date" id="dateTo" onchange="filterPurchases()">
@@ -98,11 +566,13 @@
                 <select id="statusFilter" onchange="filterPurchases()">
                     <option value="all">جميع الحالات</option>
                     <option value="paid">مدفوع</option>
+                    <option value="partial">جزئي</option>
                     <option value="pending">معلق</option>
                 </select>
+                <button class="btn-add" onclick="openPurchaseModal()">➕ فاتورة جديدة</button>
+                <button class="btn-gold" onclick="printPurchasesList()">🖨️ طباعة القائمة</button>
             </div>
 
-            <!-- ✅ جدول المشتريات -->
             <div class="table-wrapper">
                 <div class="table-scroll">
                     <table>
@@ -120,7 +590,7 @@
                             </tr>
                         </thead>
                         <tbody id="purchasesTable">
-                            <tr><td colspan="9" style="text-align:center;padding:40px;">⏳ جاري التحميل...</td></tr>
+                            <tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">⏳ جاري التحميل...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -128,44 +598,28 @@
         </main>
 
         <nav class="bottom-nav">
-            <a href="dashboard.html">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">الرئيسية</span>
-            </a>
-            <a href="sales.html">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">بيع</span>
-            </a>
-            <a href="products.html">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">مخزن</span>
-            </a>
-            <a href="purchases.html" class="active">
-                <span class="nav-icon">🚚</span>
-                <span class="nav-label">مشتريات</span>
-            </a>
-            <a href="reports.html">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">تقارير</span>
-            </a>
+            <a href="dashboard.html"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></a>
+            <a href="sales.html"><span class="nav-icon">🛒</span><span class="nav-label">بيع</span></a>
+            <a href="products.html"><span class="nav-icon">📦</span><span class="nav-label">مخزن</span></a>
+            <a href="purchases.html" class="active"><span class="nav-icon">🚚</span><span class="nav-label">مشتريات</span></a>
+            <a href="reports.html"><span class="nav-icon">📈</span><span class="nav-label">تقارير</span></a>
         </nav>
     </div>
 
-    <!-- ✅ نافذة إضافة/تعديل فاتورة شراء -->
+    <!-- نافذة إضافة/تعديل فاتورة شراء -->
     <div class="modal-overlay" id="purchaseModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 id="purchaseModalTitle">🧾 فاتورة شراء جديدة</h3>
-                <button class="modal-close" onclick="closeModal('purchaseModal')">✕</button>
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0f766e, #14b8a6);">
+                <h3 id="purchaseModalTitle" style="color:white;">🧾 فاتورة شراء جديدة</h3>
+                <button class="modal-close" onclick="closeModal('purchaseModal')" style="color:white;">✕</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editPurchaseId">
-                
-                <!-- ✅ معلومات الفاتورة -->
-                <div class="form-row">
+
+                <div class="form-row-2">
                     <div class="form-group">
                         <label>المورد *</label>
-                        <select id="modalSupplierSelect" class="form-control" required>
+                        <select id="modalSupplierSelect">
                             <option value="">اختر مورد...</option>
                         </select>
                     </div>
@@ -174,19 +628,14 @@
                         <input type="text" id="modalInvoiceNumber" readonly>
                     </div>
                 </div>
-                
-                <!-- ✅ إضافة منتج -->
+
                 <div class="form-group" style="background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border);">
-                    <label style="font-weight:700;">➕ إضافة منتج</label>
+                    <label style="font-weight:700;color:var(--primary);">➕ إضافة منتج</label>
                     <div class="form-row">
                         <div class="form-group">
                             <label>اسم المنتج</label>
-                            <div class="datalist-container">
-                                <input type="text" id="modalProductInput" list="productList" placeholder="ابحث عن منتج..." 
-                                       class="datalist-input" autocomplete="off"
-                                       onchange="selectProduct(this.value)">
-                                <datalist id="productList"></datalist>
-                            </div>
+                            <input type="text" id="modalProductInput" list="productList" placeholder="ابحث عن منتج..." autocomplete="off" onchange="selectProduct(this.value)">
+                            <datalist id="productList"></datalist>
                         </div>
                         <div class="form-group">
                             <label>الكمية</label>
@@ -194,16 +643,15 @@
                         </div>
                         <div class="form-group">
                             <label>سعر الشراء</label>
-                            <input type="number" id="modalUnitPrice" placeholder="سعر الشراء" step="0.01" min="0">
+                            <input type="number" id="modalUnitPrice" placeholder="السعر" step="0.01" min="0">
                         </div>
                     </div>
                     <button class="btn-primary" onclick="addPurchaseItem()" style="width:100%;padding:10px;">➕ إضافة صنف</button>
                 </div>
-                
-                <!-- ✅ قائمة الأصناف -->
-                <div class="table-wrapper" style="margin-top:10px;">
+
+                <div class="table-wrapper" style="margin-top:10px;margin-bottom:10px;">
                     <div style="max-height:200px;overflow-y:auto;">
-                        <table style="font-size:13px;">
+                        <table style="font-size:13px;min-width:auto;">
                             <thead>
                                 <tr>
                                     <th style="text-align:right;">المنتج</th>
@@ -219,16 +667,15 @@
                             <tfoot>
                                 <tr style="background:#f8fafc;font-weight:700;">
                                     <td colspan="3" style="text-align:left;">الإجمالي</td>
-                                    <td id="purchaseTotal" style="color:#3b82f6;">0 ج.م</td>
+                                    <td id="purchaseTotal" style="color:var(--accent);">0 ج.م</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
-                
-                <!-- ✅ المدفوع والملاحظات -->
-                <div class="form-row">
+
+                <div class="form-row-2">
                     <div class="form-group">
                         <label>المبلغ المدفوع</label>
                         <input type="number" id="modalPaidAmount" value="0" step="0.01">
@@ -246,31 +693,33 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة عرض التفاصيل -->
+    <!-- نافذة عرض التفاصيل -->
     <div class="modal-overlay" id="detailsModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>📋 تفاصيل الفاتورة</h3>
-                <button class="modal-close" onclick="closeModal('detailsModal')">✕</button>
+            <div class="modal-header" style="background: linear-gradient(135deg, #0f3d3e, #0f766e);">
+                <h3 style="color:white;">📋 تفاصيل الفاتورة</h3>
+                <button class="modal-close" onclick="closeModal('detailsModal')" style="color:white;">✕</button>
             </div>
             <div class="modal-body" id="purchaseDetails">
                 <p style="text-align:center;padding:20px;color:#94a3b8;">جاري التحميل...</p>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('detailsModal')">إغلاق</button>
+                <button class="btn-warning" id="printFromDetailsBtn" onclick="printCurrentPurchase()">🖨️ طباعة</button>
             </div>
         </div>
     </div>
 
-    <!-- ✅ نافذة تأكيد الحذف -->
+    <!-- نافذة تأكيد الحذف (مستويين) -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content modal-sm">
-            <div class="modal-header" style="background:#fef3c7;">
-                <h3>⚠️ تأكيد الحذف</h3>
-                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+            <div class="modal-header" id="confirmModalHeader" style="background:#fef3c7;">
+                <h3 id="confirmModalTitle">⚠️ تأكيد الحذف</h3>
+                <button class="modal-close" id="confirmModalClose" onclick="closeModal('confirmModal')">✕</button>
             </div>
             <div class="modal-body">
-                <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذه الفاتورة؟</p>
+                <p style="text-align:center;font-size:15px;line-height:1.7;" id="confirmMessage">هل أنت متأكد؟</p>
+                <div id="confirmExtraInfo" style="display:none;margin-top:15px;"></div>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
@@ -284,6 +733,828 @@
     <script src="js/db.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/purchases.js"></script>
+
+    <script>
+    // ============================================
+    // المتغيرات العامة
+    // ============================================
+    let allPurchases = [];
+    let filteredPurchases = [];
+    let allSuppliers = [];
+    let allProducts = [];
+    let currentItems = [];
+    let editingPurchaseId = null;
+    let purchaseToDelete = null;
+    let deleteStage = 0;
+    let currentPurchaseForDetails = null;
+
+    // ============================================
+    // بدء التشغيل
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (typeof checkAuth === 'function') await checkAuth();
+        await loadSuppliers();
+        await loadProducts();
+        await loadPurchases();
+        await loadStats();
+    });
+
+    // ============================================
+    // دوال مساعدة
+    // ============================================
+    function formatNum(num) {
+        if (num === undefined || num === null) return '0';
+        const n = Number(num);
+        return isNaN(n) ? '0' : n.toLocaleString('en-EG');
+    }
+
+    function formatDate(d) {
+        if (!d) return '-';
+        try {
+            const dt = new Date(d);
+            return isNaN(dt.getTime()) ? '-' : dt.toLocaleDateString('ar-EG');
+        } catch { return '-'; }
+    }
+
+    function showNotification(msg, type = 'info') {
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+
+        const div = document.createElement('div');
+        div.className = `notification notif-${type}`;
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => {
+            div.style.opacity = '0';
+            div.style.transition = '0.3s';
+            setTimeout(() => div.remove(), 300);
+        }, 2800);
+    }
+
+    // ============================================
+    // تحميل البيانات
+    // ============================================
+    async function loadSuppliers() {
+        try {
+            const { data, error } = await supabase.from('suppliers').select('*').order('name');
+            if (error) throw error;
+            allSuppliers = data || [];
+            populateSupplierFilter();
+            populateSupplierSelect();
+        } catch (err) {
+            console.warn('خطأ في تحميل الموردين:', err.message);
+            allSuppliers = [];
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            const { data, error } = await supabase.from('products').select('*').order('name');
+            if (error) throw error;
+            allProducts = data || [];
+            populateProductDatalist();
+        } catch (err) {
+            console.warn('خطأ في تحميل المنتجات:', err.message);
+            allProducts = [];
+        }
+    }
+
+    async function loadPurchases() {
+        try {
+            const { data, error } = await supabase
+                .from('purchases')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allPurchases = data || [];
+            filteredPurchases = [...allPurchases];
+            renderPurchases(filteredPurchases);
+        } catch (err) {
+            console.error('خطأ في تحميل المشتريات:', err);
+            document.getElementById('purchasesTable').innerHTML = `
+                <tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">
+                    ⚠️ حدث خطأ: ${err.message}
+                </td></tr>`;
+        }
+    }
+
+    async function loadStats() {
+        try {
+            const totalCount = allPurchases.length;
+            const totalAmount = allPurchases.reduce((s, p) => s + (Number(p.total_amount) || 0), 0);
+            const totalRemaining = allPurchases.reduce((s, p) => s + (Number(p.remaining_amount) || 0), 0);
+
+            document.getElementById('totalPurchases').textContent = totalCount;
+            document.getElementById('totalAmount').textContent = formatNum(totalAmount) + ' ج.م';
+            document.getElementById('totalRemaining').textContent = formatNum(totalRemaining) + ' ج.م';
+        } catch (err) {
+            console.error('خطأ في الإحصائيات:', err);
+        }
+    }
+
+    // ============================================
+    // تعبئة القوائم
+    // ============================================
+    function populateSupplierFilter() {
+        const select = document.getElementById('supplierFilter');
+        select.innerHTML = '<option value="">جميع الموردين</option>' +
+            allSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    function populateSupplierSelect() {
+        const select = document.getElementById('modalSupplierSelect');
+        select.innerHTML = '<option value="">اختر مورد...</option>' +
+            allSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    function populateProductDatalist() {
+        const datalist = document.getElementById('productList');
+        datalist.innerHTML = allProducts.map(p => `<option value="${p.name}">`).join('');
+    }
+
+    // ============================================
+    // عرض المشتريات
+    // ============================================
+    function renderPurchases(list) {
+        const tbody = document.getElementById('purchasesTable');
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#94a3b8;">لا توجد فواتير</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = list.map((p, i) => {
+            const remaining = Number(p.remaining_amount) || 0;
+            const paid = Number(p.paid_amount) || 0;
+            const total = Number(p.total_amount) || 0;
+
+            let statusClass, statusText;
+            if (remaining <= 0) {
+                statusClass = 'badge-paid'; statusText = '✅ مدفوع';
+            } else if (paid > 0) {
+                statusClass = 'badge-partial'; statusText = '⏳ جزئي';
+            } else {
+                statusClass = 'badge-pending'; statusText = '⏳ معلق';
+            }
+
+            return `<tr>
+                <td data-label="#">${i + 1}</td>
+                <td data-label="رقم الفاتورة"><strong>${p.invoice_number || '#' + p.id}</strong></td>
+                <td data-label="التاريخ">${formatDate(p.created_at)}</td>
+                <td data-label="المورد">${p.supplier_name || '-'}</td>
+                <td data-label="الإجمالي" style="color:var(--success);font-weight:700;">${formatNum(total)} ج.م</td>
+                <td data-label="المدفوع" style="color:var(--ceramic-blue);font-weight:600;">${formatNum(paid)} ج.م</td>
+                <td data-label="المتبقي" style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700;">${formatNum(remaining)} ج.م</td>
+                <td data-label="الحالة"><span class="badge ${statusClass}">${statusText}</span></td>
+                <td data-label="إجراءات">
+                    <button class="btn-action btn-view" onclick="viewPurchase(${p.id})">👁️ عرض</button>
+                    <button class="btn-action btn-print" onclick="printPurchaseReport(${p.id})">🖨️ طباعة</button>
+                    <button class="btn-action btn-edit" onclick="editPurchase(${p.id})">✏️ تعديل</button>
+                    <button class="btn-action btn-delete" onclick="confirmDeletePurchase(${p.id}, '${(p.invoice_number || '').replace(/'/g, "\\'")}')">🗑️ حذف</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ============================================
+    // فلترة المشتريات
+    // ============================================
+    function filterPurchases() {
+        const from = document.getElementById('dateFrom').value;
+        const to = document.getElementById('dateTo').value;
+        const supplierId = document.getElementById('supplierFilter').value;
+        const status = document.getElementById('statusFilter').value;
+
+        filteredPurchases = allPurchases.filter(p => {
+            if (from && new Date(p.created_at) < new Date(from)) return false;
+            if (to) {
+                const toDate = new Date(to);
+                toDate.setHours(23, 59, 59);
+                if (new Date(p.created_at) > toDate) return false;
+            }
+            if (supplierId && p.supplier_id != supplierId) return false;
+
+            const remaining = Number(p.remaining_amount) || 0;
+            const paid = Number(p.paid_amount) || 0;
+            if (status === 'paid' && remaining > 0) return false;
+            if (status === 'pending' && paid > 0) return false;
+            if (status === 'partial' && !(paid > 0 && remaining > 0)) return false;
+
+            return true;
+        });
+
+        renderPurchases(filteredPurchases);
+    }
+
+    // ============================================
+    // إضافة/تعديل فاتورة
+    // ============================================
+    function openPurchaseModal() {
+        editingPurchaseId = null;
+        currentItems = [];
+        document.getElementById('purchaseModalTitle').textContent = '🧾 فاتورة شراء جديدة';
+        document.getElementById('editPurchaseId').value = '';
+        document.getElementById('modalInvoiceNumber').value = 'PO-' + Date.now();
+        document.getElementById('modalSupplierSelect').value = '';
+        document.getElementById('modalPaidAmount').value = '0';
+        document.getElementById('modalNotes').value = '';
+        document.getElementById('modalProductInput').value = '';
+        document.getElementById('modalQuantity').value = '';
+        document.getElementById('modalUnitPrice').value = '';
+        renderItems();
+        openModal('purchaseModal');
+    }
+
+    function editPurchase(id) {
+        const p = allPurchases.find(x => x.id == id);
+        if (!p) { showNotification('الفاتورة غير موجودة', 'error'); return; }
+
+        editingPurchaseId = id;
+        document.getElementById('purchaseModalTitle').textContent = '✏️ تعديل فاتورة شراء';
+        document.getElementById('editPurchaseId').value = id;
+        document.getElementById('modalInvoiceNumber').value = p.invoice_number || '';
+        document.getElementById('modalSupplierSelect').value = p.supplier_id || '';
+        document.getElementById('modalPaidAmount').value = p.paid_amount || 0;
+        document.getElementById('modalNotes').value = p.notes || '';
+
+        // تحميل الأصناف
+        let itemsList = [];
+        try {
+            if (typeof p.items === 'string') itemsList = JSON.parse(p.items);
+            else if (Array.isArray(p.items)) itemsList = p.items;
+            else if (p.items && typeof p.items === 'object') itemsList = Object.values(p.items);
+        } catch(e) { itemsList = []; }
+
+        currentItems = itemsList.map(item => ({
+            product_id: item.product_id || item.id,
+            product_name: item.product_name || item.name || 'منتج غير معروف',
+            quantity: Number(item.quantity) || 0,
+            unit_price: Number(item.unit_price || item.price) || 0,
+            total: (Number(item.quantity) || 0) * (Number(item.unit_price || item.price) || 0)
+        }));
+
+        renderItems();
+        openModal('purchaseModal');
+    }
+
+    function selectProduct(name) {
+        const product = allProducts.find(p => p.name === name);
+        if (product) {
+            document.getElementById('modalUnitPrice').value = product.buy_price || product.price || 0;
+        }
+    }
+
+    function addPurchaseItem() {
+        const productName = document.getElementById('modalProductInput').value.trim();
+        const product = allProducts.find(p => p.name === productName);
+        if (!product) {
+            showNotification('❌ المنتج غير موجود', 'error');
+            return;
+        }
+
+        const qty = parseFloat(document.getElementById('modalQuantity').value);
+        const price = parseFloat(document.getElementById('modalUnitPrice').value);
+
+        if (!qty || qty <= 0) { showNotification('❌ أدخل كمية صحيحة', 'error'); return; }
+        if (!price || price <= 0) { showNotification('❌ أدخل سعراً صحيحاً', 'error'); return; }
+
+        const exist = currentItems.find(item => item.product_id == product.id && item.unit_price == price);
+        if (exist) {
+            showNotification('⚠️ المنتج موجود بالفعل بنفس السعر', 'warning');
+            return;
+        }
+
+        currentItems.push({
+            product_id: product.id,
+            product_name: product.name,
+            quantity: qty,
+            unit_price: price,
+            total: qty * price
+        });
+
+        renderItems();
+
+        // إعادة تعيين الحقول
+        document.getElementById('modalProductInput').value = '';
+        document.getElementById('modalQuantity').value = '';
+        document.getElementById('modalUnitPrice').value = '';
+    }
+
+    function renderItems() {
+        const tbody = document.getElementById('purchaseItemsList');
+        let total = 0;
+
+        if (currentItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8;">لا توجد أصناف</td></tr>';
+            document.getElementById('purchaseTotal').textContent = '0 ج.م';
+            return;
+        }
+
+        tbody.innerHTML = currentItems.map((it, i) => {
+            total += it.total;
+            return `<tr>
+                <td data-label="المنتج" style="text-align:right;font-weight:600;">${it.product_name}</td>
+                <td data-label="الكمية">${it.quantity}</td>
+                <td data-label="سعر الوحدة">${formatNum(it.unit_price)} ج.م</td>
+                <td data-label="الإجمالي" style="color:var(--accent);font-weight:700;">${formatNum(it.total)} ج.م</td>
+                <td data-label="حذف">
+                    <button class="btn-action" style="background:#fee2e2;color:#dc2626;" onclick="removeItem(${i})">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('purchaseTotal').textContent = formatNum(total) + ' ج.م';
+    }
+
+    function removeItem(i) {
+        currentItems.splice(i, 1);
+        renderItems();
+    }
+
+    // ============================================
+    // حفظ الفاتورة
+    // ============================================
+    async function savePurchase() {
+        const supplierId = document.getElementById('modalSupplierSelect').value;
+        if (!supplierId) { showNotification('❌ اختر المورد أولاً', 'error'); return; }
+        if (currentItems.length === 0) { showNotification('❌ أضف منتجات للفاتورة', 'error'); return; }
+
+        const supplier = allSuppliers.find(s => s.id == supplierId);
+        if (!supplier) { showNotification('❌ المورد غير موجود', 'error'); return; }
+
+        const total = currentItems.reduce((s, i) => s + i.total, 0);
+        const paid = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
+        const remaining = Math.max(0, total - paid);
+
+        const purchaseData = {
+            supplier_id: supplier.id,
+            supplier_name: supplier.name,
+            invoice_number: document.getElementById('modalInvoiceNumber').value,
+            items: JSON.stringify(currentItems),
+            total_amount: total,
+            paid_amount: paid,
+            remaining_amount: remaining,
+            notes: document.getElementById('modalNotes').value || '',
+            created_at: new Date().toISOString()
+        };
+
+        try {
+            let error;
+            if (editingPurchaseId) {
+                ({ error } = await supabase.from('purchases').update(purchaseData).eq('id', editingPurchaseId));
+            } else {
+                ({ error } = await supabase.from('purchases').insert([purchaseData]));
+            }
+
+            if (error) throw error;
+
+            showNotification(editingPurchaseId ? '✅ تم تعديل الفاتورة بنجاح' : '✅ تم حفظ الفاتورة بنجاح', 'success');
+            closeModal('purchaseModal');
+            editingPurchaseId = null;
+            currentItems = [];
+
+            await loadPurchases();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حفظ الفاتورة:', err);
+            showNotification('حدث خطأ: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================
+    // عرض التفاصيل
+    // ============================================
+    function viewPurchase(id) {
+        const p = allPurchases.find(x => x.id == id);
+        if (!p) return;
+
+        currentPurchaseForDetails = p;
+
+        let itemsList = [];
+        try {
+            if (typeof p.items === 'string') itemsList = JSON.parse(p.items);
+            else if (Array.isArray(p.items)) itemsList = p.items;
+            else if (p.items && typeof p.items === 'object') itemsList = Object.values(p.items);
+        } catch(e) { itemsList = []; }
+
+        let itemsHtml = '';
+        if (itemsList.length > 0) {
+            itemsHtml = `
+                <table style="width:100%;font-size:12px;margin-top:10px;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#e8f0ef;">
+                            <th style="padding:8px;border:1px solid var(--border);">المنتج</th>
+                            <th style="padding:8px;border:1px solid var(--border);">الكمية</th>
+                            <th style="padding:8px;border:1px solid var(--border);">سعر الوحدة</th>
+                            <th style="padding:8px;border:1px solid var(--border);">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsList.map(it => `
+                            <tr>
+                                <td style="padding:6px;border:1px solid var(--border);text-align:right;">${it.product_name || '-'}</td>
+                                <td style="padding:6px;border:1px solid var(--border);text-align:center;">${it.quantity || 0}</td>
+                                <td style="padding:6px;border:1px solid var(--border);text-align:center;">${formatNum(it.unit_price || it.price)} ج.م</td>
+                                <td style="padding:6px;border:1px solid var(--border);text-align:center;font-weight:700;">${formatNum(it.total)} ج.م</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        document.getElementById('purchaseDetails').innerHTML = `
+            <div style="background:#f8fafc;padding:14px;border-radius:8px;margin-bottom:12px;">
+                <p style="margin:0 0 8px;"><strong>📋 رقم الفاتورة:</strong> ${p.invoice_number || '#' + p.id}</p>
+                <p style="margin:0 0 8px;"><strong>🏢 المورد:</strong> ${p.supplier_name || '-'}</p>
+                <p style="margin:0 0 8px;"><strong>📅 التاريخ:</strong> ${formatDate(p.created_at)}</p>
+                ${p.notes ? `<p style="margin:0;"><strong>📝 ملاحظات:</strong> ${p.notes}</p>` : ''}
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+                <div style="background:#e0f2fe;padding:12px;border-radius:8px;text-align:center;">
+                    <div style="font-size:18px;font-weight:800;color:#0891b2;">${formatNum(p.total_amount)} ج.م</div>
+                    <div style="font-size:11px;color:#64748b;">الإجمالي</div>
+                </div>
+                <div style="background:#d1fae5;padding:12px;border-radius:8px;text-align:center;">
+                    <div style="font-size:18px;font-weight:800;color:#059669;">${formatNum(p.paid_amount)} ج.م</div>
+                    <div style="font-size:11px;color:#64748b;">المدفوع</div>
+                </div>
+                <div style="background:#fee2e2;padding:12px;border-radius:8px;text-align:center;">
+                    <div style="font-size:18px;font-weight:800;color:#dc2626;">${formatNum(p.remaining_amount)} ج.م</div>
+                    <div style="font-size:11px;color:#64748b;">المتبقي</div>
+                </div>
+            </div>
+            ${itemsHtml}
+        `;
+
+        openModal('detailsModal');
+    }
+
+    function printCurrentPurchase() {
+        if (currentPurchaseForDetails) {
+            printPurchaseReport(currentPurchaseForDetails.id);
+        }
+    }
+
+    // ============================================
+    // ✅ تأكيد حذف الفاتورة (مستويين)
+    // ============================================
+    function confirmDeletePurchase(id, invoiceNumber) {
+        purchaseToDelete = id;
+
+        const p = allPurchases.find(x => x.id == id);
+        if (!p) return;
+
+        const itemsCount = (() => {
+            try {
+                let items = typeof p.items === 'string' ? JSON.parse(p.items) : p.items;
+                return Array.isArray(items) ? items.length : 0;
+            } catch(e) { return 0; }
+        })();
+
+        const remaining = Number(p.remaining_amount) || 0;
+
+        // إذا كانت الفاتورة مدفوعة بالكامل → تأكيد عادي
+        if (remaining <= 0) {
+            deleteStage = 2;
+            const headerEl = document.getElementById('confirmModalHeader');
+            const titleEl = document.getElementById('confirmModalTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const extraEl = document.getElementById('confirmExtraInfo');
+            const btnEl = document.getElementById('confirmDeleteBtn');
+            const closeEl = document.getElementById('confirmModalClose');
+
+            headerEl.style.background = '#fef3c7';
+            titleEl.textContent = '⚠️ تأكيد الحذف';
+            titleEl.style.color = '';
+            closeEl.style.color = '';
+            msgEl.innerHTML = `هل أنت متأكد من حذف الفاتورة <strong style="color:#dc2626;">"${invoiceNumber || '#' + id}"</strong>؟<br><small style="color:#64748b;">لا يمكن التراجع عن هذا الإجراء</small>`;
+            extraEl.style.display = 'none';
+            btnEl.textContent = '🗑️ حذف';
+            btnEl.style.background = '#dc2626';
+        } else {
+            // الفاتورة عليها متبقي → تأكيد مزدوج
+            deleteStage = 1;
+            const headerEl = document.getElementById('confirmModalHeader');
+            const titleEl = document.getElementById('confirmModalTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const extraEl = document.getElementById('confirmExtraInfo');
+            const btnEl = document.getElementById('confirmDeleteBtn');
+            const closeEl = document.getElementById('confirmModalClose');
+
+            headerEl.style.background = '#fee2e2';
+            titleEl.textContent = '⚠️ تحذير: فاتورة غير مسددة';
+            titleEl.style.color = '';
+            closeEl.style.color = '';
+            msgEl.innerHTML = `الفاتورة <strong style="color:#dc2626;">"${invoiceNumber || '#' + id}"</strong> عليها متبقي <strong style="color:#dc2626;">${formatNum(remaining)} ج.م</strong>.<br><br>هل تريد المتابعة؟`;
+            extraEl.style.display = 'block';
+            extraEl.innerHTML = `
+                <div style="padding:12px;background:#fee2e2;border-radius:8px;border:1px solid #dc2626;">
+                    <p style="margin:0;font-size:13px;color:#dc2626;font-weight:700;text-align:center;">
+                        ⚠️ سيتم حذف الفاتورة و${itemsCount} صنف نهائياً
+                    </p>
+                </div>
+            `;
+            btnEl.textContent = '⚠️ متابعة الحذف';
+            btnEl.style.background = '#f59e0b';
+        }
+
+        openModal('confirmModal');
+    }
+
+    // ============================================
+    // تنفيذ الحذف
+    // ============================================
+    async function deletePurchase() {
+        if (!purchaseToDelete) {
+            showNotification('لم يتم تحديد الفاتورة', 'error');
+            return;
+        }
+
+        const id = purchaseToDelete;
+        const p = allPurchases.find(x => x.id == id);
+        if (!p) return;
+
+        const remaining = Number(p.remaining_amount) || 0;
+
+        // المرحلة الأولى: تأكيد ثاني للفواتير غير المسددة
+        if (deleteStage === 1 && remaining > 0) {
+            deleteStage = 2;
+            const headerEl = document.getElementById('confirmModalHeader');
+            const titleEl = document.getElementById('confirmModalTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const extraEl = document.getElementById('confirmExtraInfo');
+            const btnEl = document.getElementById('confirmDeleteBtn');
+            const closeEl = document.getElementById('confirmModalClose');
+
+            headerEl.style.background = '#dc2626';
+            titleEl.textContent = '🚨 تأكيد نهائي';
+            titleEl.style.color = 'white';
+            closeEl.style.color = 'white';
+
+            msgEl.innerHTML = `
+                <strong style="color:#dc2626;font-size:16px;">تأكيد نهائي!</strong><br><br>
+                سيتم حذف الفاتورة <strong>"${p.invoice_number || '#' + id}"</strong> نهائياً.<br><br>
+                <span style="color:#dc2626;font-weight:700;">هل أنت متأكد 100%؟</span>
+            `;
+            extraEl.innerHTML = `
+                <div style="padding:10px;background:#dc2626;border-radius:8px;">
+                    <p style="margin:0;font-size:13px;color:white;font-weight:700;text-align:center;">
+                        🚨 لا يمكن التراجع عن هذا الإجراء
+                    </p>
+                </div>
+            `;
+            btnEl.textContent = '🗑️ نعم، احذف نهائياً';
+            btnEl.style.background = '#991b1b';
+            return;
+        }
+
+        // المرحلة النهائية: التنفيذ
+        try {
+            const { error } = await supabase.from('purchases').delete().eq('id', id);
+            if (error) throw error;
+
+            showNotification('✅ تم حذف الفاتورة بنجاح', 'success');
+            closeModal('confirmModal');
+            purchaseToDelete = null;
+            deleteStage = 0;
+
+            await loadPurchases();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حذف الفاتورة:', err);
+            showNotification('حدث خطأ أثناء الحذف: ' + err.message, 'error');
+            closeModal('confirmModal');
+            purchaseToDelete = null;
+            deleteStage = 0;
+        }
+    }
+
+    // ============================================
+    // طباعة تقرير فاتورة فردية
+    // ============================================
+    function printPurchaseReport(id) {
+        const purchase = allPurchases.find(p => p.id == id);
+        if (!purchase) {
+            showNotification('الفاتورة غير موجودة', 'error');
+            return;
+        }
+
+        const supplierName = purchase.supplier_name || 'غير معروف';
+        const totalAmount = Number(purchase.total_amount) || 0;
+        const paidAmount = Number(purchase.paid_amount) || 0;
+        const remainingAmount = Number(purchase.remaining_amount) || (totalAmount - paidAmount);
+
+        let itemsList = [];
+        try {
+            if (typeof purchase.items === 'string') itemsList = JSON.parse(purchase.items);
+            else if (Array.isArray(purchase.items)) itemsList = purchase.items;
+            else if (purchase.items && typeof purchase.items === 'object') itemsList = Object.values(purchase.items);
+        } catch(e) { itemsList = []; }
+
+        let itemsRows = '';
+        itemsList.forEach((item, i) => {
+            const qty = Number(item.quantity) || 0;
+            const price = Number(item.unit_price || item.price) || 0;
+            const total = Number(item.total) || (qty * price);
+            itemsRows += `<tr>
+                <td style="border:1px solid #000;padding:4px;text-align:center;">${i + 1}</td>
+                <td style="border:1px solid #000;padding:4px;text-align:right;">${item.product_name || '-'}</td>
+                <td style="border:1px solid #000;padding:4px;text-align:center;">${qty}</td>
+                <td style="border:1px solid #000;padding:4px;text-align:center;">${price.toFixed(2)}</td>
+                <td style="border:1px solid #000;padding:4px;text-align:center;">${total.toFixed(2)}</td>
+            </tr>`;
+        });
+
+        const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
+        <title>فاتورة شراء ${purchase.invoice_number || '#' + purchase.id}</title>
+        <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            @page { size: A4; margin: 10mm; }
+            body { font-family: 'Tajawal', Arial, sans-serif; direction: rtl; color: #000; background: #fff; font-size: 12px; }
+            .title-bar { background: #0f766e; color: #fff; text-align: center; font-size: 22px; font-weight: bold; padding: 10px; margin-bottom: 0; }
+            .info-table { width: 100%; border-collapse: collapse; }
+            .info-table td { border: 1px solid #000; padding: 5px 8px; font-size: 12px; }
+            .info-table .lbl { font-weight: bold; background: #f0f0f0; width: 18%; }
+            .data-table { width: 100%; border-collapse: collapse; margin-top: 0; }
+            .data-table th, .data-table td { border: 1px solid #000; padding: 5px 4px; text-align: center; font-size: 12px; }
+            .data-table th { background: #0f766e; color: #fff; font-weight: bold; }
+            .data-table tfoot td { background: #f0f0f0; font-weight: bold; }
+            .summary-box { width: 60%; margin-right: auto; margin-left: 0; margin-top: 10px; border-collapse: collapse; }
+            .summary-box td { border: 1px solid #000; padding: 6px 10px; font-size: 12px; }
+            .summary-box .lbl { font-weight: bold; background: #f0f0f0; }
+            .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 40px; }
+            .signatures div { text-align: center; font-size: 13px; font-weight: bold; }
+            .signatures .line { border-top: 1px dotted #000; width: 180px; margin-top: 5px; }
+        </style></head><body>
+            <div class="title-bar">🧾 تقرير فاتورة مشتريات</div>
+            <table class="info-table">
+                <tr>
+                    <td class="lbl">اسم المورد</td><td>${supplierName}</td>
+                    <td class="lbl">رقم الفاتورة</td><td>${purchase.invoice_number || '#' + purchase.id}</td>
+                </tr>
+                <tr>
+                    <td class="lbl">التاريخ</td><td>${new Date(purchase.created_at).toLocaleDateString('en-GB')}</td>
+                    <td class="lbl">الوقت</td><td>${new Date(purchase.created_at).toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})}</td>
+                </tr>
+                ${purchase.notes ? `<tr><td class="lbl">ملاحظات</td><td colspan="3">${purchase.notes}</td></tr>` : ''}
+            </table>
+            <table class="data-table" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">م</th>
+                        <th>الصنف</th>
+                        <th style="width:80px;">الكمية</th>
+                        <th style="width:100px;">سعر الوحدة</th>
+                        <th style="width:100px;">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsRows || '<tr><td colspan="5" style="text-align:center;padding:15px;">لا توجد منتجات</td></tr>'}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="text-align:left;">الإجمالي</td>
+                        <td>${totalAmount.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <table class="summary-box">
+                <tr><td class="lbl">إجمالي الفاتورة</td><td style="text-align:center;">${totalAmount.toFixed(2)}</td></tr>
+                <tr><td class="lbl">المبلغ المدفوع</td><td style="text-align:center;">${paidAmount.toFixed(2)}</td></tr>
+                <tr><td class="lbl">الرصيد المستحق</td><td style="text-align:center;font-weight:bold;">${remainingAmount.toFixed(2)}</td></tr>
+            </table>
+            <div class="signatures">
+                <div>توقيع المحاسب<div class="line"></div></div>
+                <div>توقيع المستلم<div class="line"></div></div>
+            </div>
+            <script>window.print();setTimeout(function(){window.close();},1000);<\/script>
+        </body></html>`;
+
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        if (printWindow) {
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        }
+    }
+
+    // ============================================
+    // طباعة قائمة المشتريات
+    // ============================================
+    function printPurchasesList() {
+        const list = filteredPurchases.length > 0 ? filteredPurchases : allPurchases;
+        if (list.length === 0) {
+            showNotification('⚠️ لا توجد فواتير للطباعة', 'error');
+            return;
+        }
+
+        const totalAmount = list.reduce((s, p) => s + (Number(p.total_amount) || 0), 0);
+        const totalPaid = list.reduce((s, p) => s + (Number(p.paid_amount) || 0), 0);
+        const totalRemaining = list.reduce((s, p) => s + (Number(p.remaining_amount) || 0), 0);
+
+        const rowsHTML = list.map((p, i) => {
+            const remaining = Number(p.remaining_amount) || 0;
+            const status = remaining === 0 ? '✅ مدفوع' : '⏳ معلق';
+            return `<tr>
+                <td>${i + 1}</td>
+                <td><strong>${p.invoice_number || '#' + p.id}</strong></td>
+                <td>${new Date(p.created_at).toLocaleDateString('en-GB')}</td>
+                <td style="text-align:right;">${p.supplier_name || '-'}</td>
+                <td>${formatNum(p.total_amount)}</td>
+                <td>${formatNum(p.paid_amount)}</td>
+                <td>${formatNum(remaining)}</td>
+                <td>${status}</td>
+            </tr>`;
+        }).join('');
+
+        const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
+            <title>قائمة المشتريات</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Tajawal', sans-serif; padding: 20px; color: #0f3d3e; font-size: 12px; direction: rtl; }
+                .header { text-align: center; margin-bottom: 20px; border-bottom: 3px solid #0f766e; padding-bottom: 15px; }
+                .header h2 { margin: 0; font-size: 22px; color: #0f3d3e; }
+                .header p { margin: 5px 0; color: #64748b; font-size: 12px; }
+                .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+                .box { padding: 12px; text-align: center; border: 2px solid #0f766e; border-radius: 10px; background: #f0f5f4; }
+                .box .big { font-size: 18px; font-weight: 800; color: #0f3d3e; }
+                .box .sml { font-size: 10px; color: #64748b; margin-top: 4px; }
+                table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                thead th { background: #e8f0ef; padding: 10px 6px; text-align: center; border: 1px solid #94a8a6; color: #0f3d3e; }
+                tbody td { padding: 8px 6px; text-align: center; border: 1px solid #94a8a6; }
+                tbody tr:nth-child(even) { background: #f8fafa; }
+                tfoot td { background: #e8f0ef; font-weight: 800; padding: 10px 6px; border: 2px solid #0f766e; color: #0f3d3e; }
+                .footer { text-align: center; margin-top: 25px; font-size: 10px; color: #64748b; border-top: 2px solid #0f766e; padding-top: 10px; }
+            </style>
+        </head><body>
+            <div class="header">
+                <h2>🚚 قائمة المشتريات - شركة العبادي</h2>
+                <p>📅 ${new Date().toLocaleString('ar-EG')}</p>
+            </div>
+            <div class="summary">
+                <div class="box"><div class="big">${list.length}</div><div class="sml">عدد الفواتير</div></div>
+                <div class="box"><div class="big" style="color:#0891b2;">${formatNum(totalAmount)} ج.م</div><div class="sml">إجمالي المشتريات</div></div>
+                <div class="box"><div class="big" style="color:#10b981;">${formatNum(totalPaid)} ج.م</div><div class="sml">المدفوع</div></div>
+                <div class="box"><div class="big" style="color:#ef4444;">${formatNum(totalRemaining)} ج.م</div><div class="sml">المتبقي</div></div>
+            </div>
+            <table>
+                <thead><tr>
+                    <th>#</th><th>رقم الفاتورة</th><th>التاريخ</th><th>المورد</th>
+                    <th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th>
+                </tr></thead>
+                <tbody>${rowsHTML}</tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="text-align:left;">الإجمالي</td>
+                        <td>${formatNum(totalAmount)}</td>
+                        <td>${formatNum(totalPaid)}</td>
+                        <td>${formatNum(totalRemaining)}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="footer">
+                <p>شركة العبادي</p>
+            </div>
+            <script>window.print();setTimeout(function(){window.close();},1000);<\/script>
+        </body></html>`;
+
+        const pw = window.open('', '_blank', 'width=1100,height=700');
+        if (pw) {
+            pw.document.write(html);
+            pw.document.close();
+            pw.focus();
+            setTimeout(() => pw.print(), 500);
+        }
+    }
+
+    // ============================================
+    // نوافذ منبثقة
+    // ============================================
+    function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+    }
+
+    function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+        if (id === 'confirmModal') {
+            purchaseToDelete = null;
+            deleteStage = 0;
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+            e.target.classList.remove('active');
+            if (e.target.id === 'confirmModal') {
+                purchaseToDelete = null;
+                deleteStage = 0;
+            }
+        }
+    });
+    </script>
 </body>
 </html>
