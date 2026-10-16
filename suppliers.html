@@ -451,14 +451,17 @@
                 margin-bottom: 4px;
             }
             tbody td[data-label="الحالة"] {
-                position: absolute;
-                top: 14px;
-                left: 14px;
                 border: none;
                 padding: 0;
                 min-height: unset;
+                justify-content: flex-start;
+                gap: 8px;
+                margin-top: 6px;
             }
-            tbody td[data-label="الحالة"]::before { display: none; }
+            tbody td[data-label="الحالة"]::before {
+                display: inline;
+                margin-left: 0;
+            }
 
             .btn-action {
                 padding: 8px 14px;
