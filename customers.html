@@ -6,7 +6,372 @@
     <title>العملاء - شركة العبادي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/customers.css">
+
+    <!-- ============================================
+         CSS الخاص بصفحة العملاء
+         ============================================ -->
+    <style>
+        /* بطاقات العملاء */
+        .customers-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .customer-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .customer-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .customer-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .customer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .customer-main { flex: 1; }
+
+        .customer-main h4 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .customer-type {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .customer-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .customer-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view   { background: #dbeafe; color: #2563eb; }
+        .btn-edit   { background: #fef3c7; color: #d97706; }
+        .btn-pay    { background: #d1fae5; color: #059669; }
+        .btn-delete { background: #fee2e2; color: #dc2626; }
+
+        .btn-icon:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        .btn-icon:active { transform: scale(0.95); }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* النوافذ المنبثقة */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: modalIn 0.25s ease;
+        }
+
+        .modal-sm { max-width: 400px; }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #64748b;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover { background: #e2e8f0; }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .btn-primary, .btn-secondary, .btn-success, .btn-danger {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary   { background: #3b82f6; color: #fff; }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        .btn-success   { background: #059669; color: #fff; }
+        .btn-danger    { background: #dc2626; color: #fff; }
+
+        .btn-primary:hover   { background: #2563eb; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-success:hover   { background: #047857; }
+        .btn-danger:hover    { background: #b91c1c; }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+        }
+
+        .search-bar select {
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .stat-mini {
+            background: #fff;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-mini-value {
+            display: block;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-mini-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .btn-add {
+            background: #3b82f6;
+            color: #fff;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover { background: #2563eb; }
+
+        @media (max-width: 640px) {
+            .customers-list { grid-template-columns: 1fr; padding: 12px; }
+            .form-row { grid-template-columns: 1fr; }
+            .search-bar { flex-direction: column; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to   { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -27,42 +392,18 @@
                 <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html">
-                    <span class="nav-icon">📊</span> لوحة التحكم
-                </a>
-                <a href="sales.html">
-                    <span class="nav-icon">🛒</span> نقطة البيع
-                </a>
-                <a href="products.html">
-                    <span class="nav-icon">📦</span> المنتجات
-                </a>
-                <a href="purchases.html">
-                    <span class="nav-icon">🚚</span> المشتريات
-                </a>
-                <a href="customers.html" class="active">
-                    <span class="nav-icon">👤</span> العملاء
-                </a>
-                <a href="suppliers.html">
-                    <span class="nav-icon">🏢</span> الموردين
-                </a>
-                <a href="accounts.html">
-                    <span class="nav-icon">💰</span> الحسابات
-                </a>
-                <a href="expenses.html">
-                    <span class="nav-icon">🧾</span> المصروفات
-                </a>
-                <a href="reports.html">
-                    <span class="nav-icon">📈</span> التقارير
-                </a>
-                <a href="users.html">
-                    <span class="nav-icon">👥</span> المستخدمين
-                </a>
-                <a href="settings.html">
-                    <span class="nav-icon">⚙️</span> الإعدادات
-                </a>
-                <a href="#" onclick="logout()">
-                    <span class="nav-icon">🚪</span> تسجيل الخروج
-                </a>
+                <a href="dashboard.html"><span class="nav-icon">📊</span> لوحة التحكم</a>
+                <a href="sales.html"><span class="nav-icon">🛒</span> نقطة البيع</a>
+                <a href="products.html"><span class="nav-icon">📦</span> المنتجات</a>
+                <a href="purchases.html"><span class="nav-icon">🚚</span> المشتريات</a>
+                <a href="customers.html" class="active"><span class="nav-icon">👤</span> العملاء</a>
+                <a href="suppliers.html"><span class="nav-icon">🏢</span> الموردين</a>
+                <a href="accounts.html"><span class="nav-icon">💰</span> الحسابات</a>
+                <a href="expenses.html"><span class="nav-icon">🧾</span> المصروفات</a>
+                <a href="reports.html"><span class="nav-icon">📈</span> التقارير</a>
+                <a href="users.html"><span class="nav-icon">👥</span> المستخدمين</a>
+                <a href="settings.html"><span class="nav-icon">⚙️</span> الإعدادات</a>
+                <a href="#" onclick="logout()"><span class="nav-icon">🚪</span> تسجيل الخروج</a>
             </nav>
         </aside>
 
@@ -72,7 +413,6 @@
                 <button class="btn-add" onclick="openCustomerModal()">➕ عميل جديد</button>
             </div>
 
-            <!-- ✅ إحصائيات العملاء -->
             <div class="stats-mini">
                 <div class="stat-mini">
                     <span class="stat-mini-value" id="totalCustomers">0</span>
@@ -92,7 +432,6 @@
                 </div>
             </div>
 
-            <!-- ✅ شريط البحث والفلترة -->
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="🔍 بحث عن عميل..." oninput="filterCustomers()">
                 <select id="typeFilter" onchange="filterCustomers()">
@@ -103,7 +442,6 @@
                 </select>
             </div>
 
-            <!-- ✅ قائمة العملاء -->
             <div class="customers-list" id="customersList">
                 <div class="empty-state">
                     <div class="empty-icon">👤</div>
@@ -113,30 +451,15 @@
         </main>
 
         <nav class="bottom-nav">
-            <a href="dashboard.html">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">الرئيسية</span>
-            </a>
-            <a href="sales.html">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">بيع</span>
-            </a>
-            <a href="products.html">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">مخزن</span>
-            </a>
-            <a href="purchases.html">
-                <span class="nav-icon">🚚</span>
-                <span class="nav-label">مشتريات</span>
-            </a>
-            <a href="reports.html">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">تقارير</span>
-            </a>
+            <a href="dashboard.html"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></a>
+            <a href="sales.html"><span class="nav-icon">🛒</span><span class="nav-label">بيع</span></a>
+            <a href="products.html"><span class="nav-icon">📦</span><span class="nav-label">مخزن</span></a>
+            <a href="purchases.html"><span class="nav-icon">🚚</span><span class="nav-label">مشتريات</span></a>
+            <a href="reports.html"><span class="nav-icon">📈</span><span class="nav-label">تقارير</span></a>
         </nav>
     </div>
 
-    <!-- ✅ نافذة إضافة/تعديل عميل -->
+    <!-- نافذة إضافة/تعديل عميل -->
     <div class="modal-overlay" id="customerModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -145,39 +468,37 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editCustomerId">
-                <div class="modal-form">
+                <div class="form-group">
+                    <label>اسم العميل *</label>
+                    <input type="text" id="customerName" placeholder="اسم العميل">
+                </div>
+                <div class="form-row">
                     <div class="form-group">
-                        <label>اسم العميل *</label>
-                        <input type="text" id="customerName" placeholder="اسم العميل">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>رقم الهاتف</label>
-                            <input type="text" id="customerPhone" placeholder="رقم الهاتف">
-                        </div>
-                        <div class="form-group">
-                            <label>النوع</label>
-                            <select id="customerType">
-                                <option value="عادي">عادي</option>
-                                <option value="مميز">مميز</option>
-                                <option value="خاص">خاص</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>نسبة الخصم</label>
-                            <input type="number" id="customerDiscount" value="0" step="0.5" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label>الرصيد الافتتاحي</label>
-                            <input type="number" id="customerBalance" value="0" step="0.01">
-                        </div>
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="customerPhone" placeholder="رقم الهاتف">
                     </div>
                     <div class="form-group">
-                        <label>العنوان</label>
-                        <textarea id="customerAddress" rows="2" placeholder="العنوان"></textarea>
+                        <label>النوع</label>
+                        <select id="customerType">
+                            <option value="عادي">عادي</option>
+                            <option value="مميز">مميز</option>
+                            <option value="خاص">خاص</option>
+                        </select>
                     </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نسبة الخصم</label>
+                        <input type="number" id="customerDiscount" value="0" step="0.5" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>الرصيد الافتتاحي</label>
+                        <input type="number" id="customerBalance" value="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <textarea id="customerAddress" rows="2" placeholder="العنوان"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -187,7 +508,7 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة تفاصيل العميل -->
+    <!-- نافذة تفاصيل العميل -->
     <div class="modal-overlay" id="customerDetailsModal">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header" style="background:#3b82f6;">
@@ -204,7 +525,7 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة إضافة دفعة -->
+    <!-- نافذة إضافة دفعة -->
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-content" style="max-width: 420px;">
             <div class="modal-header" style="background:#d1fae5;">
@@ -212,6 +533,7 @@
                 <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="payCustomerId">
                 <div class="form-group">
                     <label>العميل</label>
                     <input type="text" id="payCustomerName" readonly style="background:#f8fafc;font-weight:700;">
@@ -224,15 +546,13 @@
                     <label>المبلغ المدفوع *</label>
                     <input type="number" id="payAmount" step="0.01" min="0.01" placeholder="أدخل المبلغ" required>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>طريقة الدفع</label>
-                        <select id="payMethod">
-                            <option value="نقدي">💰 نقدي</option>
-                            <option value="بطاقة">💳 بطاقة</option>
-                            <option value="تحويل بنكي">🏦 تحويل بنكي</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>طريقة الدفع</label>
+                    <select id="payMethod">
+                        <option value="نقدي">💰 نقدي</option>
+                        <option value="بطاقة">💳 بطاقة</option>
+                        <option value="تحويل بنكي">🏦 تحويل بنكي</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>ملاحظات</label>
@@ -246,7 +566,7 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة تأكيد الحذف -->
+    <!-- نافذة تأكيد الحذف -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content modal-sm">
             <div class="modal-header" style="background:#fef3c7;">
@@ -268,6 +588,511 @@
     <script src="js/db.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/customers.js"></script>
+
+    <!-- ============================================
+         JavaScript الخاص بصفحة العملاء
+         ============================================ -->
+    <script>
+    // ============================================
+    // المتغيرات العامة
+    // ============================================
+    let allCustomers = [];
+    let filteredCustomers = [];
+    let customerToDelete = null;
+
+    // ============================================
+    // بدء التشغيل
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (typeof checkAuth === 'function') await checkAuth();
+        await loadCustomers();
+        await loadStats();
+    });
+
+    // ============================================
+    // تحميل العملاء
+    // ============================================
+    async function loadCustomers() {
+        const container = document.getElementById('customersList');
+        try {
+            const { data, error } = await supabase
+                .from('customers')
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+
+            allCustomers = data || [];
+            filteredCustomers = [...allCustomers];
+            renderCustomers(filteredCustomers);
+        } catch (err) {
+            console.error('خطأ في تحميل العملاء:', err);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <p>حدث خطأ في تحميل العملاء</p>
+                    <button class="btn-primary" onclick="loadCustomers()">🔄 إعادة المحاولة</button>
+                </div>`;
+        }
+    }
+
+    // ============================================
+    // تحميل الإحصائيات
+    // ============================================
+    async function loadStats() {
+        try {
+            const { data: customers, error: cErr } = await supabase
+                .from('customers')
+                .select('balance');
+
+            if (cErr) throw cErr;
+
+            const totalCustomers = customers.length;
+            const totalDebt = customers
+                .filter(c => (c.balance || 0) > 0)
+                .reduce((sum, c) => sum + Number(c.balance || 0), 0);
+            const totalPaid = customers
+                .filter(c => (c.balance || 0) < 0)
+                .reduce((sum, c) => sum + Math.abs(Number(c.balance || 0)), 0);
+
+            let invoicesCount = 0;
+            try {
+                const { count } = await supabase
+                    .from('sales')
+                    .select('*', { count: 'exact', head: true });
+                invoicesCount = count || 0;
+            } catch (e) { /* جدول الفواتير غير موجود */ }
+
+            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalDebt').textContent = totalDebt.toFixed(2) + ' ج.م';
+            document.getElementById('totalPaid').textContent = totalPaid.toFixed(2) + ' ج.م';
+            document.getElementById('totalSales').textContent = invoicesCount;
+        } catch (err) {
+            console.error('خطأ في تحميل الإحصائيات:', err);
+        }
+    }
+
+    // ============================================
+    // عرض العملاء
+    // ============================================
+    function renderCustomers(customers) {
+        const container = document.getElementById('customersList');
+
+        if (!customers || customers.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">👤</div>
+                    <p>لا يوجد عملاء مطابقون</p>
+                    <button class="btn-primary" onclick="openCustomerModal()">➕ إضافة عميل جديد</button>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = customers.map(c => {
+            const balance = Number(c.balance || 0);
+            const balanceColor = balance > 0 ? '#dc2626' : (balance < 0 ? '#059669' : '#64748b');
+            const typeColor = c.type === 'مميز' ? '#f59e0b' : (c.type === 'خاص' ? '#8b5cf6' : '#3b82f6');
+            const safeName = (c.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            return `
+            <div class="customer-card">
+                <div class="customer-card-header">
+                    <div class="customer-avatar">${(c.name || 'ع').charAt(0)}</div>
+                    <div class="customer-main">
+                        <h4>${c.name || 'بدون اسم'}</h4>
+                        <span class="customer-type" style="background:${typeColor}20;color:${typeColor};">
+                            ${c.type || 'عادي'}
+                        </span>
+                    </div>
+                </div>
+                <div class="customer-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📞 الهاتف</span>
+                        <span class="detail-value">${c.phone || '—'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💳 الرصيد</span>
+                        <span class="detail-value" style="color:${balanceColor};font-weight:800;">
+                            ${balance.toFixed(2)} ج.م
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🎁 الخصم</span>
+                        <span class="detail-value">${c.discount || 0}%</span>
+                    </div>
+                </div>
+                <div class="customer-actions">
+                    <button class="btn-icon btn-view" onclick="viewCustomerDetails('${c.id}')" title="عرض">👁️</button>
+                    <button class="btn-icon btn-edit" onclick="editCustomer('${c.id}')" title="تعديل">✏️</button>
+                    <button class="btn-icon btn-pay" onclick="openPaymentModal('${c.id}')" title="إضافة دفعة">💵</button>
+                    <button class="btn-icon btn-delete" onclick="confirmDeleteCustomer('${c.id}', '${safeName}')" title="حذف">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // ============================================
+    // فلترة العملاء
+    // ============================================
+    function filterCustomers() {
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const type = document.getElementById('typeFilter').value;
+
+        filteredCustomers = allCustomers.filter(c => {
+            const matchSearch = !search ||
+                (c.name || '').toLowerCase().includes(search) ||
+                (c.phone || '').includes(search);
+            const matchType = type === 'all' || c.type === type;
+            return matchSearch && matchType;
+        });
+
+        renderCustomers(filteredCustomers);
+    }
+
+    // ============================================
+    // فتح نافذة إضافة/تعديل عميل
+    // ============================================
+    function openCustomerModal(id = null) {
+        document.getElementById('customerModalTitle').textContent = id ? '✏️ تعديل عميل' : '➕ عميل جديد';
+        document.getElementById('editCustomerId').value = id || '';
+
+        if (id) {
+            const c = allCustomers.find(x => x.id === id);
+            if (c) {
+                document.getElementById('customerName').value = c.name || '';
+                document.getElementById('customerPhone').value = c.phone || '';
+                document.getElementById('customerType').value = c.type || 'عادي';
+                document.getElementById('customerDiscount').value = c.discount || 0;
+                document.getElementById('customerBalance').value = c.balance || 0;
+                document.getElementById('customerAddress').value = c.address || '';
+            }
+        } else {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerType').value = 'عادي';
+            document.getElementById('customerDiscount').value = 0;
+            document.getElementById('customerBalance').value = 0;
+            document.getElementById('customerAddress').value = '';
+        }
+
+        openModal('customerModal');
+    }
+
+    function editCustomer(id) { openCustomerModal(id); }
+
+    // ============================================
+    // حفظ العميل
+    // ============================================
+    async function saveCustomer() {
+        const id = document.getElementById('editCustomerId').value;
+        const name = document.getElementById('customerName').value.trim();
+
+        if (!name) {
+            showToast('الرجاء إدخال اسم العميل', 'error');
+            return;
+        }
+
+        const payload = {
+            name,
+            phone: document.getElementById('customerPhone').value.trim(),
+            type: document.getElementById('customerType').value,
+            discount: parseFloat(document.getElementById('customerDiscount').value) || 0,
+            balance: parseFloat(document.getElementById('customerBalance').value) || 0,
+            address: document.getElementById('customerAddress').value.trim()
+        };
+
+        try {
+            let error;
+            if (id) {
+                ({ error } = await supabase.from('customers').update(payload).eq('id', id));
+            } else {
+                ({ error } = await supabase.from('customers').insert([payload]));
+            }
+
+            if (error) throw error;
+
+            showToast(id ? '✅ تم تعديل العميل بنجاح' : '✅ تم إضافة العميل بنجاح', 'success');
+            closeModal('customerModal');
+            await loadCustomers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حفظ العميل:', err);
+            showToast('حدث خطأ: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================
+    // عرض تفاصيل العميل
+    // ============================================
+    async function viewCustomerDetails(id) {
+        const content = document.getElementById('customerDetailsContent');
+        content.innerHTML = '<p style="text-align:center;padding:20px;">جاري التحميل...</p>';
+        openModal('customerDetailsModal');
+
+        const c = allCustomers.find(x => x.id === id);
+        if (!c) {
+            content.innerHTML = '<p style="text-align:center;color:#dc2626;">العميل غير موجود</p>';
+            return;
+        }
+
+        let invoices = [];
+        try {
+            const { data } = await supabase
+                .from('sales')
+                .select('*')
+                .eq('customer_id', id)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            invoices = data || [];
+        } catch (e) { /* لا توجد فواتير */ }
+
+        const totalInvoices = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
+
+        content.innerHTML = `
+            <div style="padding:10px;">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="width:70px;height:70px;border-radius:50%;background:#3b82f6;color:white;
+                                display:flex;align-items:center;justify-content:center;font-size:32px;
+                                margin:0 auto 10px;font-weight:800;">
+                        ${(c.name || 'ع').charAt(0)}
+                    </div>
+                    <h3 style="margin:0;color:#1e293b;">${c.name}</h3>
+                    <span style="color:#64748b;font-size:13px;">${c.type || 'عادي'}</span>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+                    <div style="background:#f8fafc;padding:12px;border-radius:8px;">
+                        <div style="font-size:11px;color:#64748b;">الهاتف</div>
+                        <div style="font-weight:700;">${c.phone || '—'}</div>
+                    </div>
+                    <div style="background:#f8fafc;padding:12px;border-radius:8px;">
+                        <div style="font-size:11px;color:#64748b;">الخصم</div>
+                        <div style="font-weight:700;">${c.discount || 0}%</div>
+                    </div>
+                    <div style="background:#fef2f2;padding:12px;border-radius:8px;">
+                        <div style="font-size:11px;color:#64748b;">الرصيد الحالي</div>
+                        <div style="font-weight:800;color:${Number(c.balance) > 0 ? '#dc2626' : '#059669'};">
+                            ${Number(c.balance || 0).toFixed(2)} ج.م
+                        </div>
+                    </div>
+                    <div style="background:#f0fdf4;padding:12px;border-radius:8px;">
+                        <div style="font-size:11px;color:#64748b;">إجمالي الفواتير</div>
+                        <div style="font-weight:700;">${totalInvoices.toFixed(2)} ج.م</div>
+                    </div>
+                </div>
+
+                ${c.address ? `
+                <div style="background:#f8fafc;padding:12px;border-radius:8px;margin-bottom:16px;">
+                    <div style="font-size:11px;color:#64748b;">العنوان</div>
+                    <div>${c.address}</div>
+                </div>` : ''}
+
+                <h4 style="color:#1e293b;margin:16px 0 10px;">📄 آخر الفواتير (${invoices.length})</h4>
+                ${invoices.length > 0 ? `
+                    <div style="max-height:220px;overflow-y:auto;">
+                        ${invoices.map(inv => `
+                            <div style="display:flex;justify-content:space-between;padding:10px;
+                                        border-bottom:1px solid #e2e8f0;font-size:13px;">
+                                <div>
+                                    <div style="font-weight:700;">#${inv.invoice_number || (inv.id ? inv.id.slice(0,8) : '')}</div>
+                                    <div style="font-size:11px;color:#64748b;">
+                                        ${inv.created_at ? new Date(inv.created_at).toLocaleDateString('ar-EG') : ''}
+                                    </div>
+                                </div>
+                                <div style="font-weight:800;color:#3b82f6;">
+                                    ${Number(inv.total || 0).toFixed(2)} ج.م
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<p style="text-align:center;color:#94a3b8;padding:16px;">لا توجد فواتير</p>'}
+            </div>
+        `;
+    }
+
+    // ============================================
+    // نافذة إضافة دفعة
+    // ============================================
+    function openPaymentModal(id) {
+        const c = allCustomers.find(x => x.id === id);
+        if (!c) return;
+
+        document.getElementById('payCustomerId').value = id;
+        document.getElementById('payCustomerName').value = c.name;
+        document.getElementById('payCurrentDebt').value = Number(c.balance || 0).toFixed(2) + ' ج.م';
+        document.getElementById('payAmount').value = '';
+        document.getElementById('payMethod').value = 'نقدي';
+        document.getElementById('payNote').value = '';
+
+        openModal('paymentModal');
+    }
+
+    async function addPayment() {
+        const id = document.getElementById('payCustomerId').value;
+        const amount = parseFloat(document.getElementById('payAmount').value);
+        const method = document.getElementById('payMethod').value;
+        const note = document.getElementById('payNote').value.trim();
+
+        if (!id || !amount || amount <= 0) {
+            showToast('الرجاء إدخال مبلغ صحيح', 'error');
+            return;
+        }
+
+        const c = allCustomers.find(x => x.id === id);
+        if (!c) return;
+
+        const newBalance = Number(c.balance || 0) - amount;
+
+        try {
+            // محاولة تسجيل الدفعة
+            try {
+                await supabase.from('payments').insert([{
+                    customer_id: id,
+                    amount: amount,
+                    method: method,
+                    note: note,
+                    type: 'customer_payment'
+                }]);
+            } catch (e) { /* جدول الدفعات غير موجود */ }
+
+            const { error: updErr } = await supabase
+                .from('customers')
+                .update({ balance: newBalance })
+                .eq('id', id);
+
+            if (updErr) throw updErr;
+
+            showToast('✅ تم تسجيل الدفعة بنجاح', 'success');
+            closeModal('paymentModal');
+            await loadCustomers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في إضافة الدفعة:', err);
+            showToast('حدث خطأ: ' + err.message, 'error');
+        }
+    }
+
+    // ============================================
+    // ✅ تأكيد حذف العميل
+    // ============================================
+    function confirmDeleteCustomer(id, name) {
+        customerToDelete = id;
+        const msg = document.getElementById('confirmMessage');
+        msg.innerHTML = `هل أنت متأكد من حذف العميل <strong style="color:#dc2626;">"${name}"</strong>؟<br>
+            <small style="color:#64748b;">لا يمكن التراجع عن هذا الإجراء</small>`;
+        openModal('confirmModal');
+    }
+
+    // ============================================
+    // ✅ تنفيذ الحذف
+    // ============================================
+    async function deleteCustomer() {
+        if (!customerToDelete) {
+            showToast('لم يتم تحديد العميل', 'error');
+            return;
+        }
+
+        const id = customerToDelete;
+
+        try {
+            // التحقق من وجود فواتير مرتبطة بالعميل
+            let hasInvoices = false;
+            try {
+                const { data: invoices } = await supabase
+                    .from('sales')
+                    .select('id')
+                    .eq('customer_id', id)
+                    .limit(1);
+                hasInvoices = invoices && invoices.length > 0;
+            } catch (e) { /* جدول الفواتير غير موجود */ }
+
+            if (hasInvoices) {
+                showToast('⚠️ لا يمكن حذف العميل لوجود فواتير مرتبطة به', 'error');
+                closeModal('confirmModal');
+                customerToDelete = null;
+                return;
+            }
+
+            // حذف الدفعات المرتبطة (إن وجدت)
+            try {
+                await supabase.from('payments').delete().eq('customer_id', id);
+            } catch (e) { /* جدول الدفعات غير موجود */ }
+
+            // حذف العميل
+            const { error } = await supabase
+                .from('customers')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            showToast('✅ تم حذف العميل بنجاح', 'success');
+            closeModal('confirmModal');
+            customerToDelete = null;
+
+            await loadCustomers();
+            await loadStats();
+        } catch (err) {
+            console.error('خطأ في حذف العميل:', err);
+            showToast('حدث خطأ أثناء الحذف: ' + err.message, 'error');
+            closeModal('confirmModal');
+            customerToDelete = null;
+        }
+    }
+
+    // ============================================
+    // إشعار Toast
+    // ============================================
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast-custom');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-custom';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            z-index: 10000;
+            font-family: 'Tajawal', sans-serif;
+            background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#3b82f6'};
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideDown 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // ============================================
+    // نوافذ منبثقة (Modal)
+    // ============================================
+    function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+    }
+
+    function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+    }
+
+    // إغلاق عند النقر على الخلفية
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+            e.target.classList.remove('active');
+        }
+    });
+    </script>
 </body>
 </html>
