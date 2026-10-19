@@ -409,11 +409,31 @@
 
     <script>
     // ============================================
-    // حماية الصفحة - التحقق من تسجيل الدخول
+    // 🔑 المفاتيح الموحدة
+    // ============================================
+    const SESSION_KEY = 'alabady_session';
+    const USER_KEY = 'currentUser';
+
+    // ============================================
+    // 🗑️ مسح جميع الجلسات
+    // ============================================
+    function clearAllSessions() {
+        localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(USER_KEY);
+    }
+
+    // ============================================
+    // 🛡️ حماية الصفحة - التحقق من تسجيل الدخول
     // ============================================
     (function checkSession() {
         try {
-            const session = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            // ✅ قراءة من أي مفتاح (توافق كامل)
+            const session = localStorage.getItem(SESSION_KEY) 
+                         || sessionStorage.getItem(SESSION_KEY)
+                         || localStorage.getItem(USER_KEY)
+                         || sessionStorage.getItem(USER_KEY);
 
             if (!session) {
                 const guard = document.getElementById('authGuard');
@@ -430,14 +450,22 @@
             }
 
             const user = JSON.parse(session);
+
+            // ✅ التحقق من المستخدم
             if (!user || !user.username) {
-                localStorage.removeItem('currentUser');
-                sessionStorage.removeItem('currentUser');
+                clearAllSessions();
                 window.location.replace('login.html');
                 return;
             }
 
-            // الجلسة صحيحة → إظهار المحتوى
+            // ✅ التحقق من انتهاء الجلسة
+            if (user.expires && user.expires < Date.now()) {
+                clearAllSessions();
+                window.location.replace('login.html');
+                return;
+            }
+
+            // ✅ الجلسة صحيحة → إظهار المحتوى
             setTimeout(() => {
                 const guard = document.getElementById('authGuard');
                 const app = document.getElementById('app');
@@ -454,16 +482,16 @@
 
         } catch (e) {
             console.error('خطأ في التحقق من الجلسة:', e);
-            localStorage.removeItem('currentUser');
-            sessionStorage.removeItem('currentUser');
+            clearAllSessions();
             window.location.replace('login.html');
         }
     })();
 
     // ============================================
-    // تحميل بيانات المستخدم
+    // 👤 تحميل بيانات المستخدم
     // ============================================
     function loadUserData(user) {
+        // التاريخ
         const dateEl = document.getElementById('currentDate');
         if (dateEl) {
             const now = new Date();
@@ -475,6 +503,7 @@
             });
         }
 
+        // اسم المستخدم
         const userInfoEl = document.getElementById('currentUserInfo');
         const userNameEl = document.getElementById('userName');
         const name = user.fullName || user.full_name || user.username || 'مدير النظام';
@@ -483,12 +512,11 @@
     }
 
     // ============================================
-    // تسجيل الخروج
+    // 🚪 تسجيل الخروج
     // ============================================
     function logout() {
         if (confirm('هل تريد تسجيل الخروج من النظام؟')) {
-            localStorage.removeItem('currentUser');
-            sessionStorage.removeItem('currentUser');
+            clearAllSessions();
             window.location.replace('login.html');
         }
     }
