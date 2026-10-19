@@ -277,7 +277,7 @@
         document.getElementById('userModal').classList.add('active');
     }
 
-    async function saveUser() {
+            async function saveUser() {
         const id = document.getElementById('editUserId')?.value;
         const username = document.getElementById('userUsername')?.value.trim();
         const fullName = document.getElementById('userFullName')?.value.trim();
@@ -285,20 +285,39 @@
         const isActive = document.getElementById('userStatus')?.value === 'true';
         const password = document.getElementById('userPassword')?.value;
         
-        if (!username || !fullName || (!id && !password)) { alert('يرجى ملء جميع الحقول المطلوبة'); return; }
+        if (!username) { alert('❌ أدخل اسم المستخدم'); return; }
+        if (!fullName) { alert('❌ أدخل الاسم الكامل'); return; }
+        if (!id && !password) { alert('❌ أدخل كلمة المرور'); return; }
         
-        const data = { username, full_name: fullName, role, status: isActive };
-        if (password) data.password = await hashPassword(password);
+        // بناء البيانات لترسل إلى قاعدة البيانات
+        const data = {
+            username: username,
+            full_name: fullName,
+            role: role,
+            is_active: isActive  // تم التعديل ليطابق اسم العمود في Supabase
+        };
+        
+        if (password) {
+            data.password = await hashPassword(password); // سيتم إرسالها بعد إضافة العمود
+        }
         
         try {
             let error;
-            if (id) ({ error } = await supabase.from('users').update(data).eq('id', id));
-            else ({ error } = await supabase.from('users').insert([data]));
+            if (id) {
+                ({ error } = await supabase.from('users').update(data).eq('id', id));
+            } else {
+                ({ error } = await supabase.from('users').insert([data]));
+            }
             
             if (error) throw error;
+            
             document.getElementById('userModal').classList.remove('active');
             await loadUsers();
-        } catch (error) { alert('خطأ أثناء الحفظ: ' + error.message); }
+            alert('✅ تم الحفظ بنجاح');
+        } catch (error) {
+            console.error('خطأ في حفظ المستخدم:', error);
+            alert('حدث خطأ: ' + error.message);
+        }
     }
 
     function editUser(id) {
