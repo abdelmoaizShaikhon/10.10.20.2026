@@ -27,42 +27,19 @@
                 <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html">
-                    <span class="nav-icon">📊</span> لوحة التحكم
-                </a>
-                <a href="sales.html">
-                    <span class="nav-icon">🛒</span> نقطة البيع
-                </a>
-                <a href="products.html">
-                    <span class="nav-icon">📦</span> المنتجات
-                </a>
-                <a href="purchases.html">
-                    <span class="nav-icon">🚚</span> المشتريات
-                </a>
-                <a href="customers.html">
-                    <span class="nav-icon">👤</span> العملاء
-                </a>
-                <a href="suppliers.html">
-                    <span class="nav-icon">🏢</span> الموردين
-                </a>
-                <a href="accounts.html">
-                    <span class="nav-icon">💰</span> الحسابات
-                </a>
-                <a href="expenses.html">
-                    <span class="nav-icon">🧾</span> المصروفات
-                </a>
-                <a href="reports.html">
-                    <span class="nav-icon">📈</span> التقارير
-                </a>
-                <a href="users.html" class="active">
-                    <span class="nav-icon">👥</span> المستخدمين
-                </a>
-                <a href="settings.html">
-                    <span class="nav-icon">⚙️</span> الإعدادات
-                </a>
-                <a href="#" onclick="logout()">
-                    <span class="nav-icon">🚪</span> تسجيل الخروج
-                </a>
+                <a href="dashboard.html"><span class="nav-icon">📊</span> لوحة التحكم</a>
+                <a href="sales.html"><span class="nav-icon">🛒</span> نقطة البيع</a>
+                <a href="products.html"><span class="nav-icon">📦</span> المنتجات</a>
+                <a href="purchases.html"><span class="nav-icon">🚚</span> المشتريات</a>
+                <a href="customers.html"><span class="nav-icon">👤</span> العملاء</a>
+                <a href="suppliers.html"><span class="nav-icon">🏢</span> الموردين</a>
+                <a href="accounts.html"><span class="nav-icon">💰</span> الحسابات</a>
+                <a href="transfers.html"><span class="nav-icon">💸</span> التحويلات</a>
+                <a href="expenses.html"><span class="nav-icon">🧾</span> المصروفات</a>
+                <a href="reports.html"><span class="nav-icon">📈</span> التقارير</a>
+                <a href="users.html" class="active"><span class="nav-icon">👥</span> المستخدمين</a>
+                <a href="settings.html"><span class="nav-icon">⚙️</span> الإعدادات</a>
+                <a href="#" onclick="logout()"><span class="nav-icon">🚪</span> تسجيل الخروج</a>
             </nav>
         </aside>
 
@@ -72,7 +49,6 @@
                 <button class="btn-add" onclick="openUserModal()">➕ مستخدم جديد</button>
             </div>
 
-            <!-- ✅ إحصائيات المستخدمين -->
             <div class="stats-mini">
                 <div class="stat-mini">
                     <span class="stat-mini-value" id="totalUsers">0</span>
@@ -88,7 +64,6 @@
                 </div>
             </div>
 
-            <!-- ✅ قائمة المستخدمين -->
             <div class="users-list" id="usersList">
                 <div class="empty-state">
                     <div class="empty-icon">👥</div>
@@ -98,30 +73,15 @@
         </main>
 
         <nav class="bottom-nav">
-            <a href="dashboard.html">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">الرئيسية</span>
-            </a>
-            <a href="sales.html">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">بيع</span>
-            </a>
-            <a href="products.html">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">مخزن</span>
-            </a>
-            <a href="purchases.html">
-                <span class="nav-icon">🚚</span>
-                <span class="nav-label">مشتريات</span>
-            </a>
-            <a href="reports.html">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">تقارير</span>
-            </a>
+            <a href="dashboard.html"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></a>
+            <a href="sales.html"><span class="nav-icon">🛒</span><span class="nav-label">بيع</span></a>
+            <a href="products.html"><span class="nav-icon">📦</span><span class="nav-label">مخزن</span></a>
+            <a href="purchases.html"><span class="nav-icon">🚚</span><span class="nav-label">مشتريات</span></a>
+            <a href="reports.html"><span class="nav-icon">📈</span><span class="nav-label">تقارير</span></a>
         </nav>
     </div>
 
-    <!-- ✅ نافذة إضافة/تعديل مستخدم -->
+    <!-- نافذة إضافة/تعديل مستخدم -->
     <div class="modal-overlay" id="userModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -172,7 +132,7 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة تأكيد الحذف -->
+    <!-- نافذة تأكيد الحذف -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-content modal-sm">
             <div class="modal-header" style="background:#fef3c7;">
@@ -189,11 +149,54 @@
         </div>
     </div>
 
+    <!-- السكربتات الأساسية -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/db.js"></script>
+    <script src="js/session.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
     <script src="js/users.js"></script>
+
+    <!-- كود حماية الصفحة -->
+    <script>
+    (function checkSession() {
+        try {
+            const session = localStorage.getItem('alabady_session') 
+                         || sessionStorage.getItem('alabady_session')
+                         || localStorage.getItem('currentUser')
+                         || sessionStorage.getItem('currentUser');
+
+            if (!session) {
+                setTimeout(() => window.location.replace('login.html'), 100);
+                return;
+            }
+
+            const user = JSON.parse(session);
+            if (!user || !user.username || (user.expires && user.expires < Date.now())) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace('login.html');
+                return;
+            }
+
+            const name = user.fullName || user.full_name || user.username || 'مدير النظام';
+            if (document.getElementById('userName')) document.getElementById('userName').textContent = '👤 ' + name;
+
+        } catch (e) {
+            console.error('خطأ في التحقق:', e);
+            window.location.replace('login.html');
+        }
+    })();
+
+    function logout() {
+        if (confirm('هل تريد تسجيل الخروج من النظام؟')) {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace('login.html');
+        }
+    }
+    window.logout = logout;
+    </script>
 </body>
 </html>
