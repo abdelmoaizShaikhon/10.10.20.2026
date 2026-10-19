@@ -883,7 +883,8 @@
             return `<tr>
                 <td data-label="#">${i + 1}</td>
                 <td data-label="الاسم">${c.name || 'بدون اسم'}</td>
-                <td data-label="الخصم">${c.discount || 0}%</td>
+                <td data-label="النوع"><span class="badge ${badgeClass}">${c.type || 'عادي'}</span></td>
+                <td data-label="الخصم">${c.discount_percent || 0}%</td>
                 <td data-label="الهاتف">${c.phone || '-'}</td>
                 <td data-label="المشتريات" style="color:#0891b2;font-weight:600;">${formatNum(total)} ج.م</td>
                 <td data-label="المدفوع" style="color:#10b981;font-weight:600;">${formatNum(paid)} ج.م</td>
@@ -937,7 +938,7 @@
                 document.getElementById('customerName').value = c.name || '';
                 document.getElementById('customerPhone').value = c.phone || '';
                 document.getElementById('customerType').value = c.type || 'عادي';
-                document.getElementById('customerDiscount').value = c.discount || 0;
+                document.getElementById('customerDiscount').value = c.discount_percent || 0;
                 document.getElementById('customerBalance').value = c.balance || 0;
                 document.getElementById('customerAddress').value = c.address || '';
             }
@@ -971,7 +972,7 @@
             name,
             phone: document.getElementById('customerPhone').value.trim(),
             type: document.getElementById('customerType').value,
-            discount: parseFloat(document.getElementById('customerDiscount').value) || 0,
+            discount_percent: parseFloat(document.getElementById('customerDiscount').value) || 0,
             balance: parseFloat(document.getElementById('customerBalance').value) || 0,
             address: document.getElementById('customerAddress').value.trim()
         };
@@ -1038,7 +1039,7 @@
                     <h2 style="font-size:22px;font-weight:800;color:var(--text);">${c.name}</h2>
                     <div style="display:flex;gap:15px;flex-wrap:wrap;font-size:13px;color:var(--text-light);margin-top:4px;">
                         <span><strong>النوع:</strong> ${c.type || 'عادي'}</span>
-                        <span><strong>الخصم:</strong> ${c.discount || 0}%</span>
+                        <span><strong>الخصم:</strong> ${c.discount_percent || 0}%</span>
                         <span><strong>الهاتف:</strong> ${c.phone || '-'}</span>
                     </div>
                 </div>
