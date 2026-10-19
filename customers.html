@@ -862,22 +862,27 @@
        // ============================================
     // تحميل الإحصائيات
     // ============================================
+      // ============================================
+    // تحميل الإحصائيات
+    // ============================================
     async function loadStats() {
         try {
             let totalDebt = 0;
-            let totalPaid = 0; // إجمالي المدفوعات
+            let totalPaid = 0; 
             let totalInvoices = 0;
 
-            // 1. حساب إجمالي الفواتير والمستحقات
+            // 1. حساب إجمالي الفواتير والمستحقات (فقط للعملاء المسجلين)
             allCustomers.forEach(c => {
                 const remaining = getCustomerRemaining(c.id);
                 if (remaining > 0) totalDebt += remaining;
                 totalInvoices += getCustomerInvoicesCount(c.id);
             });
 
-            // 2. حساب إجمالي المدفوعات (من الفواتير + الدفعات المنفصلة)
-            // أ. المدفوع داخل الفواتير
-            const paidFromInvoices = allSales.reduce((sum, s) => sum + (Number(s.paid_amount) || 0), 0);
+            // 2. حساب إجمالي المدفوعات (مع تجاهل فواتير "نقدي")
+            // أ. المدفوع داخل الفواتير (فقط الفواتير المرتبطة بعملاء مسجلين)
+            const paidFromInvoices = allSales
+                .filter(s => s.customer_name !== 'نقدي' && s.customer_id) // تجاهل النقدي
+                .reduce((sum, s) => sum + (Number(s.paid_amount) || 0), 0);
             
             // ب. المدفوع من سجل الدفعات المنفصلة
             const paidFromCustomerPayments = allCustomerPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
@@ -893,7 +898,6 @@
             console.error('خطأ في الإحصائيات:', err);
         }
     }
-
     // ============================================
     // عرض العملاء
     // ============================================
