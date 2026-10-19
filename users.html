@@ -7,6 +7,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/users.css">
+    <style>
+        /* أنماط إضافية لضمان عمل النوافذ المنبثقة */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 61, 62, 0.6);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex !important;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -46,7 +61,8 @@
         <main class="main-content">
             <div class="page-header">
                 <h2>👥 إدارة المستخدمين</h2>
-                <button class="btn-add" onclick="openUserModal()">➕ مستخدم جديد</button>
+                <!-- استخدام addEventListener بدلاً من onclick -->
+                <button class="btn-add" id="btnAddUser">➕ مستخدم جديد</button>
             </div>
 
             <div class="stats-mini">
@@ -86,7 +102,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="userModalTitle">➕ مستخدم جديد</h3>
-                <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+                <button class="modal-close" id="btnCloseUserModal">✕</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editUserId">
@@ -126,8 +142,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal('userModal')">إلغاء</button>
-                <button class="btn-success" onclick="saveUser()">💾 حفظ</button>
+                <button class="btn-secondary" id="btnCancelUserModal">إلغاء</button>
+                <button class="btn-success" id="btnSaveUser">💾 حفظ</button>
             </div>
         </div>
     </div>
@@ -137,14 +153,14 @@
         <div class="modal-content modal-sm">
             <div class="modal-header" style="background:#fef3c7;">
                 <h3>⚠️ تأكيد الحذف</h3>
-                <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+                <button class="modal-close" id="btnCloseConfirmModal">✕</button>
             </div>
             <div class="modal-body">
                 <p style="text-align:center;font-size:15px;" id="confirmMessage">هل أنت متأكد من حذف هذا المستخدم؟</p>
             </div>
             <div class="modal-footer" style="justify-content:center;">
-                <button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button>
-                <button class="btn-danger" id="confirmDeleteBtn" onclick="deleteUser()">🗑️ حذف</button>
+                <button class="btn-secondary" id="btnCancelConfirmModal">إلغاء</button>
+                <button class="btn-danger" id="btnDeleteUser">🗑️ حذف</button>
             </div>
         </div>
     </div>
@@ -156,10 +172,10 @@
     <script src="js/session.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/users.js"></script>
 
-    <!-- كود حماية الصفحة -->
+    <!-- كود الجافاسكريبت المدمج (لضمان عمل الأزرار) -->
     <script>
+    // 1. حماية الصفحة (التحقق من تسجيل الدخول)
     (function checkSession() {
         try {
             const session = localStorage.getItem('alabady_session') 
@@ -197,6 +213,234 @@
         }
     }
     window.logout = logout;
+
+    // 2. كود إدارة المستخدمين
+    let allUsers = [];
+    let pendingDeleteId = null;
+
+    async function hashPassword(password) {
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + 'ALABADY_SALT_2026');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+            return password;
+        }
+    }
+
+    async function loadUsers() {
+        const container = document.getElementById('usersList');
+        if (container) container.innerHTML = '<div class="empty-state"><p>⏳ جاري التحميل...</p></div>';
+
+        try {
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+            allUsers = data || [];
+            displayUsers(allUsers);
+            updateUserStats();
+        } catch (err) {
+            console.error('❌ خطأ في تحميل المستخدمين:', err);
+            if (container) container.innerHTML = `<div class="empty-state"><p style="color:red;">خطأ: ${err.message}</p></div>`;
+        }
+    }
+
+    function displayUsers(users) {
+        const container = document.getElementById('usersList');
+        if (!container) return;
+
+        if (!users || users.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد مستخدمين</p></div>`;
+            return;
+        }
+
+        const roleLabels = {
+            'admin': { label: 'مدير النظام', color: '#dc2626' },
+            'manager': { label: 'مدير', color: '#f59e0b' },
+            'accountant': { label: 'محاسب', color: '#0891b2' },
+            'cashier': { label: 'كاشير', color: '#8b5cf6' },
+            'user': { label: 'مستخدم', color: '#64748b' }
+        };
+
+        container.innerHTML = users.map(u => {
+            const role = roleLabels[u.role] || roleLabels['user'];
+            const isActive = u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false;
+            const isMainAdmin = u.username === 'admin';
+            
+            return `
+                <div class="user-card" style="background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:250px;">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;">
+                            ${(u.full_name || u.username || 'م').charAt(0)}
+                        </div>
+                        <div>
+                            <div style="font-weight:800;color:#0f3d3e;font-size:15px;">${u.full_name || u.username}</div>
+                            <div style="font-size:12px;color:#64748b;">@${u.username}</div>
+                            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+                                <span style="background:${role.color}20;color:${role.color};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">${role.label}</span>
+                                <span style="background:${isActive ? '#d1fae5' : '#fee2e2'};color:${isActive ? '#059669' : '#dc2626'};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">
+                                    ${isActive ? '🟢 نشط' : '🔴 غير نشط'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        ${!isMainAdmin ? `
+                            <button class="btn-edit-user" data-id="${u.id}" style="padding:8px 16px;border:none;border-radius:8px;background:#e0f2f1;color:#0f766e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">✏️ تعديل</button>
+                            <button class="btn-delete-user" data-id="${u.id}" data-name="${(u.full_name || u.username).replace(/'/g, "\\'")}" style="padding:8px 16px;border:none;border-radius:8px;background:#fee2e2;color:#dc2626;font-family:'Tajawal',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">🗑️ حذف</button>
+                        ` : '<span style="color:#94a3b8;font-size:11px;font-weight:bold;">حساب رئيسي</span>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // ربط أزرار التعديل والحذف ديناميكياً
+        document.querySelectorAll('.btn-edit-user').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                editUser(id);
+            });
+        });
+
+        document.querySelectorAll('.btn-delete-user').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const name = e.target.getAttribute('data-name');
+                confirmDeleteUser(id, name);
+            });
+        });
+    }
+
+    function updateUserStats() {
+        const totalEl = document.getElementById('totalUsers');
+        const activeEl = document.getElementById('activeUsers');
+        const inactiveEl = document.getElementById('inactiveUsers');
+        if (!totalEl || !activeEl || !inactiveEl) return;
+        
+        const total = allUsers.length;
+        const active = allUsers.filter(u => u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false).length;
+        
+        totalEl.textContent = total;
+        activeEl.textContent = active;
+        inactiveEl.textContent = total - active;
+    }
+
+    function openUserModal(data = null) {
+        const isEdit = !!data;
+        document.getElementById('userModalTitle').textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
+        document.getElementById('editUserId').value = data?.id || '';
+        document.getElementById('userUsername').value = data?.username || '';
+        document.getElementById('userFullName').value = data?.full_name || '';
+        document.getElementById('userRole').value = data?.role || 'user';
+        
+        const isActive = data ? (data.status === true || data.status === 'true' || data.status === 1 || data.is_active !== false) : true;
+        document.getElementById('userStatus').value = isActive ? 'true' : 'false';
+        
+        document.getElementById('userPassword').value = '';
+        document.getElementById('userPassword').required = !isEdit;
+        
+        const hintEl = document.getElementById('userPasswordHint');
+        if (hintEl) hintEl.style.display = isEdit ? 'block' : 'none';
+        
+        document.getElementById('userModal').classList.add('active');
+    }
+
+    async function saveUser() {
+        const id = document.getElementById('editUserId')?.value;
+        const username = document.getElementById('userUsername')?.value.trim();
+        const fullName = document.getElementById('userFullName')?.value.trim();
+        const role = document.getElementById('userRole')?.value || 'user';
+        const isActive = document.getElementById('userStatus')?.value === 'true';
+        const password = document.getElementById('userPassword')?.value;
+        
+        if (!username) { alert('❌ أدخل اسم المستخدم'); return; }
+        if (!fullName) { alert('❌ أدخل الاسم الكامل'); return; }
+        if (!id && !password) { alert('❌ أدخل كلمة المرور'); return; }
+        
+        const data = {
+            username: username,
+            full_name: fullName,
+            role: role,
+            status: isActive
+        };
+        
+        if (password) {
+            data.password = await hashPassword(password);
+        }
+        
+        try {
+            let error;
+            if (id) {
+                ({ error } = await supabase.from('users').update(data).eq('id', id));
+            } else {
+                ({ error } = await supabase.from('users').insert([data]));
+            }
+            
+            if (error) throw error;
+            
+            document.getElementById('userModal').classList.remove('active');
+            await loadUsers();
+            alert('✅ تم الحفظ بنجاح');
+        } catch (error) {
+            console.error('خطأ في حفظ المستخدم:', error);
+            alert('حدث خطأ: ' + error.message);
+        }
+    }
+
+    function editUser(id) {
+        const user = allUsers.find(u => u.id === id || u.id == id);
+        if (user) openUserModal(user);
+    }
+
+    function confirmDeleteUser(id, name) {
+        pendingDeleteId = id;
+        document.getElementById('confirmMessage').innerHTML = `⚠️ هل أنت متأكد من حذف المستخدم <strong style="color:#dc2626;">"${name}"</strong>؟`;
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    async function deleteUser() {
+        if (!pendingDeleteId) return;
+        try {
+            const { error } = await supabase.from('users').delete().eq('id', pendingDeleteId);
+            if (error) throw error;
+            
+            document.getElementById('confirmModal').classList.remove('active');
+            pendingDeleteId = null;
+            await loadUsers();
+            alert('✅ تم حذف المستخدم');
+        } catch (error) {
+            console.error('خطأ في الحذف:', error);
+            alert('حدث خطأ: ' + error.message);
+        }
+    }
+
+    // 3. ربط الأزرار الأساسية
+    document.addEventListener('DOMContentLoaded', function() {
+        // زر الإضافة
+        document.getElementById('btnAddUser')?.addEventListener('click', () => openUserModal());
+        
+        // أزرار إغلاق النوافذ
+        document.getElementById('btnCloseUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
+        document.getElementById('btnCancelUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
+        document.getElementById('btnCloseConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+        document.getElementById('btnCancelConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+        
+        // زر الحفظ
+        document.getElementById('btnSaveUser')?.addEventListener('click', saveUser);
+        
+        // زر الحذف النهائي
+        document.getElementById('btnDeleteUser')?.addEventListener('click', deleteUser);
+
+        // تحميل المستخدمين عند فتح الصفحة
+        if (document.getElementById('usersList')) {
+            loadUsers();
+        }
+    });
     </script>
 </body>
 </html>
