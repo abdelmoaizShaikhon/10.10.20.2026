@@ -8,8 +8,7 @@
 let loginAttempts = 0;
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000; // 15 دقيقة
-const SESSION_KEY = 'alabady_session';
-const USER_KEY = 'currentUser';
+
 const LOCK_KEY = 'account_lock';
 const ATTEMPTS_KEY = 'login_attempts';
 const SALT = 'ALABADY_SALT_2026';
