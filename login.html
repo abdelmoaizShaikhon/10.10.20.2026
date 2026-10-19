@@ -457,19 +457,16 @@
 
             if (session) {
                 const user = JSON.parse(session);
-                // فقط إذا كانت الجلسة صالحة (غير منتهية)
                 if (user && user.username && (!user.expires || user.expires > Date.now())) {
                     showSuccess('مرحباً بك مجدداً ' + (user.fullName || user.username));
                     setTimeout(() => {
                         window.location.replace('index.html');
                     }, 800);
                 } else {
-                    // جلسة منتهية: احذفها
                     clearAllSessions();
                 }
             }
         } catch (e) {
-            console.warn('خطأ في قراءة الجلسة:', e);
             clearAllSessions();
         }
     }
@@ -529,12 +526,12 @@
     }
 
     // ============================================
-    // 🔐 تشفير كلمة المرور
+    // 🔐 تشفير كلمة المرور (يجب أن يطابق التشفير في users.js)
     // ============================================
     async function hashPassword(password) {
         try {
             const encoder = new TextEncoder();
-            const data = encoder.encode(password);
+            const data = encoder.encode(password + 'ALABADY_SALT_2026');
             const hashBuffer = await crypto.subtle.digest('SHA-256', data);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -595,12 +592,6 @@
                     role: 'admin',
                     status: true
                 };
-                // حفظ المستخدم الافتراضي
-                const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                if (!localUsers.find(u => u.username === 'admin')) {
-                    localUsers.push(user);
-                    localStorage.setItem('users', JSON.stringify(localUsers));
-                }
             }
 
             // ❌ المستخدم غير موجود
@@ -615,18 +606,19 @@
             const storedPassword = user.password || user.password_hash || '';
             let passwordMatch = false;
 
-            // مقارنة مباشرة (نص عادي)
-            if (storedPassword === password) {
+            // تشفير الكلمة المدخلة
+            const hashedInput = await hashPassword(password);
+
+            // مقارنة الحالة 1: الكلمة المشفرة
+            if (storedPassword === hashedInput) {
                 passwordMatch = true;
             }
-            // مقارنة Hash
-            else if (storedPassword && storedPassword.length === 64) {
-                const hashHex = await hashPassword(password);
-                passwordMatch = (hashHex === storedPassword);
+            // مقارنة الحالة 2: الكلمة نص عادي (حسابات قديمة)
+            else if (storedPassword === password) {
+                passwordMatch = true;
             }
-
-            // المستخدم الافتراضي (احتياطي)
-            if (!passwordMatch && username === 'admin' && password === 'admin123') {
+            // مقارنة الحالة 3: المستخدم الافتراضي
+            else if (username === 'admin' && password === 'admin123') {
                 passwordMatch = true;
             }
 
@@ -641,8 +633,10 @@
             const isActive = user.status === true 
                           || user.status === 'true' 
                           || user.status === 1 
-                          || user.status === 'active' 
-                          || user.status === undefined;
+                          || user.is_active === true
+                          || user.is_active === 'true'
+                          || user.is_active === 1
+                          || user.status === undefined && user.is_active === undefined;
             if (!isActive) {
                 showError('❌ هذا الحساب غير نشط');
                 loginBtn.disabled = false;
@@ -650,7 +644,7 @@
                 return;
             }
 
-            // ✅ 6. حفظ الجلسة (بالمفاتيح الموحدة)
+            // ✅ 6. حفظ الجلسة
             const sessionData = {
                 id: user.id || user._id,
                 username: user.username,
