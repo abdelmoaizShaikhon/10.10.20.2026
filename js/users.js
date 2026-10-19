@@ -1,11 +1,11 @@
 // ============================================
-// 👥 إدارة المستخدمين - متوافق مع Supabase مباشرة
+// 👥 إدارة المستخدمين - كود متكامل ومصحح
 // ============================================
 
 let allUsers = [];
 let pendingDeleteId = null;
 
-// 🔐 دالة تشفير كلمة المرور (SHA-256)
+// 🔐 دالة تشفير كلمة المرور
 async function hashPassword(password) {
     try {
         const encoder = new TextEncoder();
@@ -18,7 +18,7 @@ async function hashPassword(password) {
     }
 }
 
-// 📥 تحميل المستخدمين من السحابة
+// 📥 تحميل المستخدمين
 async function loadUsers() {
     const container = document.getElementById('usersList');
     if (container) container.innerHTML = '<div class="empty-state"><p>⏳ جاري التحميل...</p></div>';
@@ -90,7 +90,7 @@ function displayUsers(users) {
     }).join('');
 }
 
-// 📊 تحديث الإحصائيات
+// 📊 الإحصائيات
 function updateUserStats() {
     const totalEl = document.getElementById('totalUsers');
     const activeEl = document.getElementById('activeUsers');
@@ -109,30 +109,20 @@ function updateUserStats() {
 // ➕ فتح النافذة
 function openUserModal(data = null) {
     const isEdit = !!data;
-    const titleEl = document.getElementById('userModalTitle');
-    const editIdEl = document.getElementById('editUserId');
-    const usernameEl = document.getElementById('userUsername');
-    const fullNameEl = document.getElementById('userFullName');
-    const roleEl = document.getElementById('userRole');
-    const statusEl = document.getElementById('userStatus');
-    const passwordEl = document.getElementById('userPassword');
-    const hintEl = document.getElementById('userPasswordHint');
-    const passReqEl = document.getElementById('passRequired');
-    
-    titleEl.textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
-    editIdEl.value = data?.id || '';
-    usernameEl.value = data?.username || '';
-    fullNameEl.value = data?.full_name || '';
-    roleEl.value = data?.role || 'user';
+    document.getElementById('userModalTitle').textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
+    document.getElementById('editUserId').value = data?.id || '';
+    document.getElementById('userUsername').value = data?.username || '';
+    document.getElementById('userFullName').value = data?.full_name || '';
+    document.getElementById('userRole').value = data?.role || 'user';
     
     const isActive = data ? (data.status === true || data.status === 'true' || data.status === 1 || data.is_active !== false) : true;
-    statusEl.value = isActive ? 'true' : 'false';
+    document.getElementById('userStatus').value = isActive ? 'true' : 'false';
     
-    passwordEl.value = '';
-    passwordEl.required = !isEdit;
+    document.getElementById('userPassword').value = '';
+    document.getElementById('userPassword').required = !isEdit;
     
+    const hintEl = document.getElementById('userPasswordHint');
     if (hintEl) hintEl.style.display = isEdit ? 'block' : 'none';
-    if (passReqEl) passReqEl.textContent = isEdit ? '' : '*';
     
     openModal('userModal');
 }
@@ -172,41 +162,57 @@ async function saveUser() {
         if (error) throw error;
         
         closeModal('userModal');
-        showToast(id ? '✅ تم تحديث المستخدم' : '✅ تم إضافة المستخدم للسحابة', 'success');
+        showToast(id ? '✅ تم تحديث المستخدم' : '✅ تم إضافة المستخدم بنجاح', 'success');
         await loadUsers();
     } catch (error) {
         console.error('خطأ في حفظ المستخدم:', error);
+        // إذا كان الخطأ بسبب عدم وجود عمود معين، سيظهر في التنبيه
         showToast('حدث خطأ: ' + error.message, 'error');
     }
 }
 
+// ✏️ تعديل
 function editUser(id) {
     const user = allUsers.find(u => u.id === id || u.id == id);
     if (user) openUserModal(user);
 }
 
+// 🗑️ تأكيد الحذف
 function confirmDeleteUser(id, name) {
     pendingDeleteId = id;
-    document.getElementById('confirmMessage').innerHTML = `⚠️ هل أنت متأكد من حذف <strong>"${name}"</strong>؟`;
+    const msgEl = document.getElementById('confirmMessage');
+    if (msgEl) msgEl.innerHTML = `⚠️ هل أنت متأكد من حذف المستخدم <strong style="color:#dc2626;">"${name}"</strong>؟`;
     openModal('confirmModal');
 }
 
+// 🗑️ حذف
 async function deleteUser() {
     if (!pendingDeleteId) return;
     try {
         const { error } = await supabase.from('users').delete().eq('id', pendingDeleteId);
         if (error) throw error;
+        
         closeModal('confirmModal');
+        pendingDeleteId = null;
         showToast('✅ تم حذف المستخدم', 'success');
         await loadUsers();
     } catch (error) {
+        console.error('خطأ في الحذف:', error);
         showToast('حدث خطأ: ' + error.message, 'error');
     }
 }
 
-// 🛠️ أدوات
-function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
-function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); }
+// 🛠️ أدوات مساعدة
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+}
+
 function showToast(msg, type = 'info') {
     const div = document.createElement('div');
     div.style.cssText = `position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 20px; color: white; font-weight: 700; z-index: 100000; font-family: 'Tajawal', sans-serif; background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#3b82f6'}; box-shadow: 0 6px 20px rgba(0,0,0,0.2);`;
@@ -215,6 +221,19 @@ function showToast(msg, type = 'info') {
     setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
 }
 
+// 🌐 تصدير الدوال (هذا هو السر لجعل الأزرار تعمل)
+window.loadUsers = loadUsers;
+window.openUserModal = openUserModal;
+window.saveUser = saveUser;
+window.editUser = editUser;
+window.confirmDeleteUser = confirmDeleteUser;
+window.deleteUser = deleteUser;
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+// 🚀 التحميل التلقائي
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('usersList')) loadUsers();
+    if (document.getElementById('usersList')) {
+        loadUsers();
+    }
 });
