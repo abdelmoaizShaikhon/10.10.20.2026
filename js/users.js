@@ -14,7 +14,6 @@ async function hashPassword(password) {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     } catch (e) {
-        console.warn('خطأ في التشفير:', e);
         return password;
     }
 }
@@ -32,26 +31,6 @@ async function loadUsers() {
 
         if (error) throw error;
         allUsers = data || [];
-        
-        // إنشاء مستخدم افتراضي إذا كان الجدول فارغاً تماماً
-        if (allUsers.length === 0) {
-            const adminPass = await hashPassword('admin123');
-            const { data: newUser, error: insertErr } = await supabase
-                .from('users')
-                .insert([{ 
-                    username: 'admin', 
-                    password: adminPass, 
-                    full_name: 'مدير النظام', 
-                    role: 'admin', 
-                    status: true 
-                }])
-                .select();
-            
-            if (!insertErr && newUser) {
-                allUsers = newUser;
-            }
-        }
-
         displayUsers(allUsers);
         updateUserStats();
     } catch (err) {
@@ -66,13 +45,7 @@ function displayUsers(users) {
     if (!container) return;
 
     if (!users || users.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">👥</div>
-                <p>لا يوجد مستخدمين</p>
-                <p style="font-size:12px;color:var(--text-light);">اضغط على "مستخدم جديد" للإضافة</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد مستخدمين</p></div>`;
         return;
     }
 
@@ -86,10 +59,7 @@ function displayUsers(users) {
 
     container.innerHTML = users.map(u => {
         const role = roleLabels[u.role] || roleLabels['user'];
-        // توافق مع حالة الحساب سواء كان الحقل اسمه status أو is_active
-        const isActive = u.status === true || u.status === 'true' || u.status === 1 || u.is_active === true || u.is_active === 1 || u.is_active === undefined;
-        
-        // منع حذف أو تعديل حساب admin الرئيسي
+        const isActive = u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false;
         const isMainAdmin = u.username === 'admin';
         
         return `
@@ -129,15 +99,14 @@ function updateUserStats() {
     if (!totalEl || !activeEl || !inactiveEl) return;
     
     const total = allUsers.length;
-    const active = allUsers.filter(u => u.status === true || u.status === 'true' || u.status === 1 || u.is_active === true || u.is_active === 1 || u.is_active === undefined).length;
-    const inactive = total - active;
+    const active = allUsers.filter(u => u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false).length;
     
     totalEl.textContent = total;
     activeEl.textContent = active;
-    inactiveEl.textContent = inactive;
+    inactiveEl.textContent = total - active;
 }
 
-// ➕ فتح نافذة إضافة/تعديل مستخدم
+// ➕ فتح النافذة
 function openUserModal(data = null) {
     const isEdit = !!data;
     const titleEl = document.getElementById('userModalTitle');
@@ -149,11 +118,6 @@ function openUserModal(data = null) {
     const passwordEl = document.getElementById('userPassword');
     const hintEl = document.getElementById('userPasswordHint');
     const passReqEl = document.getElementById('passRequired');
-    
-    if (!titleEl || !editIdEl || !usernameEl || !fullNameEl || !roleEl || !statusEl || !passwordEl) {
-        console.error('❌ عناصر النافذة غير موجودة');
-        return;
-    }
     
     titleEl.textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
     editIdEl.value = data?.id || '';
@@ -173,7 +137,7 @@ function openUserModal(data = null) {
     openModal('userModal');
 }
 
-// 💾 حفظ المستخدم في السحابة
+// 💾 حفظ المستخدم
 async function saveUser() {
     const id = document.getElementById('editUserId')?.value;
     const username = document.getElementById('userUsername')?.value.trim();
@@ -193,7 +157,6 @@ async function saveUser() {
         status: isActive
     };
     
-    // تشفير كلمة المرور إذا تم إدخالها
     if (password) {
         data.password = await hashPassword(password);
     }
@@ -217,49 +180,33 @@ async function saveUser() {
     }
 }
 
-// ✏️ تعديل مستخدم
 function editUser(id) {
     const user = allUsers.find(u => u.id === id || u.id == id);
-    if (!user) { showToast('المستخدم غير موجود', 'error'); return; }
-    openUserModal(user);
+    if (user) openUserModal(user);
 }
 
-// 🗑️ تأكيد الحذف
 function confirmDeleteUser(id, name) {
     pendingDeleteId = id;
-    const msgEl = document.getElementById('confirmMessage');
-    if (msgEl) msgEl.innerHTML = `⚠️ هل أنت متأكد من حذف المستخدم <strong style="color:#dc2626;">"${name}"</strong>؟`;
+    document.getElementById('confirmMessage').innerHTML = `⚠️ هل أنت متأكد من حذف <strong>"${name}"</strong>؟`;
     openModal('confirmModal');
 }
 
-// 🗑️ حذف المستخدم
 async function deleteUser() {
     if (!pendingDeleteId) return;
     try {
         const { error } = await supabase.from('users').delete().eq('id', pendingDeleteId);
         if (error) throw error;
-        
         closeModal('confirmModal');
-        pendingDeleteId = null;
         showToast('✅ تم حذف المستخدم', 'success');
         await loadUsers();
     } catch (error) {
-        console.error('خطأ في الحذف:', error);
         showToast('حدث خطأ: ' + error.message, 'error');
     }
 }
 
-// 🛠️ أدوات مساعدة
-function openModal(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-}
-
-function closeModal(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-}
-
+// 🛠️ أدوات
+function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
+function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); }
 function showToast(msg, type = 'info') {
     const div = document.createElement('div');
     div.style.cssText = `position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 20px; color: white; font-weight: 700; z-index: 100000; font-family: 'Tajawal', sans-serif; background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#3b82f6'}; box-shadow: 0 6px 20px rgba(0,0,0,0.2);`;
@@ -268,17 +215,6 @@ function showToast(msg, type = 'info') {
     setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
 }
 
-// 🌐 تصدير الدوال
-window.loadUsers = loadUsers;
-window.openUserModal = openUserModal;
-window.saveUser = saveUser;
-window.editUser = editUser;
-window.confirmDeleteUser = confirmDeleteUser;
-window.deleteUser = deleteUser;
-
-// 🚀 التحميل التلقائي
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('usersList')) {
-        loadUsers();
-    }
+    if (document.getElementById('usersList')) loadUsers();
 });
