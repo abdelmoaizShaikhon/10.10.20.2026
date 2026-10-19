@@ -163,197 +163,199 @@
     <script src="js/session.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
+        <script src="js/users.js"></script>
+
 
     <!-- الكود المدمج لإدارة المستخدمين (لا يحتاج لملف خارجي) -->
     <script>
     // 1. حماية الصفحة
-    (function checkSession() {
-        try {
-            const session = localStorage.getItem('alabady_session') || sessionStorage.getItem('alabady_session') || localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
-            if (!session) { setTimeout(() => window.location.replace('login.html'), 100); return; }
-            const user = JSON.parse(session);
-            if (!user || !user.username || (user.expires && user.expires < Date.now())) {
-                localStorage.clear(); sessionStorage.clear(); window.location.replace('login.html'); return;
-            }
-            if (document.getElementById('userName')) document.getElementById('userName').textContent = '👤 ' + (user.fullName || user.full_name || user.username);
-        } catch (e) { window.location.replace('login.html'); }
-    })();
-    function logout() { if (confirm('هل تريد تسجيل الخروج؟')) { localStorage.clear(); sessionStorage.clear(); window.location.replace('login.html'); } }
-    window.logout = logout;
+    // (function checkSession() {
+    //     try {
+    //         const session = localStorage.getItem('alabady_session') || sessionStorage.getItem('alabady_session') || localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+    //         if (!session) { setTimeout(() => window.location.replace('login.html'), 100); return; }
+    //         const user = JSON.parse(session);
+    //         if (!user || !user.username || (user.expires && user.expires < Date.now())) {
+    //             localStorage.clear(); sessionStorage.clear(); window.location.replace('login.html'); return;
+    //         }
+    //         if (document.getElementById('userName')) document.getElementById('userName').textContent = '👤 ' + (user.fullName || user.full_name || user.username);
+    //     } catch (e) { window.location.replace('login.html'); }
+    // })();
+    // function logout() { if (confirm('هل تريد تسجيل الخروج؟')) { localStorage.clear(); sessionStorage.clear(); window.location.replace('login.html'); } }
+    // window.logout = logout;
 
-    // 2. إدارة المستخدمين
-    let allUsers = [];
-    let pendingDeleteId = null;
+    // // 2. إدارة المستخدمين
+    // let allUsers = [];
+    // let pendingDeleteId = null;
 
-    async function hashPassword(password) {
-        try {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password + 'ALABADY_SALT_2026');
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        } catch (e) { return password; }
-    }
+    // async function hashPassword(password) {
+    //     try {
+    //         const encoder = new TextEncoder();
+    //         const data = encoder.encode(password + 'ALABADY_SALT_2026');
+    //         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    //         const hashArray = Array.from(new Uint8Array(hashBuffer));
+    //         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    //     } catch (e) { return password; }
+    // }
 
-    async function loadUsers() {
-        const container = document.getElementById('usersList');
-        if (container) container.innerHTML = '<div class="empty-state"><p>⏳ جاري التحميل...</p></div>';
-        try {
-            const { data, error } = await supabase.from('users').select('*').order('id', { ascending: true });
-            if (error) throw error;
-            allUsers = data || [];
-            displayUsers(allUsers);
-            updateUserStats();
-        } catch (err) {
-            console.error('❌ خطأ في تحميل المستخدمين:', err);
-            if (container) container.innerHTML = `<div class="empty-state"><p style="color:red;">خطأ: ${err.message}</p></div>`;
-        }
-    }
+    // async function loadUsers() {
+    //     const container = document.getElementById('usersList');
+    //     if (container) container.innerHTML = '<div class="empty-state"><p>⏳ جاري التحميل...</p></div>';
+    //     try {
+    //         const { data, error } = await supabase.from('users').select('*').order('id', { ascending: true });
+    //         if (error) throw error;
+    //         allUsers = data || [];
+    //         displayUsers(allUsers);
+    //         updateUserStats();
+    //     } catch (err) {
+    //         console.error('❌ خطأ في تحميل المستخدمين:', err);
+    //         if (container) container.innerHTML = `<div class="empty-state"><p style="color:red;">خطأ: ${err.message}</p></div>`;
+    //     }
+    // }
 
-    function displayUsers(users) {
-        const container = document.getElementById('usersList');
-        if (!container) return;
-        if (!users || users.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد مستخدمين</p></div>`; return; }
+    // function displayUsers(users) {
+    //     const container = document.getElementById('usersList');
+    //     if (!container) return;
+    //     if (!users || users.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>لا يوجد مستخدمين</p></div>`; return; }
 
-        const roleLabels = {
-            'admin': { label: 'مدير النظام', color: '#dc2626' },
-            'manager': { label: 'مدير', color: '#f59e0b' },
-            'accountant': { label: 'محاسب', color: '#0891b2' },
-            'cashier': { label: 'كاشير', color: '#8b5cf6' },
-            'user': { label: 'مستخدم', color: '#64748b' }
-        };
+    //     const roleLabels = {
+    //         'admin': { label: 'مدير النظام', color: '#dc2626' },
+    //         'manager': { label: 'مدير', color: '#f59e0b' },
+    //         'accountant': { label: 'محاسب', color: '#0891b2' },
+    //         'cashier': { label: 'كاشير', color: '#8b5cf6' },
+    //         'user': { label: 'مستخدم', color: '#64748b' }
+    //     };
 
-        container.innerHTML = users.map(u => {
-            const role = roleLabels[u.role] || roleLabels['user'];
-            const isActive = u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false;
-            const isMainAdmin = u.username === 'admin';
-            return `
-                <div class="user-card">
-                    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:250px;">
-                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;">${(u.full_name || u.username || 'م').charAt(0)}</div>
-                        <div>
-                            <div style="font-weight:800;color:#0f3d3e;font-size:15px;">${u.full_name || u.username}</div>
-                            <div style="font-size:12px;color:#64748b;">@${u.username}</div>
-                            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
-                                <span style="background:${role.color}20;color:${role.color};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">${role.label}</span>
-                                <span style="background:${isActive ? '#d1fae5' : '#fee2e2'};color:${isActive ? '#059669' : '#dc2626'};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">${isActive ? '🟢 نشط' : '🔴 غير نشط'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                        ${!isMainAdmin ? `
-                            <button class="action-btn btn-edit-user" data-id="${u.id}" style="background:#e0f2f1;color:#0f766e;">✏️ تعديل</button>
-                            <button class="action-btn btn-delete-user" data-id="${u.id}" data-name="${(u.full_name || u.username).replace(/'/g, "\\'")}" style="background:#fee2e2;color:#dc2626;">🗑️ حذف</button>
-                        ` : '<span style="color:#94a3b8;font-size:11px;font-weight:bold;">حساب رئيسي</span>'}
-                    </div>
-                </div>`;
-        }).join('');
+    //     container.innerHTML = users.map(u => {
+    //         const role = roleLabels[u.role] || roleLabels['user'];
+    //         const isActive = u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false;
+    //         const isMainAdmin = u.username === 'admin';
+    //         return `
+    //             <div class="user-card">
+    //                 <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:250px;">
+    //                     <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;">${(u.full_name || u.username || 'م').charAt(0)}</div>
+    //                     <div>
+    //                         <div style="font-weight:800;color:#0f3d3e;font-size:15px;">${u.full_name || u.username}</div>
+    //                         <div style="font-size:12px;color:#64748b;">@${u.username}</div>
+    //                         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+    //                             <span style="background:${role.color}20;color:${role.color};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">${role.label}</span>
+    //                             <span style="background:${isActive ? '#d1fae5' : '#fee2e2'};color:${isActive ? '#059669' : '#dc2626'};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">${isActive ? '🟢 نشط' : '🔴 غير نشط'}</span>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    //                     ${!isMainAdmin ? `
+    //                         <button class="action-btn btn-edit-user" data-id="${u.id}" style="background:#e0f2f1;color:#0f766e;">✏️ تعديل</button>
+    //                         <button class="action-btn btn-delete-user" data-id="${u.id}" data-name="${(u.full_name || u.username).replace(/'/g, "\\'")}" style="background:#fee2e2;color:#dc2626;">🗑️ حذف</button>
+    //                     ` : '<span style="color:#94a3b8;font-size:11px;font-weight:bold;">حساب رئيسي</span>'}
+    //                 </div>
+    //             </div>`;
+    //     }).join('');
 
-        // ربط الأزرار ديناميكياً
-        document.querySelectorAll('.btn-edit-user').forEach(btn => btn.addEventListener('click', (e) => editUser(e.target.getAttribute('data-id'))));
-        document.querySelectorAll('.btn-delete-user').forEach(btn => btn.addEventListener('click', (e) => confirmDeleteUser(e.target.getAttribute('data-id'), e.target.getAttribute('data-name'))));
-    }
+    //     // ربط الأزرار ديناميكياً
+    //     document.querySelectorAll('.btn-edit-user').forEach(btn => btn.addEventListener('click', (e) => editUser(e.target.getAttribute('data-id'))));
+    //     document.querySelectorAll('.btn-delete-user').forEach(btn => btn.addEventListener('click', (e) => confirmDeleteUser(e.target.getAttribute('data-id'), e.target.getAttribute('data-name'))));
+    // }
 
-    function updateUserStats() {
-        if (!document.getElementById('totalUsers')) return;
-        const total = allUsers.length;
-        const active = allUsers.filter(u => u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false).length;
-        document.getElementById('totalUsers').textContent = total;
-        document.getElementById('activeUsers').textContent = active;
-        document.getElementById('inactiveUsers').textContent = total - active;
-    }
+    // function updateUserStats() {
+    //     if (!document.getElementById('totalUsers')) return;
+    //     const total = allUsers.length;
+    //     const active = allUsers.filter(u => u.status === true || u.status === 'true' || u.status === 1 || u.is_active !== false).length;
+    //     document.getElementById('totalUsers').textContent = total;
+    //     document.getElementById('activeUsers').textContent = active;
+    //     document.getElementById('inactiveUsers').textContent = total - active;
+    // }
 
-    function openUserModal(data = null) {
-        const isEdit = !!data;
-        document.getElementById('userModalTitle').textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
-        document.getElementById('editUserId').value = data?.id || '';
-        document.getElementById('userUsername').value = data?.username || '';
-        document.getElementById('userFullName').value = data?.full_name || '';
-        document.getElementById('userRole').value = data?.role || 'user';
-        const isActive = data ? (data.status === true || data.status === 'true' || data.status === 1 || data.is_active !== false) : true;
-        document.getElementById('userStatus').value = isActive ? 'true' : 'false';
-        document.getElementById('userPassword').value = '';
-        document.getElementById('userPasswordHint').style.display = isEdit ? 'block' : 'none';
-        document.getElementById('userModal').classList.add('active');
-    }
+    // function openUserModal(data = null) {
+    //     const isEdit = !!data;
+    //     document.getElementById('userModalTitle').textContent = isEdit ? '✏️ تعديل مستخدم' : '➕ مستخدم جديد';
+    //     document.getElementById('editUserId').value = data?.id || '';
+    //     document.getElementById('userUsername').value = data?.username || '';
+    //     document.getElementById('userFullName').value = data?.full_name || '';
+    //     document.getElementById('userRole').value = data?.role || 'user';
+    //     const isActive = data ? (data.status === true || data.status === 'true' || data.status === 1 || data.is_active !== false) : true;
+    //     document.getElementById('userStatus').value = isActive ? 'true' : 'false';
+    //     document.getElementById('userPassword').value = '';
+    //     document.getElementById('userPasswordHint').style.display = isEdit ? 'block' : 'none';
+    //     document.getElementById('userModal').classList.add('active');
+    // }
 
-            async function saveUser() {
-        const id = document.getElementById('editUserId')?.value;
-        const username = document.getElementById('userUsername')?.value.trim();
-        const fullName = document.getElementById('userFullName')?.value.trim();
-        const role = document.getElementById('userRole')?.value || 'user';
-        const isActive = document.getElementById('userStatus')?.value === 'true';
-        const password = document.getElementById('userPassword')?.value;
+    //         async function saveUser() {
+    //     const id = document.getElementById('editUserId')?.value;
+    //     const username = document.getElementById('userUsername')?.value.trim();
+    //     const fullName = document.getElementById('userFullName')?.value.trim();
+    //     const role = document.getElementById('userRole')?.value || 'user';
+    //     const isActive = document.getElementById('userStatus')?.value === 'true';
+    //     const password = document.getElementById('userPassword')?.value;
         
-        if (!username) { alert('❌ أدخل اسم المستخدم'); return; }
-        if (!fullName) { alert('❌ أدخل الاسم الكامل'); return; }
-        if (!id && !password) { alert('❌ أدخل كلمة المرور'); return; }
+    //     if (!username) { alert('❌ أدخل اسم المستخدم'); return; }
+    //     if (!fullName) { alert('❌ أدخل الاسم الكامل'); return; }
+    //     if (!id && !password) { alert('❌ أدخل كلمة المرور'); return; }
         
-        // بناء البيانات لترسل إلى قاعدة البيانات
-        const data = {
-            username: username,
-            full_name: fullName,
-            role: role,
-            is_active: isActive  // تم التعديل ليطابق اسم العمود في Supabase
-        };
+    //     // بناء البيانات لترسل إلى قاعدة البيانات
+    //     const data = {
+    //         username: username,
+    //         full_name: fullName,
+    //         role: role,
+    //         is_active: isActive  // تم التعديل ليطابق اسم العمود في Supabase
+    //     };
         
-        if (password) {
-            data.password = await hashPassword(password); // سيتم إرسالها بعد إضافة العمود
-        }
+    //     if (password) {
+    //         data.password = await hashPassword(password); // سيتم إرسالها بعد إضافة العمود
+    //     }
         
-        try {
-            let error;
-            if (id) {
-                ({ error } = await supabase.from('users').update(data).eq('id', id));
-            } else {
-                ({ error } = await supabase.from('users').insert([data]));
-            }
+    //     try {
+    //         let error;
+    //         if (id) {
+    //             ({ error } = await supabase.from('users').update(data).eq('id', id));
+    //         } else {
+    //             ({ error } = await supabase.from('users').insert([data]));
+    //         }
             
-            if (error) throw error;
+    //         if (error) throw error;
             
-            document.getElementById('userModal').classList.remove('active');
-            await loadUsers();
-            alert('✅ تم الحفظ بنجاح');
-        } catch (error) {
-            console.error('خطأ في حفظ المستخدم:', error);
-            alert('حدث خطأ: ' + error.message);
-        }
-    }
+    //         document.getElementById('userModal').classList.remove('active');
+    //         await loadUsers();
+    //         alert('✅ تم الحفظ بنجاح');
+    //     } catch (error) {
+    //         console.error('خطأ في حفظ المستخدم:', error);
+    //         alert('حدث خطأ: ' + error.message);
+    //     }
+    // }
 
-    function editUser(id) {
-        const user = allUsers.find(u => u.id == id);
-        if (user) openUserModal(user);
-    }
+    // function editUser(id) {
+    //     const user = allUsers.find(u => u.id == id);
+    //     if (user) openUserModal(user);
+    // }
 
-    function confirmDeleteUser(id, name) {
-        pendingDeleteId = id;
-        document.getElementById('confirmMessage').innerHTML = `⚠️ هل أنت متأكد من حذف <strong>"${name}"</strong>؟`;
-        document.getElementById('confirmModal').classList.add('active');
-    }
+    // function confirmDeleteUser(id, name) {
+    //     pendingDeleteId = id;
+    //     document.getElementById('confirmMessage').innerHTML = `⚠️ هل أنت متأكد من حذف <strong>"${name}"</strong>؟`;
+    //     document.getElementById('confirmModal').classList.add('active');
+    // }
 
-    async function deleteUser() {
-        if (!pendingDeleteId) return;
-        try {
-            const { error } = await supabase.from('users').delete().eq('id', pendingDeleteId);
-            if (error) throw error;
-            document.getElementById('confirmModal').classList.remove('active');
-            pendingDeleteId = null;
-            await loadUsers();
-        } catch (error) { alert('خطأ أثناء الحذف: ' + error.message); }
-    }
+    // async function deleteUser() {
+    //     if (!pendingDeleteId) return;
+    //     try {
+    //         const { error } = await supabase.from('users').delete().eq('id', pendingDeleteId);
+    //         if (error) throw error;
+    //         document.getElementById('confirmModal').classList.remove('active');
+    //         pendingDeleteId = null;
+    //         await loadUsers();
+    //     } catch (error) { alert('خطأ أثناء الحذف: ' + error.message); }
+    // }
 
-    // 3. ربط أزرار الواجهة الأساسية
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('btnAddUser')?.addEventListener('click', () => openUserModal());
-        document.getElementById('btnCloseUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
-        document.getElementById('btnCancelUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
-        document.getElementById('btnCloseConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
-        document.getElementById('btnCancelConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
-        document.getElementById('btnSaveUser')?.addEventListener('click', saveUser);
-        document.getElementById('btnDeleteUser')?.addEventListener('click', deleteUser);
+    // // 3. ربط أزرار الواجهة الأساسية
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     document.getElementById('btnAddUser')?.addEventListener('click', () => openUserModal());
+    //     document.getElementById('btnCloseUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
+    //     document.getElementById('btnCancelUserModal')?.addEventListener('click', () => document.getElementById('userModal').classList.remove('active'));
+    //     document.getElementById('btnCloseConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+    //     document.getElementById('btnCancelConfirmModal')?.addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+    //     document.getElementById('btnSaveUser')?.addEventListener('click', saveUser);
+    //     document.getElementById('btnDeleteUser')?.addEventListener('click', deleteUser);
 
-        if (document.getElementById('usersList')) loadUsers();
-    });
+    //     if (document.getElementById('usersList')) loadUsers();
+    // });
     </script>
 </body>
 </html>
