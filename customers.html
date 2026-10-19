@@ -859,19 +859,32 @@
     // ============================================
     // تحميل الإحصائيات
     // ============================================
+       // ============================================
+    // تحميل الإحصائيات
+    // ============================================
     async function loadStats() {
         try {
             let totalDebt = 0;
-            let totalPaid = 0;
+            let totalPaid = 0; // إجمالي المدفوعات
             let totalInvoices = 0;
 
+            // 1. حساب إجمالي الفواتير والمستحقات
             allCustomers.forEach(c => {
                 const remaining = getCustomerRemaining(c.id);
                 if (remaining > 0) totalDebt += remaining;
-                else if (remaining < 0) totalPaid += Math.abs(remaining);
                 totalInvoices += getCustomerInvoicesCount(c.id);
             });
 
+            // 2. حساب إجمالي المدفوعات (من الفواتير + الدفعات المنفصلة)
+            // أ. المدفوع داخل الفواتير
+            const paidFromInvoices = allSales.reduce((sum, s) => sum + (Number(s.paid_amount) || 0), 0);
+            
+            // ب. المدفوع من سجل الدفعات المنفصلة
+            const paidFromCustomerPayments = allCustomerPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+            totalPaid = paidFromInvoices + paidFromCustomerPayments;
+
+            // تحديث الواجهة
             document.getElementById('totalCustomers').textContent = allCustomers.length;
             document.getElementById('totalDebt').textContent = formatNum(totalDebt) + ' ج.م';
             document.getElementById('totalPaid').textContent = formatNum(totalPaid) + ' ج.م';
