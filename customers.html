@@ -733,6 +733,7 @@
     let allCustomers = [];
     let filteredCustomers = [];
     let allSales = [];
+    let allCustomerPayments = []; // مصفوفة جديدة لحفظ الدفعات
     let customerToDelete = null;
     let deleteStage = 0;
 
@@ -742,6 +743,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         if (typeof checkAuth === 'function') await checkAuth();
         await loadSales();
+        await loadCustomerPayments(); // تحميل الدفعات
         await loadCustomers();
         await loadStats();
     });
@@ -771,7 +773,7 @@
     }
 
     // ============================================
-    // تحميل الفواتير
+    // تحميل البيانات (الفواتير والدفعات)
     // ============================================
     async function loadSales() {
         try {
@@ -784,8 +786,19 @@
         }
     }
 
+    async function loadCustomerPayments() {
+        try {
+            const { data, error } = await supabase.from('customer_payments').select('*');
+            if (error) throw error;
+            allCustomerPayments = data || [];
+        } catch (err) {
+            console.warn('لا يمكن تحميل الدفعات:', err.message);
+            allCustomerPayments = [];
+        }
+    }
+
     // ============================================
-    // حسابات العميل
+    // حسابات العميل (تم دمج الفواتير مع الدفعات)
     // ============================================
     function getCustomerTotalPurchases(customerId) {
         return allSales
@@ -794,9 +807,17 @@
     }
 
     function getCustomerTotalPaid(customerId) {
-        return allSales
+        // 1. المدفوع من الفواتير
+        const paidFromInvoices = allSales
             .filter(s => s.customer_id == customerId)
             .reduce((sum, s) => sum + (Number(s.paid_amount) || 0), 0);
+        
+        // 2. المدفوع من سجل الدفعات (customer_payments)
+        const paidFromPayments = allCustomerPayments
+            .filter(p => p.customer_id == customerId)
+            .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+            
+        return paidFromInvoices + paidFromPayments;
     }
 
     function getCustomerRemaining(customerId) {
@@ -1015,11 +1036,16 @@
             .filter(s => s.customer_id == id)
             .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+        const customerPayments = allCustomerPayments
+            .filter(p => p.customer_id == id)
+            .sort((a, b) => new Date(b.payment_date || b.created_at) - new Date(a.payment_date || a.created_at));
+
         const total = getCustomerTotalPurchases(id);
         const paid = getCustomerTotalPaid(id);
         const remaining = getCustomerRemaining(id);
 
-        let rows = customerInvoices.map((inv, i) => {
+        // جدول الفواتير
+        let invoicesRows = customerInvoices.map((inv, i) => {
             const invTotal = Number(inv.total_amount) || Number(inv.total) || 0;
             const invPaid = Number(inv.paid_amount) || 0;
             const invRemaining = Number(inv.remaining_amount) || (invTotal - invPaid);
@@ -1030,6 +1056,17 @@
                 <td data-label="الإجمالي" style="color:#0891b2;font-weight:600;">${formatNum(invTotal)} ج.م</td>
                 <td data-label="المدفوع" style="color:#059669;font-weight:600;">${formatNum(invPaid)} ج.م</td>
                 <td data-label="المتبقي" style="color:${invRemaining > 0 ? '#ef4444' : '#10b981'};font-weight:700;">${formatNum(invRemaining)} ج.م</td>
+            </tr>`;
+        }).join('');
+
+        // جدول الدفعات
+        let paymentsRows = customerPayments.map((p, i) => {
+            return `<tr>
+                <td data-label="#">${i + 1}</td>
+                <td data-label="التاريخ">${new Date(p.payment_date || p.created_at).toLocaleDateString('ar-EG')}</td>
+                <td data-label="طريقة الدفع">${p.payment_method || '-'}</td>
+                <td data-label="ملاحظات">${p.notes || '-'}</td>
+                <td data-label="المبلغ" style="color:#059669;font-weight:700;">${formatNum(p.amount)} ج.م</td>
             </tr>`;
         }).join('');
 
@@ -1058,11 +1095,34 @@
                     </div>
                 </div>
             </div>
+            
+            <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:15px;">
+                <div style="padding:12px 16px;background:#e8f0ef;font-weight:700;color:var(--primary);">
+                    💵 سجل الدفعات (${customerPayments.length})
+                </div>
+                <div style="overflow-x:auto;max-height:200px;overflow-y:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:500px;">
+                        <thead style="position:sticky;top:0;z-index:5;">
+                            <tr style="background:#e8f0ef;">
+                                <th style="padding:8px 6px;border:1px solid var(--border);">#</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">التاريخ</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">طريقة الدفع</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">ملاحظات</th>
+                                <th style="padding:8px 6px;border:1px solid var(--border);">المبلغ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${paymentsRows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8;">لا توجد دفعات</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;">
                 <div style="padding:12px 16px;background:#e8f0ef;font-weight:700;color:var(--primary);">
                     📄 الفواتير (${customerInvoices.length})
                 </div>
-                <div style="overflow-x:auto;max-height:350px;overflow-y:auto;">
+                <div style="overflow-x:auto;max-height:200px;overflow-y:auto;">
                     <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:500px;">
                         <thead style="position:sticky;top:0;z-index:5;">
                             <tr style="background:#e8f0ef;">
@@ -1075,7 +1135,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94a3b8;">لا توجد فواتير</td></tr>'}
+                            ${invoicesRows || '<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8;">لا توجد فواتير</td></tr>'}
                         </tbody>
                     </table>
                 </div>
@@ -1117,16 +1177,19 @@
         const newBalance = Number(c.balance || 0) - amount;
 
         try {
-            try {
-                await supabase.from('payments').insert([{
-                    customer_id: id,
-                    amount: amount,
-                    method: method,
-                    note: note,
-                    type: 'customer_payment'
-                }]);
-            } catch (e) { /* جدول الدفعات غير موجود */ }
+            // 1. حفظ الدفعة في جدول customer_payments
+            const { error: payErr } = await supabase.from('customer_payments').insert([{
+                customer_id: id,
+                amount: amount,
+                payment_method: method,
+                payment_date: new Date().toISOString(),
+                notes: note,
+                type: 'سداد'
+            }]);
 
+            if (payErr) throw payErr;
+
+            // 2. تحديث رصيد العميل
             const { error: updErr } = await supabase
                 .from('customers')
                 .update({ balance: newBalance })
@@ -1136,6 +1199,9 @@
 
             showNotification('✅ تم تسجيل الدفعة بنجاح', 'success');
             closeModal('paymentModal');
+            
+            // إعادة تحميل البيانات لتحديث الواجهة
+            await loadCustomerPayments();
             await loadCustomers();
             await loadStats();
         } catch (err) {
@@ -1159,7 +1225,6 @@
         const btnEl = document.getElementById('confirmDeleteBtn');
         const closeEl = document.getElementById('confirmModalClose');
 
-        // إعادة تعيين الألوان
         titleEl.style.color = '';
         closeEl.style.color = '';
 
@@ -1203,7 +1268,6 @@
         const id = customerToDelete;
         const invoicesCount = getCustomerInvoicesCount(id);
 
-        // المرحلة الأولى: طلب تأكيد ثاني
         if (deleteStage === 1 && invoicesCount > 0) {
             const c = allCustomers.find(x => x.id == id);
             const name = c ? c.name : '';
@@ -1238,7 +1302,6 @@
             return;
         }
 
-        // المرحلة النهائية: التنفيذ
         try {
             // حذف الفواتير
             if (invoicesCount > 0) {
@@ -1249,9 +1312,9 @@
                 if (salesErr) throw new Error('فشل حذف الفواتير: ' + salesErr.message);
             }
 
-            // حذف الدفعات
+            // حذف الدفعات من customer_payments
             try {
-                await supabase.from('payments').delete().eq('customer_id', id);
+                await supabase.from('customer_payments').delete().eq('customer_id', id);
             } catch (e) { /* غير موجود */ }
 
             // حذف العميل
@@ -1268,6 +1331,7 @@
             deleteStage = 0;
 
             await loadSales();
+            await loadCustomerPayments();
             await loadCustomers();
             await loadStats();
         } catch (err) {
