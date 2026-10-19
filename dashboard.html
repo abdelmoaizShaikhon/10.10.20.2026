@@ -9,6 +9,23 @@
     <link rel="stylesheet" href="css/dashboard.css">
 
     <style>
+        :root {
+            --primary: #0f3d3e;
+            --primary-dark: #0a2e2f;
+            --accent: #14b8a6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f0f4f4;
+            --card: #ffffff;
+            --border: #d1d9d9;
+            --text: #0f3d3e;
+            --text-light: #64748b;
+            --radius: 12px;
+            --shadow: 0 2px 10px rgba(15, 61, 62, 0.08);
+        }
+
         .auth-guard {
             position: fixed;
             inset: 0;
@@ -35,6 +52,102 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .auth-guard p { font-size: 15px; font-weight: 700; opacity: 0.9; }
         .auth-guard .lock-icon { font-size: 56px; margin-bottom: 16px; }
+
+        /* إحصائيات المبيعات */
+        .sales-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 16px 16px;
+        }
+        .sales-stat-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .sales-stat-card .number { font-size: 24px; font-weight: 900; margin-bottom: 5px; }
+        .sales-stat-card .label { font-size: 12px; color: var(--text-light); }
+        .sales-stat-card .number.blue { color: var(--info); }
+        .sales-stat-card .number.green { color: var(--success); }
+        .sales-stat-card .number.red { color: var(--danger); }
+
+        /* جدول آخر المبيعات */
+        .recent-sales-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 0 16px 16px;
+            overflow: hidden;
+        }
+        .recent-sales-header {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary);
+        }
+        .recent-sales-header a {
+            font-size: 12px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .recent-sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .recent-sales-table th {
+            background: #e8f0ef;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+        }
+        .recent-sales-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .recent-sales-table tr:last-child td { border-bottom: none; }
+        .badge-paid { background: #d1fae5; color: #059669; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .badge-partial { background: #ffedd5; color: #d97706; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .sales-stats { grid-template-columns: 1fr; gap: 10px; }
+            .recent-sales-table { min-width: 500px; }
+            .table-scroll { overflow-x: auto; }
+            /* تحويل الجدول لبطاقات في الموبايل */
+            .recent-sales-table, .recent-sales-table thead, .recent-sales-table tbody, .recent-sales-table th, .recent-sales-table td, .recent-sales-table tr { 
+                display: block; 
+            }
+            .recent-sales-table thead { display: none; }
+            .recent-sales-table tr {
+                background: #fff;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+            }
+            .recent-sales-table td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 12px;
+                text-align: right;
+                border-bottom: 1px dashed #e2e8f0;
+            }
+            .recent-sales-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-light);
+            }
+        }
     </style>
 </head>
 <body>
@@ -85,6 +198,46 @@
                 <p>مرحباً بك في شركة العبادي - نظام إدارة المخازن والمبيعات</p>
             </div>
 
+            <!-- ✅ إحصائيات المبيعات السريعة -->
+            <div class="sales-stats">
+                <div class="sales-stat-card">
+                    <div class="number green" id="totalSalesAmount">0 ج.م</div>
+                    <div class="label">إجمالي المبيعات</div>
+                </div>
+                <div class="sales-stat-card">
+                    <div class="number blue" id="totalSalesCount">0</div>
+                    <div class="label">عدد الفواتير</div>
+                </div>
+                <div class="sales-stat-card">
+                    <div class="number red" id="totalSalesRemaining">0 ج.م</div>
+                    <div class="label">إجمالي المستحقات</div>
+                </div>
+            </div>
+
+            <!-- ✅ جدول آخر المبيعات -->
+            <div class="recent-sales-card">
+                <div class="recent-sales-header">
+                    <span>🕐 آخر المبيعات</span>
+                    <a href="sales.html">عرض الكل ←</a>
+                </div>
+                <div class="table-scroll">
+                    <table class="recent-sales-table" id="recentSalesTable">
+                        <thead>
+                            <tr>
+                                <th>الفاتورة</th>
+                                <th>العميل</th>
+                                <th>الإجمالي</th>
+                                <th>المدفوع</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="5" style="text-align:center;padding:20px;">⏳ جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="quick-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;padding:0 16px 16px;">
                 <a href="sales.html" class="quick-card" style="background:#fff;padding:24px 16px;border-radius:12px;text-align:center;box-shadow:0 2px 10px rgba(15,61,62,0.08);border:1px solid #d1d9d9;text-decoration:none;color:#0f3d3e;">
                     <div style="font-size:36px;margin-bottom:8px;">🛒</div>
@@ -129,11 +282,10 @@
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
 
-   <script>
+    <script>
     // 🛡️ حماية الصفحة
     (function checkSession() {
         try {
-            // نقرأ الجلسة (المتغيرات معرفة في session.js)
             const session = localStorage.getItem('alabady_session') 
                          || sessionStorage.getItem('alabady_session')
                          || localStorage.getItem('currentUser')
@@ -155,7 +307,6 @@
                 return;
             }
 
-            // نجاح
             setTimeout(() => {
                 const guard = document.getElementById('authGuard');
                 const app = document.getElementById('app');
@@ -164,14 +315,10 @@
                 setTimeout(() => { if (guard) guard.style.display = 'none'; }, 400);
 
                 const name = user.fullName || user.full_name || user.username || 'مدير النظام';
-                if (document.getElementById('currentUserInfo')) document.getElementById('currentUserInfo').textContent = name;
                 if (document.getElementById('userName')) document.getElementById('userName').textContent = '👤 ' + name;
                 
-                if (document.getElementById('currentDate')) {
-                    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ar-EG', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    });
-                }
+                // تحميل بيانات المبيعات بعد إظهار الصفحة
+                loadDashboardSales();
             }, 300);
 
         } catch (e) {
@@ -188,7 +335,62 @@
         }
     }
     window.logout = logout;
-</script>
-   
+
+    // ============================================
+    // 📊 تحميل بيانات المبيعات للوحة التحكم
+    // ============================================
+    async function loadDashboardSales() {
+        try {
+            const { data, error } = await supabase
+                .from('sales')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            
+            const sales = data || [];
+            
+            // 1. حساب الإحصائيات
+            const totalAmount = sales.reduce((sum, s) => sum + (Number(s.final_total) || 0), 0);
+            const totalRemaining = sales.reduce((sum, s) => sum + (Number(s.remaining_amount) || 0), 0);
+            const totalCount = sales.length;
+
+            document.getElementById('totalSalesAmount').textContent = totalAmount.toLocaleString('en-EG') + ' ج.م';
+            document.getElementById('totalSalesCount').textContent = totalCount;
+            document.getElementById('totalSalesRemaining').textContent = totalRemaining.toLocaleString('en-EG') + ' ج.م';
+
+            // 2. عرض آخر 5 مبيعات
+            const recentSales = sales.slice(0, 5);
+            const tbody = document.querySelector('#recentSalesTable tbody');
+            
+            if (recentSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">لا توجد مبيعات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = recentSales.map(s => {
+                const rem = Number(s.remaining_amount) || 0;
+                const statusBadge = rem <= 0 
+                    ? '<span class="badge-paid">مدفوع</span>' 
+                    : '<span class="badge-partial">متبقي</span>';
+                
+                const date = new Date(s.created_at).toLocaleDateString('ar-EG');
+
+                return `<tr>
+                    <td data-label="الفاتورة"><strong>${s.invoice_number || '#' + s.id}</strong><br><small style="color:#64748b;">${date}</small></td>
+                    <td data-label="العميل">${s.customer_name || 'نقدي'}</td>
+                    <td data-label="الإجمالي" style="color:#10b981;font-weight:700;">${(Number(s.final_total)||0).toLocaleString('en-EG')} ج.م</td>
+                    <td data-label="المدفوع">${(Number(s.paid_amount)||0).toLocaleString('en-EG')} ج.م</td>
+                    <td data-label="الحالة">${statusBadge}</td>
+                </tr>`;
+            }).join('');
+
+        } catch (err) {
+            console.error('خطأ في تحميل مبيعات لوحة التحكم:', err);
+            document.querySelector('#recentSalesTable tbody').innerHTML = 
+                '<tr><td colspan="5" style="text-align:center;padding:20px;color:red;">حدث خطأ في تحميل البيانات</td></tr>';
+        }
+    }
+    </script>
 </body>
 </html>
