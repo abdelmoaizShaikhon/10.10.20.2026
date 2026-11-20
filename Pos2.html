@@ -73,7 +73,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 </style>
 </head>
 <body>
-<div class="top-bar"><div class="store-name">🏪 شركة العبادي</div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
+<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v14-FIX-ITEMS</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
 <div class="edit-banner" id="editBanner">✏ وضع تعديل فاتورة سابقة - <span id="editBannerInfo"></span> <button onclick="window.cancelEditInvoice()" style="background:#fff;color:#b45309;border:none;padding:2px 12px;border-radius:12px;font-weight:800;cursor:pointer;">إلغاء التعديل</button></div>
 <div class="main-container">
 <div class="right-sidebar">
@@ -119,6 +119,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 <script src="js/app.js"></script>
 <script src="js/sales.js"></script>
 <script>
+console.log("POS2 VERSION: v14-FIX-ITEMS - يجرب 14 جدول");
 // FIX: لا نعرف أي متغير عام بـ let/var/const هنا، لأن js/sales.js فيه نفس الأسماء.
 // كل الحالة على window.* فقط، فمفيش تعارض أبدا.
 window.INVOICE_PASSWORD = "1122";
