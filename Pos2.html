@@ -73,7 +73,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 </style>
 </head>
 <body>
-<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v18-FREEZE-DATE</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
+<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v19-FIX-SYNTAX</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
 <div class="edit-banner" id="editBanner">✏ وضع تعديل فاتورة سابقة - <span id="editBannerInfo"></span> <button onclick="window.cancelEditInvoice()" style="background:#fff;color:#b45309;border:none;padding:2px 12px;border-radius:12px;font-weight:800;cursor:pointer;">إلغاء التعديل</button></div>
 <div class="main-container">
 <div class="right-sidebar">
@@ -119,8 +119,8 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 <script src="js/app.js"></script>
 <script src="js/sales.js"></script>
 <script>
-// v18-FREEZE-DATE: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
-console.log("POS2 VERSION: v18-FREEZE-DATE");
+// v19-FIX-SYNTAX: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
+console.log("POS2 VERSION: v19-FIX-SYNTAX");
 window.INVOICE_PASSWORD = "1122";
 window.allInvoicesList = window.allInvoicesList || [];
 window.allInvoiceItemsCache = window.allInvoiceItemsCache || {};
@@ -231,7 +231,7 @@ window.viewInvoiceForPrint = async function(id){
   var cust=(inv.customers&&inv.customers.name)||inv.customer_name||'نقدي'; var total=Number(inv.total_amount||inv.total||0);
   var _items = inv.items; if(typeof _items==='string'){ try{ _items=JSON.parse(_items); }catch(e){ _items=[]; } } if(!Array.isArray(_items)) _items=[];
   var _rows = _items.map(function(it,i){ var _p=Number(it.price||it.sell_price||0); var _q=Number(it.quantity||it.qty||1); return '<tr><td>'+(i+1)+'</td><td>'+(it.product_name||it.name||'')+'</td><td>'+_q+'</td><td>'+_p.toLocaleString()+'</td><td>'+(_p*_q).toLocaleString()+'</td></tr>'; }).join(''); var paid=Number(inv.paid_amount||0); var dateStr=inv.created_at? new Date(inv.created_at).toLocaleString('ar-EG'):'';
-  var html='<div style="direction:rtl;font-family:Tajawal;text-align:center;padding:20px;max-width:400px;margin:auto;"><h2>شركة العبادي</h2><p>فاتورة رقم: '+(inv.invoice_number||inv.id)+'<br>التاريخ: '+dateStr+'<br>العميل: '+cust+'</p><table border="1" style="width:100%;border-collapse:collapse;"><tr><th>البيان</th><th>القيمة</th></tr><tr><td colspan='2'>الأصناف</td></tr>'+_rows+'<tr><td>إجمالي الفاتورة</td><td>'+total.toLocaleString()+'</td></tr><tr><td>المدفوع</td><td>'+paid.toLocaleString()+'</td></tr><tr><td>المتبقي</td><td>'+(total-paid).toLocaleString()+'</td></tr></table></div>';
+  var html='<div style="direction:rtl;font-family:Tajawal;text-align:center;padding:20px;max-width:400px;margin:auto;"><h2>شركة العبادي</h2><p>فاتورة رقم: '+(inv.invoice_number||inv.id)+'<br>التاريخ: '+dateStr+'<br>العميل: '+cust+'</p><table border="1" style="width:100%;border-collapse:collapse;"><tr><th>#</th><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>'+_rows+'</table><table border="1" style="width:100%;border-collapse:collapse;margin-top:10px;"><tr><td>إجمالي الفاتورة</td><td>'+total.toLocaleString()+'</td></tr><tr><td>المدفوع</td><td>'+paid.toLocaleString()+'</td></tr><tr><td>المتبقي</td><td>'+(total-paid).toLocaleString()+'</td></tr></table></div>';
   var area=document.getElementById('printArea'); if(area){ area.innerHTML=html; area.style.display='block'; window.print(); setTimeout(function(){ area.style.display='none'; },500); }
 };
 document.addEventListener('DOMContentLoaded', function(){ var btn=document.getElementById('btnSaveSale'); if(btn){ btn.addEventListener('click', async function(e){ if(window.editingInvoiceId){ e.preventDefault(); e.stopImmediatePropagation(); await window.saveEditedInvoice(); } }, true); } });
