@@ -95,7 +95,53 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;height:100vh;height:100
 @media(max-width:480px){:root{--sidebar-width:50px;--header-height:44px;--footer-height:48px;--search-height:44px}.right-sidebar .btn-customer,.right-sidebar .btn-hold,.right-sidebar .btn-held-list{font-size:8px;padding:4px 2px;min-height:28px;border-radius:4px;border-width:1px}.customer-sidebar{width:130px;min-width:130px}.center-content{padding:4px 5px}.qty-input{width:40px}.price-edit{width:48px}}
 @media print{.top-bar,.bottom-bar,.search-bar,.right-sidebar,.customer-sidebar{display:none!important}.main-container{height:auto!important}}
 </style>
+
+<style id="display-fix">
+/* ===== إصلاح العرض - شركة العبادي ===== */
+body{overflow:auto !important; height:auto !important; min-height:100vh;}
+.main-container{height:auto !important; min-height:calc(100vh - 106px); align-items:stretch;}
+.center-content{overflow:visible;}
+.table-container{min-height:320px;}
+/* كمبيوتر: مساحات مريحة */
+.right-sidebar{width:165px !important; min-width:165px !important; padding:8px 6px !important; gap:6px !important;}
+.right-sidebar .btn-customer, .right-sidebar .btn-hold, .right-sidebar .btn-held-list{
+  font-size:12px !important; padding:10px 6px !important; min-height:42px !important; border-radius:8px !important; line-height:1.3 !important; white-space:normal !important;
+}
+.right-sidebar .btn-customer.primary{font-size:13px !important; min-height:48px !important;}
+.customer-sidebar{width:210px !important; min-width:210px !important; padding:8px 6px !important; gap:6px !important;}
+.summary-item{padding:6px 8px !important;}
+.summary-item label{font-size:10px !important;}
+.summary-item input{height:30px !important; font-size:13px !important;}
+.summary-item input.grand-total{height:38px !important; font-size:20px !important;}
+.invoice-header .header-row input{max-width:130px !important; font-size:12px !important; padding:5px 8px !important;}
+.pos-table thead th{font-size:12px !important; padding:7px 5px !important;}
+.pos-table tbody td{font-size:13px !important; padding:6px 5px !important;}
+.qty-input{width:60px !important; font-size:13px !important; padding:4px !important;}
+.price-edit{width:70px !important; font-size:13px !important; padding:4px !important;}
+.top-bar{padding:8px 16px !important; min-height:56px !important;}
+.top-bar .store-name{font-size:16px !important; max-width:none !important;}
+.top-bar button{font-size:12px !important; padding:6px 14px !important;}
+.search-bar{padding:6px 10px !important; min-height:56px !important; gap:8px !important;}
+.search-bar input, .search-bar select{height:38px !important; font-size:13px !important;}
+#categoryFilter{width:130px !important;}
+/* موبايل: لا تصغر الأزرار، رصهم تحت بعض بشكل مريح */
+@media (max-width: 768px){
+  .main-container{flex-direction:column !important; height:auto !important; overflow:visible !important;}
+  .right-sidebar{width:100% !important; min-width:0 !important; flex-direction:row !important; flex-wrap:wrap !important; border-left:none !important; border-bottom:1px solid #c0c7d2 !important; order:1;}
+  .right-sidebar .btn-customer, .right-sidebar .btn-hold, .right-sidebar .btn-held-list{flex:1 1 30% !important; font-size:11px !important; min-height:38px !important;}
+  .center-content{order:2; min-height:380px;}
+  .customer-sidebar{width:100% !important; min-width:0 !important; flex-direction:row !important; flex-wrap:wrap !important; border-right:none !important; border-top:1px solid #c0c7d2 !important; order:3;}
+  .customer-sidebar .summary-item{flex:1 1 30% !important;}
+  .customer-sidebar .buttons{flex:1 1 100% !important;}
+  body{height:auto !important; overflow:auto !important;}
+}
+@media (max-width: 480px){
+  .right-sidebar .btn-customer, .right-sidebar .btn-hold, .right-sidebar .btn-held-list{font-size:11px !important; padding:8px 4px !important; min-height:38px !important; border-radius:8px !important;}
+  .top-bar .store-name{font-size:14px !important; max-width:none !important;}
+}
+</style>
 </head>
+
 <body>
 <div class="top-bar"><div class="store-name">🏪 <span id="storeNameDisplay">شركة العبادي</span></div><div class="user-info"><span id="userNameDisplay">👤 موظف</span><button onclick="window.location.href='dashboard.html'">🏠</button><button onclick="window.location.href='customers.html'">👥</button></div></div>
 <div class="edit-banner" id="editBanner">✏ وضع تعديل فاتورة سابقة - التاريخ يؤخذ من الحقل - <span id="editBannerInfo"></span> <button onclick="cancelEditInvoice()" style="background:#fff;color:#b45309;border:none;padding:2px 10px;border-radius:12px;font-weight:800;cursor:pointer;">إلغاء التعديل</button></div>
@@ -160,6 +206,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;height:100vh;height:100
 // شركة العبادي - إدارة الفواتير السابقة
 // Features: عرض / تعديل / حذف بباسورد 1122 / طباعة / تعديل التاريخ / خصم الفرق فقط
 // طريقة التركيب: ضع هذا الملف بعد js/sales.js في pos.html
+// <script src="js/invoices-manager.js"></script>
 // وأضف الزر والمودال الموجودين في آخر الملف كتعليق HTML
 // ============================================
 
