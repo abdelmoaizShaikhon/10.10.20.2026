@@ -73,7 +73,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 </style>
 </head>
 <body>
-<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v20-RENDER-CART</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
+<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v21-DATE-FROM-FIELD</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
 <div class="edit-banner" id="editBanner">✏ وضع تعديل فاتورة سابقة - <span id="editBannerInfo"></span> <button onclick="window.cancelEditInvoice()" style="background:#fff;color:#b45309;border:none;padding:2px 12px;border-radius:12px;font-weight:800;cursor:pointer;">إلغاء التعديل</button></div>
 <div class="main-container">
 <div class="right-sidebar">
@@ -119,8 +119,8 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 <script src="js/app.js"></script>
 <script src="js/sales.js"></script>
 <script>
-// v20-RENDER-CART: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
-console.log("POS2 VERSION: v20-RENDER-CART");
+// v21-DATE-FROM-FIELD: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
+console.log("POS2 VERSION: v21-DATE-FROM-FIELD");
 window.INVOICE_PASSWORD = "1122";
 window.allInvoicesList = window.allInvoicesList || [];
 window.allInvoiceItemsCache = window.allInvoiceItemsCache || {};
@@ -140,11 +140,18 @@ window.editTimeSnapshot = null;
   var d=document.getElementById('invoiceDate'); var t=document.getElementById('invoiceTime');
   if(d) d.addEventListener('input', function(){ if(window.editingInvoiceId){ window.editDateSnapshot=d.value; } });
   if(d) d.addEventListener('change', function(){ if(window.editingInvoiceId){ window.editDateSnapshot=d.value; } });
+  // أهم إصلاح: أثناء اختيار التاريخ من التقويم، لا تتدخل أبداً - المستخدم هو اللي بيغيّر
+  if(d) d.addEventListener('focus', function(){ window.userEditingDate=true; });
+  if(d) d.addEventListener('blur', function(){ window.userEditingDate=false; if(window.editingInvoiceId){ window.editDateSnapshot=d.value; } });
+  if(d) d.addEventListener('click', function(){ window.userEditingDate=true; setTimeout(function(){ window.userEditingDate=false; if(window.editingInvoiceId){ window.editDateSnapshot=d.value; } }, 3000); });
   if(t) t.addEventListener('input', function(){ if(window.editingInvoiceId){ window.editTimeSnapshot=t.value; } });
   if(t) t.addEventListener('change', function(){ if(window.editingInvoiceId){ window.editTimeSnapshot=t.value; } });
-  // حارس كل ثانية: لو في وضع تعديل والتاريخ اتغير تلقائيا بدون input، رجّعه
+  if(t) t.addEventListener('focus', function(){ window.userEditingDate=true; });
+  if(t) t.addEventListener('blur', function(){ window.userEditingDate=false; if(window.editingInvoiceId){ window.editTimeSnapshot=t.value; } });
+  // حارس كل ثانية: لو في وضع تعديل والتاريخ اتغير تلقائيا بدون تدخل المستخدم، رجّعه
   setInterval(function(){
     if(!window.editingInvoiceId) return;
+    if(window.userEditingDate) return;
     var dd=document.getElementById('invoiceDate'); var tt=document.getElementById('invoiceTime');
     if(!dd || !tt) return;
     if(window.editDateSnapshot && dd.value!==window.editDateSnapshot){ dd.value=window.editDateSnapshot; }
@@ -242,7 +249,9 @@ window.saveEditedInvoice = async function(){
   if(!window.editingInvoiceId) return false;
   var inv=window.originalInvoiceData;
   var dateVal=document.getElementById('invoiceDate').value; var timeVal=document.getElementById('invoiceTime').value||'12:00';
-  var newCreatedAt=inv.created_at; if(dateVal){ newCreatedAt=new Date(dateVal+'T'+timeVal+':00').toISOString(); }
+  var newCreatedAt=inv.created_at; if(dateVal){ newCreatedAt=dateVal+'T'+timeVal+':00'; }
+  // ثبّت اللقطة على اللي المستخدم اختاره قبل الحفظ، عشان الحارس ميرجعش القديم
+  window.editDateSnapshot=dateVal; window.editTimeSnapshot=timeVal;
   var cartTotal=0; if(typeof cart!=='undefined' && Array.isArray(cart) && cart.length){ cartTotal=cart.reduce(function(s,i){return s+Number(i.price||i.sell_price||0)*Number(i.quantity||i.qty||1);},0); } var total=cartTotal||Number(String(document.getElementById('totalAmount').value||'0').replace(/[^0-9.]/g,''))||Number(inv.total_amount||0);
   var paid=Number(document.getElementById('paidAmount').value||0);
   // حفظ الأصناف الجديدة في sales.items كـ JSON - نفس طريقة الحفظ في sales.html
@@ -252,7 +261,8 @@ window.saveEditedInvoice = async function(){
   } else { cartToSave = window.originalInvoiceItems; }
   var upd=await supabase.from('sales').update({ total_amount: total, paid_amount: paid, remaining_amount: total-paid, created_at: newCreatedAt, items: cartToSave }).eq('id', window.editingInvoiceId);
   if(upd.error){ window.showNotification('خطأ: '+upd.error.message,'error'); return false; }
-  window.showNotification('تم تعديل الفاتورة (التاريخ والإجمالي والمدفوع)','success');
+  // تأكيد: أعد قراءة الفاتورة من السيرفر للتأكد أن التاريخ اتحفظ فعلاً
+  try{ var chk=await supabase.from('sales').select('created_at').eq('id', window.editingInvoiceId).single(); if(chk.data) window.showNotification('تم تعديل الفاتورة - التاريخ المحفوظ: '+new Date(chk.data.created_at).toLocaleString('ar-EG'),'success'); else window.showNotification('تم تعديل الفاتورة (التاريخ والإجمالي والمدفوع)','success'); }catch(e2){ window.showNotification('تم تعديل الفاتورة (التاريخ والإجمالي والمدفوع)','success'); }
   var eid=window.editingInvoiceId; window.cancelEditInvoice(); delete window.allInvoiceItemsCache[eid]; return true;
 };
 window.deleteInvoiceWithPassword = async function(id){
