@@ -73,7 +73,7 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 </style>
 </head>
 <body>
-<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v19-FIX-SYNTAX</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
+<div class="top-bar"><div class="store-name">🏪 شركة العبادي <span style="background:#f59e0b;color:#000;font-size:10px;padding:2px 8px;border-radius:10px;">v20-RENDER-CART</span></div><div><span>👤 موظف</span> <button onclick="window.location.href='dashboard.html'">🏠</button> <button onclick="window.location.href='customers.html'">👥</button></div></div>
 <div class="edit-banner" id="editBanner">✏ وضع تعديل فاتورة سابقة - <span id="editBannerInfo"></span> <button onclick="window.cancelEditInvoice()" style="background:#fff;color:#b45309;border:none;padding:2px 12px;border-radius:12px;font-weight:800;cursor:pointer;">إلغاء التعديل</button></div>
 <div class="main-container">
 <div class="right-sidebar">
@@ -119,8 +119,8 @@ body{font-family:'Tajawal',sans-serif;background:#d9dfe6;min-height:100vh;displa
 <script src="js/app.js"></script>
 <script src="js/sales.js"></script>
 <script>
-// v19-FIX-SYNTAX: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
-console.log("POS2 VERSION: v19-FIX-SYNTAX");
+// v20-RENDER-CART: عرض وتعديل الفاتورة من صف sales نفسه، بدون أي جدول أصناف جديد، وبدون أي طلب 404
+console.log("POS2 VERSION: v20-RENDER-CART");
 window.INVOICE_PASSWORD = "1122";
 window.allInvoicesList = window.allInvoicesList || [];
 window.allInvoiceItemsCache = window.allInvoiceItemsCache || {};
@@ -166,6 +166,40 @@ window.getInvoiceItems = async function(saleId){
   window.allInvoiceItemsCache[saleId]=items;
   return items;
 };
+// رسم السلة مباشرة في الجدول - بدون الاعتماد على اسم دالة الرسم في sales.js
+window.renderEditCart = function(){
+  var tbody=document.getElementById('invoiceTableBody'); if(!tbody) return;
+  var list = (typeof cart!=='undefined' && Array.isArray(cart)) ? cart : window.originalInvoiceItems;
+  if(!list || !list.length){ tbody.innerHTML='<tr><td colspan="6" style="padding:30px;color:#888">🛒 السلة فارغة</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(it, idx){
+    var nm = it.product_name||it.name||'صنف';
+    var pr = Number(it.price||it.sell_price||0);
+    var q  = Number(it.quantity||it.qty||1);
+    return '<tr><td>'+(idx+1)+'</td><td>'+nm+'</td><td>'+pr.toLocaleString()+'</td><td><button onclick="window.editQty('+idx+',-1)" style="padding:2px 8px;">-</button> '+q+' <button onclick="window.editQty('+idx+',1)" style="padding:2px 8px;">+</button></td><td>'+(pr*q).toLocaleString()+'</td><td><button onclick="window.editRemove('+idx+')" style="background:#fee2e2;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;">🗑</button></td></tr>';
+  }).join('');
+  var tc=document.getElementById('totalItemsCount'); if(tc) tc.textContent=list.length;
+  var tq=document.getElementById('totalQuantity'); if(tq) tq.textContent=list.reduce(function(s,i){return s+Number(i.quantity||i.qty||1);},0);
+};
+window.editQty = function(idx, delta){
+  var list = (typeof cart!=='undefined' && Array.isArray(cart)) ? cart : window.originalInvoiceItems;
+  if(!list[idx]) return;
+  var q = Number(list[idx].quantity||list[idx].qty||1) + delta;
+  if(q<=0){ window.editRemove(idx); return; }
+  list[idx].quantity=q; list[idx].qty=q;
+  list[idx].total = Number(list[idx].price||list[idx].sell_price||0)*q;
+  window.renderEditCart(); window.refreshEditTotals();
+};
+window.editRemove = function(idx){
+  var list = (typeof cart!=='undefined' && Array.isArray(cart)) ? cart : window.originalInvoiceItems;
+  list.splice(idx,1); window.renderEditCart(); window.refreshEditTotals();
+};
+window.refreshEditTotals = function(){
+  var list = (typeof cart!=='undefined' && Array.isArray(cart)) ? cart : window.originalInvoiceItems;
+  var total = list.reduce(function(s,i){ return s + Number(i.price||i.sell_price||0)*Number(i.quantity||i.qty||1); },0);
+  var tot=document.getElementById('totalAmount'); if(tot) tot.value=total.toFixed(2);
+  var paid=Number(document.getElementById('paidAmount').value||0);
+  var rem=document.getElementById('remainingAmount'); if(rem) rem.value=(total-paid).toFixed(2);
+};
 window.editInvoiceWithPassword = async function(id){ if(!window.askPassword('تعديل الفاتورة')) return; await window.startEditInvoice(id); };
 window.startEditInvoice = async function(id){
   var inv=window.allInvoicesList.find(function(x){ return String(x.id)===String(id); }); if(!inv) return;
@@ -190,12 +224,13 @@ window.startEditInvoice = async function(id){
         total: Number(it.total)||(Number(it.price||it.sell_price||0)*Number(it.quantity||it.qty||1))
       });
     });
-    if(typeof renderCart==='function') renderCart();
-    else if(typeof renderInvoiceTable==='function') renderInvoiceTable();
+    window.renderEditCart();
   }
+  // الترتيب مهم: نحط المدفوع والإجمالي بعد أي updateTotals، ومنناديهاش تاني لأنها بتصفّر المدفوع
+  var tot=document.getElementById('totalAmount'); if(tot){ tot.value=Number(inv.total_amount||inv.total||0).toFixed(2); tot.readOnly=false; tot.style.border='2px solid #f59e0b'; }
   var paidEl=document.getElementById('paidAmount'); if(paidEl) paidEl.value=Number(inv.paid_amount||0);
-  var tot=document.getElementById('totalAmount'); if(tot){ tot.value=Number(inv.total_amount||inv.total||0); tot.readOnly=false; tot.style.border='2px solid #f59e0b'; }
-  if(typeof updateTotals==='function') updateTotals();
+  var remEl=document.getElementById('remainingAmount'); if(remEl) remEl.value=(Number(inv.total_amount||inv.total||0)-Number(inv.paid_amount||0)).toFixed(2);
+  var cb=document.getElementById('currentBalance'); if(cb) cb.value=Number(inv.total_amount||inv.total||0).toFixed(2);
   var btn=document.getElementById('btnSaveSale'); if(btn){ btn.textContent='💾 حفظ التعديل'; btn.style.background='#f59e0b'; }
   document.getElementById('editBanner').classList.add('show'); document.getElementById('editBannerInfo').textContent='فاتورة '+(inv.invoice_number||id);
   window.closeModal('invoicesHistoryModal');
@@ -208,7 +243,7 @@ window.saveEditedInvoice = async function(){
   var inv=window.originalInvoiceData;
   var dateVal=document.getElementById('invoiceDate').value; var timeVal=document.getElementById('invoiceTime').value||'12:00';
   var newCreatedAt=inv.created_at; if(dateVal){ newCreatedAt=new Date(dateVal+'T'+timeVal+':00').toISOString(); }
-  var total=Number(String(document.getElementById('totalAmount').value||'0').replace(/[^0-9.]/g,''))||Number(inv.total_amount||0);
+  var cartTotal=0; if(typeof cart!=='undefined' && Array.isArray(cart) && cart.length){ cartTotal=cart.reduce(function(s,i){return s+Number(i.price||i.sell_price||0)*Number(i.quantity||i.qty||1);},0); } var total=cartTotal||Number(String(document.getElementById('totalAmount').value||'0').replace(/[^0-9.]/g,''))||Number(inv.total_amount||0);
   var paid=Number(document.getElementById('paidAmount').value||0);
   // حفظ الأصناف الجديدة في sales.items كـ JSON - نفس طريقة الحفظ في sales.html
   var cartToSave=[];
