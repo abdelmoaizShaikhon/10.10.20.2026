@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>التحويلات المالية - شركة العبادي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root{--primary:#0f3d3e;--accent:#14b8a6;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;--purple:#8b5cf6;--bg:#f0f4f4;--card:#fff;--border:#d1d9d9;--text:#0f3d3e;--text-light:#64748b;--radius:12px;--shadow:0 2px 10px rgba(15,61,62,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);min-height:100vh}
+.navbar{background:linear-gradient(135deg,#0f3d3e,#0a2e2f);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.nav-brand{font-weight:800;font-size:18px;display:flex;gap:8px;align-items:center}
+.btn-nav{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:16px;cursor:pointer;font-family:'Tajawal',sans-serif}
+.sidebar{position:fixed;top:0;right:0;bottom:0;width:250px;background:#fff;box-shadow:-2px 0 15px rgba(0,0,0,.1);transform:translateX(105%);transition:.3s;z-index:100;padding:16px;overflow-y:auto}
+.sidebar.open,.sidebar.show{transform:translateX(0)}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px}
+.sidebar-nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;color:#0f3d3e;text-decoration:none;font-weight:600}
+.sidebar-nav a.active,.sidebar-nav a:hover{background:#e8f0ef}
+.btn-close-sidebar{background:none;border:none;font-size:18px;cursor:pointer}
+.main-content{padding:16px;max-width:1200px;margin:0 auto}
+.page-header{padding:16px}
+.page-header h2{font-size:20px;font-weight:800}
+.table-wrapper{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);margin:0 16px 16px}
+.table-scroll{max-height:500px;overflow-y:auto;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+thead{position:sticky;top:0;z-index:5}
+thead th{background:#e8f0ef;padding:12px 8px;text-align:center;font-weight:700;border-bottom:2px solid var(--border);white-space:nowrap;color:var(--primary)}
+tbody td{padding:10px 6px;text-align:center;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+tbody tr:hover{background:#f0f5f4}
+.badge{padding:4px 12px;border-radius:15px;font-size:11px;font-weight:600;display:inline-block}
+.badge-cash{background:#d1fae5;color:#059669}.badge-bank{background:#dbeafe;color:#1e40af}.badge-wallet{background:#fef3c7;color:#92400e}.badge-email{background:#ede9fe;color:#6d28d9}.badge-vodafone{background:#fee2e2;color:#dc2626}.badge-orange{background:#ffedd5;color:#ea580c}.badge-etisalat{background:#d1fae5;color:#059669}.badge-instapay{background:#dbeafe;color:#1e40af}.badge-we{background:#ede9fe;color:#6d28d9}
+.btn-action{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:600;margin:1px;white-space:nowrap}
+.btn-view{background:#e0f2fe;color:#1e40af}.btn-print{background:#fef3c7;color:#92400e}.btn-delete{background:#fee2e2;color:#dc2626}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;padding:16px}
+.stat-card{background:var(--card);padding:20px;border-radius:var(--radius);text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
+.stat-card .number{font-size:24px;font-weight:900;margin-bottom:5px}.stat-card .label{font-size:12px;color:var(--text-light)}
+.number.blue{color:#0891b2}.number.green{color:var(--success)}.number.red{color:var(--danger)}.number.orange{color:var(--warning)}.number.purple{color:var(--purple)}
+.filter-bar{background:var(--card);padding:15px;border-radius:var(--radius);display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow);border:1px solid var(--border);margin:0 16px 16px}
+.filter-bar input,.filter-bar select{padding:10px 14px;border:2px solid var(--border);border-radius:25px;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;background:#fafbfc}
+.filter-bar input{flex:1;min-width:140px}.filter-bar select{min-width:130px}
+.btn-add{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:25px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;white-space:nowrap}
+.btn-gold{background:#d4af37;color:#fff;border:none;padding:10px 20px;border-radius:25px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;white-space:nowrap}
+.sales-summary-card{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border-radius:var(--radius);padding:20px;margin:0 16px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:15px;box-shadow:0 6px 20px rgba(20,184,166,.3)}
+.sales-summary-card .item{text-align:center;padding:10px;background:rgba(255,255,255,.1);border-radius:10px}
+.sales-summary-card .item .value{font-size:22px;font-weight:900;margin-bottom:4px}.sales-summary-card .item .label{font-size:11px;opacity:.9}.sales-summary-card .item .sub{font-size:10px;opacity:.75;margin-top:4px}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,61,62,.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal-content{background:#fff;border-radius:var(--radius);width:90%;max-width:620px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.modal-sm{max-width:450px}.modal-lg{max-width:900px}
+.modal-header{padding:14px 20px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#f8fafc;flex-shrink:0}
+.modal-header h3{margin:0;font-size:16px;font-weight:800}.modal-close{background:none;border:none;font-size:22px;cursor:pointer;width:32px;height:32px;border-radius:50%}
+.modal-body{flex:1;overflow-y:auto;padding:20px}.modal-footer{padding:14px 20px;border-top:2px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#f8fafc}
+.btn-primary,.btn-success,.btn-secondary,.btn-danger,.btn-warning{padding:10px 24px;border-radius:25px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:600;font-size:13px;border:none}
+.btn-primary{background:var(--accent);color:#fff}.btn-success{background:var(--success);color:#fff}.btn-secondary{background:#e2e8f0;color:var(--text)}.btn-danger{background:var(--danger);color:#fff}.btn-warning{background:#d4af37;color:#fff}
+.form-group{margin-bottom:14px}.form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:700;color:#334155}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:14px;background:#fafbfc;box-sizing:border-box}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);background:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.notification{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.2);font-family:'Tajawal',sans-serif;pointer-events:none}
+.notif-success{background:#d1fae5;color:#059669}.notif-error{background:#fee2e2;color:#dc2626}.notif-info{background:#e0f2f1;color:#0f766e}.notif-warning{background:#fef3c7;color:#92400e}
+.balances-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.balance-card{background:#f8fafc;padding:14px;border-radius:10px;border:2px solid var(--border)}
+.balance-card .name{font-size:15px;font-weight:800;color:var(--primary);margin-bottom:10px;display:flex;gap:6px;align-items:center}
+.balance-card .row{font-size:12px;color:var(--text-light);margin-bottom:4px;display:flex;justify-content:space-between}
+.balance-card .row strong{color:var(--text)}.balance-card .net{margin-top:8px;padding:8px;border-radius:6px;text-align:center}.balance-card .net .lbl{font-size:10px;color:var(--text-light)}.balance-card .net .val{font-size:16px;font-weight:900}
+.net-positive{background:#d1fae5}.net-positive .val{color:#059669}.net-negative{background:#fee2e2}.net-negative .val{color:#dc2626}.net-zero{background:#e2e8f0}.net-zero .val{color:#64748b}
+.wallets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.wallet-box{padding:12px;border-radius:10px;text-align:center;border:2px solid}.wallet-box .name{font-size:12px;font-weight:700;margin-bottom:6px}.wallet-box .amount{font-size:16px;font-weight:900}.wallet-box .count{font-size:10px;color:var(--text-light);margin-top:3px}
+.wallet-vodafone{background:#fee2e2;border-color:#dc2626;color:#dc2626}.wallet-orange{background:#ffedd5;border-color:#ea580c;color:#ea580c}.wallet-etisalat{background:#d1fae5;border-color:#059669;color:#059669}.wallet-instapay{background:#dbeafe;border-color:#1e40af;color:#1e40af}.wallet-we{background:#ede9fe;border-color:#6d28d9;color:#6d28d9}.wallet-other{background:#f1f5f9;border-color:#64748b;color:#64748b}
+.report-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin:0 16px 16px}
+.report-card .card-header{padding:12px 18px;background:#f8fafc;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.report-card .card-body{padding:15px}
+#loadStatus{font-size:11px;font-weight:700;color:#059669;background:#d1fae5;padding:4px 10px;border-radius:12px;white-space:nowrap}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr);gap:8px;padding:12px}.stat-card{padding:12px 8px}.stat-card .number{font-size:16px}.sales-summary-card{grid-template-columns:1fr}.filter-bar{flex-direction:column}.filter-bar input,.filter-bar select,.filter-bar .btn-add,.filter-bar .btn-gold{width:100%}.table-wrapper{margin:0 12px 12px;background:transparent;box-shadow:none;border:none}.table-scroll{max-height:none;overflow:visible}table{min-width:unset;width:100%;display:block}thead{display:none}tbody{display:block}tbody tr{display:block;background:var(--card);border-radius:12px;margin-bottom:12px;padding:14px;box-shadow:var(--shadow);border:1px solid var(--border)}tbody td{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #e2e8f0;text-align:right!important;white-space:normal!important;font-size:13px}tbody td:last-child{border-bottom:none;flex-wrap:wrap;gap:6px;justify-content:center}tbody td::before{content:attr(data-label);font-weight:700;color:var(--text-light);font-size:12px;margin-left:10px}tbody td[data-label="#"]{display:none}.modal-overlay{padding:0;align-items:flex-end}.modal-content{width:100%!important;max-width:100%!important;max-height:92vh;border-radius:20px 20px 0 0}.modal-footer{flex-direction:column-reverse}.modal-footer button{width:100%}.form-row{grid-template-columns:1fr;gap:0}.balances-grid{grid-template-columns:1fr}.wallets-grid{grid-template-columns:repeat(2,1fr)}.bottom-nav{display:flex!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<nav class="navbar"><div class="nav-brand"><span class="brand-icon">🏢</span><span class="brand-name">شركة العبادي</span></div><div class="nav-actions"><span class="user-name" id="userName">👤 مدير النظام</span><button class="btn-nav" onclick="toggleSidebar()">☰</button></div></nav>
+<aside id="sidebar" class="sidebar"><div class="sidebar-header"><h3>القائمة الرئيسية</h3><button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button></div><nav class="sidebar-nav"><a href="dashboard.html"><span class="nav-icon">📊</span> لوحة التحكم</a><a href="sales.html"><span class="nav-icon">🛒</span> نقطة البيع</a><a href="products.html"><span class="nav-icon">📦</span> المنتجات</a><a href="purchases.html"><span class="nav-icon">🚚</span> المشتريات</a><a href="customers.html"><span class="nav-icon">👤</span> العملاء</a><a href="suppliers.html"><span class="nav-icon">🏢</span> الموردين</a><a href="accounts.html"><span class="nav-icon">💰</span> الحسابات</a><a href="transfers.html" class="active"><span class="nav-icon">💸</span> التحويلات</a><a href="expenses.html"><span class="nav-icon">🧾</span> المصروفات</a><a href="reports.html"><span class="nav-icon">📈</span> التقارير</a><a href="users.html"><span class="nav-icon">👥</span> المستخدمين</a><a href="settings.html"><span class="nav-icon">⚙</span> الإعدادات</a><a href="#" onclick="logout()"><span class="nav-icon">🚪</span> تسجيل الخروج</a></nav></aside>
+<main class="main-content">
+<div class="page-header"><h2>💸 التحويلات المالية</h2></div>
+<div class="sales-summary-card"><div class="item"><div class="value" id="salesPaidTotal">0 ج.م</div><div class="label">💰 إجمالي المبيعات المدفوعة</div><div class="sub" id="salesPaidCount">0 فاتورة</div></div><div class="item"><div class="value" id="transfersTotal">0 ج.م</div><div class="label">💸 إجمالي التحويلات</div><div class="sub" id="transfersCount">0 عملية</div></div><div class="item"><div class="value" id="remainingToTransfer">0 ج.م</div><div class="label">⚠ المتبقي للتحويل</div><div class="sub">من المبيعات المدفوعة</div></div></div>
+<div class="stats-row"><div class="stat-card"><div class="number green" id="cashAmount">0 ج.م</div><div class="label">💵 كاش</div></div><div class="stat-card"><div class="number blue" id="bankAmount">0 ج.م</div><div class="label">🏦 بنكي</div></div><div class="stat-card"><div class="number orange" id="walletAmount">0 ج.م</div><div class="label">📱 محافظ إلكترونية</div></div><div class="stat-card"><div class="number purple" id="emailAmount">0 ج.م</div><div class="label">📧 بريد إلكتروني</div></div></div>
+<div class="filter-bar"><input type="date" id="dateFrom" onchange="filterTransfers()"><input type="date" id="dateTo" onchange="filterTransfers()"><select id="methodFilter" onchange="filterTransfers()"><option value="all">جميع الطرق</option><option value="كاش">💵 كاش</option><option value="بنك">🏦 بنكي</option><option value="محفظة">📱 محفظة</option><option value="بريد">📧 بريد</option></select><input type="text" id="searchInput" placeholder="🔍 بحث..." oninput="filterTransfers()"><button class="btn-add" onclick="openTransferModal()">➕ تحويل جديد</button><button class="btn-gold" onclick="printTransfersReport()">🖨 طباعة</button><button class="btn-gold" onclick="loadTransfers(true)">عرض التحويلات</button><span id="loadStatus">● جاري التحميل...</span></div>
+<div class="report-card"><div class="card-header"><span>💰 أرصدة الأشخاص</span><button class="btn-primary" onclick="loadBalances()" style="padding:6px 14px;font-size:12px;">🔄 تحديث</button></div><div class="card-body"><div id="balancesContainer" class="balances-grid"><p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">جاري التحميل...</p></div></div></div>
+<div class="report-card"><div class="card-header"><span>📱 تفصيل المحافظ الإلكترونية</span></div><div class="card-body"><div id="walletsContainer" class="wallets-grid"><p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">لا توجد محافظ</p></div></div></div>
+<div class="table-wrapper"><div class="table-scroll"><table><thead><tr><th>#</th><th>التاريخ</th><th>من</th><th>إلى</th><th>المبلغ</th><th>الطريقة / المحفظة</th><th>البيان</th><th>إجراءات</th></tr></thead><tbody id="transfersTable"><tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">⏳ جاري التحميل...</td></tr></tbody></table></div></div>
+</main>
+<nav class="bottom-nav"><a href="dashboard.html"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></a><a href="sales.html"><span class="nav-icon">🛒</span><span class="nav-label">بيع</span></a><a href="transfers.html" class="active"><span class="nav-icon">💸</span><span class="nav-label">تحويلات</span></a><a href="reports.html"><span class="nav-icon">📈</span><span class="nav-label">تقارير</span></a></nav>
+</div>
+<div class="modal-overlay" id="transferModal"><div class="modal-content"><div class="modal-header" style="background:linear-gradient(135deg,#0f766e,#14b8a6);"><h3 id="transferModalTitle" style="color:white;">➕ تحويل جديد</h3><button class="modal-close" onclick="closeModal('transferModal')" style="color:white;">✕</button></div><div class="modal-body"><input type="hidden" id="editTransferId"><div class="form-row"><div class="form-group"><label>من (المحوِّل) *</label><input type="text" id="fromPerson" placeholder="اسم المحوِّل" list="personsList"></div><div class="form-group"><label>إلى (المستلم) *</label><input type="text" id="toPerson" placeholder="اسم المستلم" list="personsList"></div></div><datalist id="personsList"><option value="المحاسب"><option value="صاحب الشركة"><option value="المدير"><option value="الكاشير"><option value="أمين الخزينة"></datalist><div class="form-row"><div class="form-group"><label>المبلغ (ج.م) *</label><input type="number" id="transferAmount" step="0.01" min="0.01" placeholder="0.00"><small style="font-size:11px;color:#64748b;display:block;margin-top:4px;">💡 المتاح من المبيعات: <strong id="availableForTransfer" style="color:#059669;">0 ج.م</strong></small></div><div class="form-group"><label>التاريخ *</label><input type="date" id="transferDate"></div></div><div class="form-group"><label>طريقة التحويل *</label><select id="transferMethod" onchange="onMethodChange()"><option value="كاش">💵 كاش باليد</option><option value="بنك">🏦 تحويل بنكي</option><option value="محفظة">📱 محفظة إلكترونية</option><option value="بريد">📧 بريد إلكتروني</option></select></div><div id="extraFields"></div><div class="form-group"><label>البيان / السبب</label><textarea id="transferNote" rows="2" placeholder="مثال: تسليم إيرادات اليوم"></textarea></div></div><div class="modal-footer"><button class="btn-secondary" onclick="closeModal('transferModal')">إلغاء</button><button class="btn-success" onclick="saveTransfer()">💾 حفظ التحويل</button></div></div></div>
+<div class="modal-overlay" id="detailsModal"><div class="modal-content modal-sm"><div class="modal-header" style="background:linear-gradient(135deg,#0f3d3e,#0f766e);"><h3 style="color:white;">📋 تفاصيل التحويل</h3><button class="modal-close" onclick="closeModal('detailsModal')" style="color:white;">✕</button></div><div class="modal-body" id="detailsContent"></div><div class="modal-footer"><button class="btn-secondary" onclick="closeModal('detailsModal')">إغلاق</button><button class="btn-warning" onclick="printTransferReceipt()">🖨 طباعة</button></div></div></div>
+<div class="modal-overlay" id="confirmModal"><div class="modal-content modal-sm"><div class="modal-header" style="background:#fef3c7;"><h3>⚠ تأكيد الحذف</h3><button class="modal-close" onclick="closeModal('confirmModal')">✕</button></div><div class="modal-body"><p style="text-align:center;font-size:15px;line-height:1.7;" id="confirmMessage">هل أنت متأكد؟</p></div><div class="modal-footer" style="justify-content:center;"><button class="btn-secondary" onclick="closeModal('confirmModal')">إلغاء</button><button class="btn-danger" id="confirmDeleteBtn" onclick="deleteTransfer()">🗑 حذف</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+let allTransfers=[],filteredTransfers=[],allSales=[],transferToDelete=null,currentTransferForDetails=null;
+function getDB(){
+  const cands=[window.supabaseClient,window.db,window.supabaseDb,window.SUPABASE_CLIENT];
+  for(const c of cands){ if(c && typeof c.from==='function') return c; }
+  // js/supabase.js في مشروعك أحياناً يعرّف supabase كعميل، وأحياناً كالمكتبة فقط
+  if(window.supabase && typeof window.supabase.from==='function') return window.supabase;
+  return null;
+}
+async function waitForDB(tries=20){
+  for(let i=0;i<tries;i++){ const c=getDB(); if(c) return c; await new Promise(r=>setTimeout(r,250)); }
+  return getDB();
+}
+function setStatus(t,ok=true){ const el=document.getElementById('loadStatus'); if(el){ el.textContent=t; el.style.background=ok?'#d1fae5':'#fee2e2'; el.style.color=ok?'#059669':'#dc2626'; } }
+document.addEventListener('DOMContentLoaded', async ()=>{
+  try{ if(typeof checkAuth==='function') await checkAuth(); }catch(e){}
+  const d=document.getElementById('transferDate'); if(d) d.value=new Date().toISOString().split('T')[0];
+  await bootTransfers();
+  setInterval(()=>{ if(!document.hidden && !isAnyModalOpen()) bootTransfers(false); },30000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) bootTransfers(false); });
+});
+function isAnyModalOpen(){ return [...document.querySelectorAll('.modal-overlay')].some(m=>m.classList.contains('active')); }
+async function bootTransfers(showLoading=true){
+  if(showLoading) setStatus('● جاري التحميل...');
+  await loadSales();
+  await loadTransfers();
+  try{ loadStats(); }catch(e){}
+  try{ loadBalances(); }catch(e){}
+  try{ loadWalletsDetail(); }catch(e){}
+}
+function formatNum(num){ if(num===undefined||num===null) return '0'; const n=Number(num); return isNaN(n)?'0':n.toLocaleString('en-EG',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function formatDate(d){ if(!d) return '-'; try{ const dt=new Date(d); return isNaN(dt.getTime())?'-':dt.toLocaleDateString('ar-EG'); }catch(e){ return '-'; } }
+function escapeHtml(str){ return String(str||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+function showNotification(msg,type='info'){ const ex=document.querySelector('.notification'); if(ex) ex.remove(); const div=document.createElement('div'); div.className=`notification notif-${type}`; div.textContent=msg; document.body.appendChild(div); setTimeout(()=>{ div.style.opacity='0'; div.style.transition='0.3s'; setTimeout(()=>div.remove(),300); },3200); }
+async function loadSales(){
+  const db=await waitForDB(4);
+  if(!db){ allSales=[]; return; }
+  try{ const {data,error}=await db.from('sales').select('*'); if(error) throw error; allSales=data||[]; }
+  catch(e){ console.warn('sales:',e.message); allSales=[]; }
+}
+function getTotalPaidSales(){ return allSales.reduce((s,x)=>s+(Number(x.paid_amount)||0),0); }
+// ===== الإصلاح الأساسي: تحميل التحويلات =====
+async function loadTransfers(force=false){
+  const tbody=document.getElementById('transfersTable');
+  const db=await waitForDB();
+  const local=JSON.parse(localStorage.getItem('transfers')||'[]');
+  if(!db){
+    // لا يوجد عميل Supabase أصلاً - اعرض المحلي ولا تخفي الخطأ
+    allTransfers=local; filteredTransfers=[...allTransfers]; renderTransfers(filteredTransfers);
+    setStatus('⚠ Supabase غير متصل - يعرض المحلي فقط',false);
+    if(force) showNotification('⚠ عميل Supabase غير موجود - تحقق من js/supabase.js','error');
+    return;
+  }
+  // جرّب الاستعلام الأساسي، ثم بدون ترتيب، ثم باسم جدول بديل
+  let data=null,lastErr=null;
+  const attempts=[
+    ()=>db.from('transfers').select('*').order('transfer_date',{ascending:false}),
+    ()=>db.from('transfers').select('*').order('created_at',{ascending:false}),
+    ()=>db.from('transfers').select('*'),
+  ];
+  for(const fn of attempts){
+    try{ const res=await fn(); if(res.error) throw res.error; data=res.data||[]; lastErr=null; break; }
+    catch(e){ lastErr=e; }
+  }
+  if(lastErr){
+    console.error('loadTransfers Supabase error:',lastErr);
+    // لا تمسح بيانات Supabase القديمة، واعرض المحلي + رسالة الخطأ الحقيقية
+    if(allTransfers.length===0) { allTransfers=local; filteredTransfers=[...allTransfers]; renderTransfers(filteredTransfers); }
+    setStatus('⚠ خطأ: '+(lastErr.message||'تعذر تحميل التحويلات'),false);
+    if(force||allTransfers.length===0) showNotification('❌ لم تصل التحويلات من Supabase: '+(lastErr.message||''),'error');
+    return;
+  }
+  // نجح من Supabase: ادمج مع المحلي اللي لسه متسجّلش (لو فيه) بدون تكرار
+  const dbIds=new Set(data.map(x=>String(x.id)));
+  const onlyLocal=local.filter(x=>!dbIds.has(String(x.id)));
+  allTransfers=[...data,...onlyLocal];
+  filteredTransfers=[...allTransfers];
+  renderTransfers(filteredTransfers);
+  setStatus('● آخر تحديث '+new Date().toLocaleTimeString('ar-EG')+' - '+allTransfers.length+' تحويل',true);
+  try{ loadStats(); loadBalances(); loadWalletsDetail(); }catch(e){}
+}
+function loadStats(){
+  const totalPaidSales=getTotalPaidSales();
+  const paidInvoicesCount=allSales.filter(s=>Number(s.paid_amount)>0).length;
+  const totalTransfers=allTransfers.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const remaining=totalPaidSales-totalTransfers;
+  const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  setText('salesPaidTotal',formatNum(totalPaidSales)+' ج.م'); setText('salesPaidCount',paidInvoicesCount+' فاتورة');
+  setText('transfersTotal',formatNum(totalTransfers)+' ج.م'); setText('transfersCount',allTransfers.length+' عملية'); setText('remainingToTransfer',formatNum(remaining)+' ج.م');
+  setText('cashAmount',formatNum(allTransfers.filter(t=>t.method==='كاش').reduce((s,t)=>s+(Number(t.amount)||0),0))+' ج.م');
+  setText('bankAmount',formatNum(allTransfers.filter(t=>t.method==='بنك').reduce((s,t)=>s+(Number(t.amount)||0),0))+' ج.م');
+  setText('walletAmount',formatNum(allTransfers.filter(t=>t.method==='محفظة').reduce((s,t)=>s+(Number(t.amount)||0),0))+' ج.م');
+  setText('emailAmount',formatNum(allTransfers.filter(t=>t.method==='بريد').reduce((s,t)=>s+(Number(t.amount)||0),0))+' ج.م');
+}
+function loadWalletsDetail(){
+  const container=document.getElementById('walletsContainer'); if(!container) return;
+  const walletTransfers=allTransfers.filter(t=>t.method==='محفظة');
+  if(walletTransfers.length===0){ container.innerHTML='<p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">لا توجد تحويلات عبر المحافظ الإلكترونية</p>'; return; }
+  const wallets={};
+  walletTransfers.forEach(t=>{ let extra={}; try{ extra=typeof t.extra_data==='string'?JSON.parse(t.extra_data):(t.extra_data||{}); }catch(e){} const n=extra.wallet_name||'أخرى'; if(!wallets[n]) wallets[n]={name:n,amount:0,count:0}; wallets[n].amount+=Number(t.amount)||0; wallets[n].count+=1; });
+  const list=Object.values(wallets).sort((a,b)=>b.amount-a.amount);
+  const cls=n=>n.includes('فودافون')?'wallet-vodafone':(n.includes('أورنج')||n.includes('اورنج'))?'wallet-orange':n.includes('اتصالات')?'wallet-etisalat':(n.includes('انستاباي')||n.includes('إنستاباي'))?'wallet-instapay':(n.includes('وي')||n==='WE')?'wallet-we':'wallet-other';
+  const ic=n=>n.includes('فودافون')?'🔴':(n.includes('أورنج')||n.includes('اورنج'))?'🟠':n.includes('اتصالات')?'🟢':(n.includes('انستاباي')||n.includes('إنستاباي'))?'🔵':(n.includes('وي')||n==='WE')?'🟣':'📱';
+  container.innerHTML=list.map(w=>`<div class="wallet-box ${cls(w.name)}"><div class="name">${ic(w.name)} ${escapeHtml(w.name)}</div><div class="amount">${formatNum(w.amount)} ج.م</div><div class="count">${w.count} عملية</div></div>`).join('');
+}
+function loadBalances(){
+  const container=document.getElementById('balancesContainer'); if(!container) return;
+  const balances={};
+  allTransfers.forEach(t=>{ const amt=Number(t.amount)||0; const f=t.from_person||'غير معروف'; const to=t.to_person||'غير معروف'; if(!balances[to]) balances[to]={received:0,sent:0}; balances[to].received+=amt; if(!balances[f]) balances[f]={received:0,sent:0}; balances[f].sent+=amt; });
+  const list=Object.entries(balances).map(([name,b])=>({name,received:b.received,sent:b.sent,net:b.received-b.sent})).sort((a,b)=>b.net-a.net);
+  if(list.length===0){ container.innerHTML='<p style="text-align:center;padding:20px;color:#94a3b8;grid-column:1/-1;">لا توجد بيانات</p>'; return; }
+  container.innerHTML=list.map(p=>{ const c=p.net>0?'net-positive':(p.net<0?'net-negative':'net-zero'); const ic=p.net>0?'📈':(p.net<0?'📉':'➖'); const lb=p.net>0?'دائن (له)':(p.net<0?'مدين (عليه)':'متوازن'); return `<div class="balance-card"><div class="name">👤 ${escapeHtml(p.name)}</div><div class="row"><span>📥 استلم:</span><strong style="color:#059669;">${formatNum(p.received)} ج.م</strong></div><div class="row"><span>📤 أرسل:</span><strong style="color:#dc2626;">${formatNum(p.sent)} ج.م</strong></div><div class="net ${c}"><div class="lbl">${ic} ${lb}</div><div class="val">${formatNum(Math.abs(p.net))} ج.م</div></div></div>`; }).join('');
+}
+function renderTransfers(list){
+  const tbody=document.getElementById('transfersTable'); if(!tbody) return;
+  if(!list||list.length===0){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;">لا توجد تحويلات - اضغط "عرض التحويلات" أو أضف تحويلاً جديداً</td></tr>'; return; }
+  let html='';
+  list.forEach((t,i)=>{
+    let extra={}; try{ extra=typeof t.extra_data==='string'?JSON.parse(t.extra_data):(t.extra_data||{}); }catch(e){}
+    let badge='';
+    const m=t.method||'';
+    if(m==='كاش') badge='<span class="badge badge-cash">💵 كاش</span>';
+    else if(m==='بنك') badge=`<span class="badge badge-bank">🏦 ${escapeHtml(extra.bank_name||'بنكي')}</span>`;
+    else if(m==='محفظة'){ const w=extra.wallet_name||'محفظة'; let c='badge-wallet'; if(w.includes('فودافون')) c='badge-vodafone'; else if(w.includes('أورنج')||w.includes('اورنج')) c='badge-orange'; else if(w.includes('اتصالات')) c='badge-etisalat'; else if(w.includes('انستاباي')||w.includes('إنستاباي')) c='badge-instapay'; else if(w.includes('وي')||w==='WE') c='badge-we'; badge=`<span class="badge ${c}">📱 ${escapeHtml(w)}</span>`; }
+    else if(m==='بريد') badge=`<span class="badge badge-email">📧 ${escapeHtml(extra.email_to||'بريد')}</span>`;
+    else badge=`<span class="badge badge-cash">${escapeHtml(m)}</span>`;
+    html+=`<tr><td data-label="#">${i+1}</td><td data-label="التاريخ">${formatDate(t.transfer_date||t.created_at)}</td><td data-label="من" style="font-weight:700;color:#dc2626;">${escapeHtml(t.from_person||'-')}</td><td data-label="إلى" style="font-weight:700;color:#059669;">${escapeHtml(t.to_person||'-')}</td><td data-label="المبلغ" style="color:#14b8a6;font-weight:900;font-size:15px;">${formatNum(t.amount)} ج.م</td><td data-label="طريقة التحويل">${badge}</td><td data-label="البيان">${escapeHtml(t.note||'-')}</td><td data-label="إجراءات"><button class="btn-action btn-view" onclick="viewTransfer('${t.id}')" type="button">👁</button><button class="btn-action btn-print" onclick="printTransferReceipt('${t.id}')" type="button">🖨</button><button class="btn-action btn-delete" onclick="confirmDeleteTransfer('${t.id}')" type="button">🗑</button></td></tr>`;
+  });
+  tbody.innerHTML=html;
+}
+function filterTransfers(){
+  const from=document.getElementById('dateFrom')?.value||''; const to=document.getElementById('dateTo')?.value||''; const method=document.getElementById('methodFilter')?.value||'all'; const search=(document.getElementById('searchInput')?.value||'').toLowerCase().trim();
+  filteredTransfers=allTransfers.filter(t=>{
+    if(from){ try{ const d=new Date(t.transfer_date||t.created_at).toISOString().split('T')[0]; if(d<from) return false; }catch(e){} }
+    if(to){ try{ const d=new Date(t.transfer_date||t.created_at).toISOString().split('T')[0]; if(d>to) return false; }catch(e){} }
+    if(method!=='all'&&t.method!==method) return false;
+    if(search){ const a=(t.from_person||'').toLowerCase().includes(search); const b=(t.to_person||'').toLowerCase().includes(search); const c=(t.note||'').toLowerCase().includes(search); if(!a&&!b&&!c) return false; }
+    return true;
+  });
+  renderTransfers(filteredTransfers);
+}
+function openTransferModal(){
+  const setVal=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
+  const titleEl=document.getElementById('transferModalTitle'); if(titleEl) titleEl.textContent='➕ تحويل جديد';
+  setVal('editTransferId',''); setVal('fromPerson',''); setVal('toPerson',''); setVal('transferAmount',''); setVal('transferDate',new Date().toISOString().split('T')[0]); setVal('transferMethod','كاش'); setVal('transferNote','');
+  const avail=getTotalPaidSales()-allTransfers.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const av=document.getElementById('availableForTransfer'); if(av) av.textContent=formatNum(avail)+' ج.م';
+  onMethodChange(); openModal('transferModal');
+}
+function onMethodChange(){
+  const methodEl=document.getElementById('transferMethod'); if(!methodEl) return; const method=methodEl.value; const extra=document.getElementById('extraFields'); if(!extra) return;
+  if(method==='كاش') extra.innerHTML=`<div class="form-group"><label>ملاحظة استلام الكاش</label><input type="text" id="cashReceiptNote" placeholder="مثال: تم التسليم بيد أمين الخزينة"></div>`;
+  else if(method==='بنك') extra.innerHTML=`<div class="form-row"><div class="form-group"><label>اسم البنك *</label><input type="text" id="bankName" placeholder="مثال: بنك مصر"></div><div class="form-group"><label>رقم الحساب / IBAN</label><input type="text" id="bankAccount" placeholder="رقم الحساب"></div></div><div class="form-group"><label>رقم عملية التحويل</label><input type="text" id="bankRef" placeholder="رقم المرجع"></div>`;
+  else if(method==='محفظة') extra.innerHTML=`<div class="form-row"><div class="form-group"><label>اسم المحفظة *</label><select id="walletName" onchange="onWalletChange()"><option value="فودافون كاش">🔴 فودافون كاش</option><option value="أورنج كاش">🟠 أورنج كاش</option><option value="اتصالات كاش">🟢 اتصالات كاش</option><option value="انستاباي">🔵 انستاباي</option><option value="وي باي">🟣 وي باي</option><option value="أخرى">📱 أخرى</option></select></div><div class="form-group"><label>رقم المحفظة</label><input type="text" id="walletNumber" placeholder="01xxxxxxxxx"></div></div><div class="form-group"><label>رقم عملية التحويل</label><input type="text" id="walletRef" placeholder="رقم المرجع"></div><div class="form-group" id="otherWalletGroup" style="display:none;"><label>اسم المحفظة الأخرى *</label><input type="text" id="otherWalletName" placeholder="اسم المحفظة"></div>`;
+  else if(method==='بريد') extra.innerHTML=`<div class="form-row"><div class="form-group"><label>البريد المرسل إليه *</label><input type="email" id="emailTo" placeholder="example@mail.com"></div><div class="form-group"><label>الموضوع</label><input type="text" id="emailSubject" placeholder="موضوع الرسالة"></div></div><div class="form-group"><label>ملاحظات إضافية</label><input type="text" id="emailNotes" placeholder="ملاحظات"></div>`;
+}
+function onWalletChange(){ const w=document.getElementById('walletName'); const g=document.getElementById('otherWalletGroup'); if(w&&g) g.style.display=w.value==='أخرى'?'block':'none'; }
+async function saveTransfer(){
+  const getVal=id=>{ const el=document.getElementById(id); return el?el.value:''; };
+  const id=getVal('editTransferId'); const fromPerson=getVal('fromPerson').trim(); const toPerson=getVal('toPerson').trim(); const amount=parseFloat(getVal('transferAmount')); const transferDate=getVal('transferDate'); const method=getVal('transferMethod'); const note=getVal('transferNote').trim();
+  if(!fromPerson){ showNotification('❌ أدخل اسم المحوِّل','error'); return; }
+  if(!toPerson){ showNotification('❌ أدخل اسم المستلم','error'); return; }
+  if(!amount||amount<=0){ showNotification('❌ أدخل مبلغ صحيح','error'); return; }
+  if(!transferDate){ showNotification('❌ حدد التاريخ','error'); return; }
+  const totalPaid=getTotalPaidSales(); const totalExisting=allTransfers.filter(t=>t.id!=id).reduce((s,t)=>s+(Number(t.amount)||0),0); const available=totalPaid-totalExisting;
+  if(amount>available){ showNotification(`⚠ المبلغ أكبر من المتاح (${formatNum(available)} ج.م)`,'error'); return; }
+  const extraData={};
+  if(method==='كاش') extraData.cash_note=getVal('cashReceiptNote').trim();
+  else if(method==='بنك'){ const bn=getVal('bankName').trim(); if(!bn){ showNotification('❌ أدخل اسم البنك','error'); return; } extraData.bank_name=bn; extraData.bank_account=getVal('bankAccount').trim(); extraData.bank_ref=getVal('bankRef').trim(); }
+  else if(method==='محفظة'){ let wn=getVal('walletName'); if(wn==='أخرى'){ wn=getVal('otherWalletName').trim(); if(!wn){ showNotification('❌ أدخل اسم المحفظة','error'); return; } } extraData.wallet_name=wn; extraData.wallet_number=getVal('walletNumber').trim(); extraData.wallet_ref=getVal('walletRef').trim(); }
+  else if(method==='بريد'){ const em=getVal('emailTo').trim(); if(!em){ showNotification('❌ أدخل البريد الإلكتروني','error'); return; } extraData.email_to=em; extraData.email_subject=getVal('emailSubject').trim(); extraData.email_notes=getVal('emailNotes').trim(); }
+  const payload={from_person:fromPerson,to_person:toPerson,amount:amount,transfer_date:transferDate,method:method,note:note,extra_data:JSON.stringify(extraData),created_at:new Date().toISOString()};
+  const db=await waitForDB(4);
+  try{
+    if(!db) throw new Error('no-db');
+    let error; if(id) ({error}=await db.from('transfers').update(payload).eq('id',id)); else ({error}=await db.from('transfers').insert([payload]));
+    if(error) throw error;
+    showNotification(id?'✅ تم تعديل التحويل':'✅ تم حفظ التحويل بنجاح','success');
+    closeModal('transferModal'); await loadTransfers(true);
+  }catch(err){ console.warn('save fallback local:',err.message); saveToLocalStorage(payload,id); }
+}
+function saveToLocalStorage(payload,id){
+  let transfers=JSON.parse(localStorage.getItem('transfers')||'[]');
+  if(id){ const idx=transfers.findIndex(t=>t.id==id); if(idx>=0) transfers[idx]={...transfers[idx],...payload}; }
+  else{ payload.id=Date.now(); transfers.push(payload); }
+  localStorage.setItem('transfers',JSON.stringify(transfers));
+  allTransfers=transfers; filteredTransfers=[...allTransfers]; renderTransfers(filteredTransfers); loadStats(); loadBalances(); loadWalletsDetail();
+  showNotification('✅ تم حفظ التحويل (محلي - راجع اتصال Supabase)','warning'); closeModal('transferModal');
+}
+function viewTransfer(id){
+  const t=allTransfers.find(x=>x.id==id); if(!t) return; currentTransferForDetails=t;
+  let extra={}; try{ extra=typeof t.extra_data==='string'?JSON.parse(t.extra_data):(t.extra_data||{}); }catch(e){}
+  const mb={'كاش':{icon:'💵',label:'كاش باليد'},'بنك':{icon:'🏦',label:'تحويل بنكي'},'محفظة':{icon:'📱',label:'محفظة إلكترونية'},'بريد':{icon:'📧',label:'بريد إلكتروني'}}[t.method]||{icon:'💵',label:t.method};
+  let extraRows=''; const rowHtml=(l,v,c='')=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e2e8f0;font-size:13px;"><span style="font-weight:700;color:#64748b;">${l}</span><span style="${c?'font-weight:700;color:'+c+';':''}">${escapeHtml(v)}</span></div>`;
+  if(t.method==='كاش'&&extra.cash_note) extraRows+=rowHtml('ملاحظة الاستلام',extra.cash_note);
+  else if(t.method==='بنك'){ if(extra.bank_name) extraRows+=rowHtml('🏦 البنك',extra.bank_name,'#1e40af'); if(extra.bank_account) extraRows+=rowHtml('رقم الحساب',extra.bank_account); if(extra.bank_ref) extraRows+=rowHtml('رقم العملية',extra.bank_ref); }
+  else if(t.method==='محفظة'){ if(extra.wallet_name) extraRows+=rowHtml('📱 المحفظة',extra.wallet_name,'#92400e'); if(extra.wallet_number) extraRows+=rowHtml('رقم المحفظة',extra.wallet_number); if(extra.wallet_ref) extraRows+=rowHtml('رقم العملية',extra.wallet_ref); }
+  else if(t.method==='بريد'){ if(extra.email_to) extraRows+=rowHtml('📧 البريد',extra.email_to); if(extra.email_subject) extraRows+=rowHtml('الموضوع',extra.email_subject); if(extra.email_notes) extraRows+=rowHtml('ملاحظات',extra.email_notes); }
+  const content=document.getElementById('detailsContent');
+  if(content) content.innerHTML=`<div style="text-align:center;padding:20px;background:linear-gradient(135deg,#0f766e,#14b8a6);border-radius:12px;margin-bottom:15px;color:white;"><div style="font-size:36px;font-weight:900;margin-bottom:5px;">${formatNum(t.amount)} ج.م</div><div style="font-size:13px;opacity:0.9;">${mb.icon} ${mb.label}</div></div><div style="background:#f8fafc;padding:16px;border-radius:10px;border:1px solid var(--border);">${rowHtml('📅 التاريخ',formatDate(t.transfer_date||t.created_at))}${rowHtml('👤 من',t.from_person,'#dc2626')}${rowHtml('👤 إلى',t.to_person,'#059669')}${t.note?rowHtml('📝 البيان',t.note):''}${extraRows}</div>`;
+  openModal('detailsModal');
+}
+function confirmDeleteTransfer(id){ transferToDelete=id; const t=allTransfers.find(x=>x.id==id); const amt=t?formatNum(t.amount):'0'; const m=document.getElementById('confirmMessage'); if(m) m.innerHTML=`هل أنت متأكد من حذف التحويل بمبلغ <strong style="color:#dc2626;">${amt} ج.م</strong>؟<br><small style="color:#64748b;">لا يمكن التراجع</small>`; openModal('confirmModal'); }
+async function deleteTransfer(){
+  if(!transferToDelete) return; const id=transferToDelete; const db=await waitForDB(4);
+  try{
+    if(db){ const {error}=await db.from('transfers').delete().eq('id',id); if(error&&error.code!=='42P01'&&!String(error.message).includes('does not exist')) throw error; }
+    let transfers=JSON.parse(localStorage.getItem('transfers')||'[]'); transfers=transfers.filter(t=>t.id!=id); localStorage.setItem('transfers',JSON.stringify(transfers));
+    showNotification('✅ تم حذف التحويل','success'); closeModal('confirmModal'); transferToDelete=null; await loadTransfers(true);
+  }catch(err){ showNotification('حدث خطأ: '+err.message,'error'); closeModal('confirmModal'); transferToDelete=null; }
+}
+function printTransferReceipt(id){
+  const t=id?allTransfers.find(x=>x.id==id):currentTransferForDetails; if(!t){ showNotification('لا يوجد تحويل للطباعة','error'); return; }
+  let extra={}; try{ extra=typeof t.extra_data==='string'?JSON.parse(t.extra_data):(t.extra_data||{}); }catch(e){}
+  const methodLabel={'كاش':'💵 كاش باليد','بنك':'🏦 تحويل بنكي','محفظة':`📱 ${extra.wallet_name||'محفظة إلكترونية'}`,'بريد':'📧 بريد إلكتروني'}[t.method]||t.method;
+  let extraRows=''; const trRow=(l,v)=>`<tr><td style="font-weight:bold;background:#f0f0f0;width:35%;">${l}</td><td>${escapeHtml(v)}</td></tr>`;
+  if(t.method==='كاش'&&extra.cash_note) extraRows+=trRow('ملاحظة',extra.cash_note);
+  else if(t.method==='بنك'){ if(extra.bank_name) extraRows+=trRow('البنك',extra.bank_name); if(extra.bank_account) extraRows+=trRow('رقم الحساب',extra.bank_account); if(extra.bank_ref) extraRows+=trRow('رقم العملية',extra.bank_ref); }
+  else if(t.method==='محفظة'){ if(extra.wallet_name) extraRows+=trRow('المحفظة',extra.wallet_name); if(extra.wallet_number) extraRows+=trRow('رقم المحفظة',extra.wallet_number); if(extra.wallet_ref) extraRows+=trRow('رقم العملية',extra.wallet_ref); }
+  else if(t.method==='بريد'){ if(extra.email_to) extraRows+=trRow('البريد',extra.email_to); if(extra.email_subject) extraRows+=trRow('الموضوع',extra.email_subject); }
+  const html=`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>إيصال تحويل - ${t.id}</title><style>@page{size:A5;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tajawal',Arial,sans-serif;direction:rtl;color:#000;background:#fff;padding:20px}.header{text-align:center;padding:15px;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border-radius:10px;margin-bottom:20px}.header h1{font-size:24px}.amount-box{text-align:center;padding:20px;background:#f0f5f4;border:3px solid #0f766e;border-radius:10px;margin-bottom:20px}.amount-box .amount{font-size:36px;font-weight:900;color:#0f766e}table{width:100%;border-collapse:collapse;margin-bottom:20px}table td{border:1px solid #000;padding:10px 12px;font-size:14px}.signatures{display:flex;justify-content:space-between;margin-top:60px;padding:0 20px}.signatures div{text-align:center;font-size:13px;font-weight:bold}.signatures .line{border-top:1px dotted #000;width:150px;margin-top:8px}.footer{text-align:center;margin-top:30px;padding-top:15px;border-top:2px solid #0f766e;font-size:11px;color:#64748b}</style></head><body><div class="header"><h1>💸 إيصال تحويل مالي</h1><p>شركة العبادي</p></div><div class="amount-box"><div class="amount">${formatNum(t.amount)} ج.م</div><div class="label">${methodLabel}</div></div><table><tr><td style="font-weight:bold;background:#f0f0f0;width:35%;">رقم الإيصال</td><td>TRF-${String(t.id).padStart(6,'0')}</td></tr><tr><td style="font-weight:bold;background:#f0f0f0;">التاريخ</td><td>${formatDate(t.transfer_date||t.created_at)}</td></tr><tr><td style="font-weight:bold;background:#f0f0f0;">من (المحوِّل)</td><td>${escapeHtml(t.from_person)}</td></tr><tr><td style="font-weight:bold;background:#f0f0f0;">إلى (المستلم)</td><td>${escapeHtml(t.to_person)}</td></tr><tr><td style="font-weight:bold;background:#f0f0f0;">طريقة التحويل</td><td>${methodLabel}</td></tr>${extraRows}${t.note?trRow('البيان',t.note):''}</table><div class="signatures"><div>توقيع المحوِّل<div class="line"></div></div><div>توقيع المستلم<div class="line"></div></div></div><div class="footer"><p>شركة العبادي - نظام إدارة الحسابات</p><p>تاريخ الطباعة: ${new Date().toLocaleString('ar-EG')}</p></div><script>window.print();setTimeout(function(){window.close();},1000);<\/script></body></html>`;
+  const w=window.open('','_blank','width=800,height=700'); if(w){ w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),500); }
+}
+function printTransfersReport(){
+  const list=filteredTransfers.length>0?filteredTransfers:allTransfers; if(list.length===0){ showNotification('⚠ لا توجد تحويلات','error'); return; }
+  const totalAmount=list.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const rows=list.map((t,i)=>{ let extra={}; try{ extra=typeof t.extra_data==='string'?JSON.parse(t.extra_data):(t.extra_data||{}); }catch(e){} let ml=t.method; if(t.method==='محفظة') ml=`📱 ${extra.wallet_name||'محفظة'}`; else if(t.method==='بنك') ml=`🏦 ${extra.bank_name||'بنكي'}`; else if(t.method==='كاش') ml='💵 كاش'; else if(t.method==='بريد') ml='📧 بريد'; return `<tr><td>${i+1}</td><td>${formatDate(t.transfer_date||t.created_at)}</td><td>${escapeHtml(t.from_person)}</td><td>${escapeHtml(t.to_person)}</td><td style="font-weight:bold;">${formatNum(t.amount)}</td><td>${escapeHtml(ml)}</td><td style="text-align:right;">${escapeHtml(t.note||'-')}</td></tr>`; }).join('');
+  const html=`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>تقرير التحويلات</title><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tajawal',Arial,sans-serif;direction:rtl;color:#000;background:#fff;padding:20px;font-size:12px}.header{text-align:center;padding:15px;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border-radius:10px;margin-bottom:20px}.header h1{font-size:24px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}.box{padding:12px;text-align:center;border:2px solid #0f766e;border-radius:8px;background:#f0f5f4}.box .big{font-size:16px;font-weight:900}.box .sml{font-size:10px;color:#64748b;margin-top:4px}table{width:100%;border-collapse:collapse;font-size:11px}thead th{background:#0f766e;color:#fff;padding:8px 6px;border:1px solid #0f766e}tbody td{padding:6px;text-align:center;border:1px solid #94a8a6}tbody tr:nth-child(even){background:#f8fafa}tfoot td{background:#e8f0ef;font-weight:800;padding:8px 6px;border:2px solid #0f766e;text-align:center}</style></head><body><div class="header"><h1>💸 تقرير التحويلات المالية</h1><p>شركة العبادي</p></div><div class="summary"><div class="box"><div class="big">${list.length}</div><div class="sml">عدد التحويلات</div></div><div class="box"><div class="big" style="color:#0f766e;">${formatNum(totalAmount)}</div><div class="sml">الإجمالي</div></div><div class="box"><div class="big" style="color:#059669;">${formatNum(list.filter(t=>t.method==='كاش').reduce((s,t)=>s+(Number(t.amount)||0),0))}</div><div class="sml">💵 كاش</div></div><div class="box"><div class="big" style="color:#92400e;">${formatNum(list.filter(t=>t.method==='محفظة').reduce((s,t)=>s+(Number(t.amount)||0),0))}</div><div class="sml">📱 محافظ</div></div></div><table><thead><tr><th>#</th><th>التاريخ</th><th>من</th><th>إلى</th><th>المبلغ</th><th>الطريقة</th><th>البيان</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4" style="text-align:left;">الإجمالي</td><td>${formatNum(totalAmount)}</td><td colspan="2"></td></tr></tfoot></table><script>window.print();setTimeout(function(){window.close();},1000);<\/script></body></html>`;
+  const w=window.open('','_blank','width=1100,height=700'); if(w){ w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),500); }
+}
+function openModal(id){ const el=document.getElementById(id); if(el) el.classList.add('active'); }
+function closeModal(id){ const el=document.getElementById(id); if(el) el.classList.remove('active'); if(id==='confirmModal') transferToDelete=null; }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-overlay')){ e.target.classList.remove('active'); if(e.target.id==='confirmModal') transferToDelete=null; } });
+window.openTransferModal=openTransferModal; window.saveTransfer=saveTransfer; window.viewTransfer=viewTransfer; window.confirmDeleteTransfer=confirmDeleteTransfer; window.deleteTransfer=deleteTransfer; window.printTransferReceipt=printTransferReceipt; window.printTransfersReport=printTransfersReport; window.filterTransfers=filterTransfers; window.loadBalances=loadBalances; window.onMethodChange=onMethodChange; window.onWalletChange=onWalletChange; window.openModal=openModal; window.closeModal=closeModal; window.loadTransfers=loadTransfers;
+</script>
+</body>
+</html>
